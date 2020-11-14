@@ -63,6 +63,7 @@ struct adminSettings {
 adminSettings mySettings;
 nfcTagObject myCard;
 folderSettings *myFolder;
+folderSettings lastFolder;
 unsigned long sleepAtMillis = 0;
 static uint16_t _lastTrackFinished;
 
@@ -133,9 +134,56 @@ void shuffleQueue() {
   */
 }
 
+int lastFolderSize = 4;
+
+int flashAddress_Track() {
+  return lastFolderSize + myFolder->folder;
+}
+
+int flashAddress_Settings() {
+  return lastFolderSize + sizeof(myFolder->folder) * 100;
+}
+
+void writeLastFolderToFlash() {
+  Serial.println(F("=== writeLastFolderToFlash()"));
+  EEPROM.put(0, lastFolder);
+}
+
+void loadLastFolderFromFlash() {
+  Serial.println(F("=== loadLastFolderFromFlash()"));
+  EEPROM.get(0, lastFolder);
+  
+  Serial.print(F("Last folder: "));
+  Serial.println(lastFolder.folder);
+  Serial.print(F("Last mode: "));
+  Serial.println(lastFolder.mode);
+  Serial.print(F("Last special: "));
+  Serial.println(lastFolder.special);
+  Serial.print(F("Last special2: "));
+  Serial.println(lastFolder.special2);
+}
+
+void writeLastTrackToFlash(uint8_t track) {
+  Serial.println(F("=== writeLastTrackToFlash()"));
+  EEPROM.update(flashAddress_Track(), track);
+}
+
+void loadLastTrackFromFlash() {
+  Serial.println(F("=== loadLastTrackFromFlash()"));
+  currentTrack = EEPROM.read(flashAddress_Track());
+  
+  Serial.print(F("Last track: "));
+  Serial.println(currentTrack);
+  
+  if (currentTrack == 0 || currentTrack > numTracksInFolder) 
+  {
+    currentTrack = 1;
+  }
+}
+
 void writeSettingsToFlash() {
   Serial.println(F("=== writeSettingsToFlash()"));
-  int address = sizeof(myFolder->folder) * 100;
+  int address = flashAddress_Settings();
   EEPROM.put(address, mySettings);
 }
 
@@ -178,7 +226,7 @@ void migrateSettings(int oldVersion) {
 
 void loadSettingsFromFlash() {
   Serial.println(F("=== loadSettingsFromFlash()"));
-  int address = sizeof(myFolder->folder) * 100;
+  int address = flashAddress_Settings();
   EEPROM.get(address, mySettings);
   if (mySettings.cookie != cardCookie)
   {
@@ -215,6 +263,12 @@ void loadSettingsFromFlash() {
   Serial.print(mySettings.adminMenuPin[1]);
   Serial.print(mySettings.adminMenuPin[2]);
   Serial.println(mySettings.adminMenuPin[3]);
+}
+
+void loadDataFromFlash()
+{
+  loadSettingsFromFlash();
+  loadLastFolderFromFlash();
 }
 
 class Modifier {
@@ -408,7 +462,7 @@ class KindergardenMode: public Modifier {
         myFolder = &myCard.nfcFolderSettings;
         Serial.println(myFolder->folder);
         Serial.println(myFolder->mode);
-        playFolder();
+        loadAndPlayFolder();
         return true;
       }
       return false;
@@ -562,16 +616,15 @@ static void nextTrack(uint16_t track) {
   if (myFolder->mode == 5) {
     if (currentTrack != numTracksInFolder) {
       currentTrack = currentTrack + 1;
-      Serial.print(F("Hörbuch Modus ist aktiv -> nächster Track und "
-                     "Fortschritt speichern"));
+      Serial.print(F("Hörbuch Modus ist aktiv -> nächster Track und Fortschritt speichern"));
       Serial.println(currentTrack);
       mp3.playFolderTrack(myFolder->folder, currentTrack);
       // Fortschritt im EEPROM abspeichern
-      EEPROM.update(myFolder->folder, currentTrack);
+      writeLastTrackToFlash(currentTrack);
     } else {
       //      mp3.sleep();  // Je nach Modul kommt es nicht mehr zurück aus dem Sleep!
       // Fortschritt zurück setzen
-      EEPROM.update(myFolder->folder, 1);
+      writeLastTrackToFlash(1);
       setstandbyTimer();
     }
   }
@@ -616,7 +669,7 @@ static void previousTrack() {
     }
     mp3.playFolderTrack(myFolder->folder, currentTrack);
     // Fortschritt im EEPROM abspeichern
-    EEPROM.update(myFolder->folder, currentTrack);
+    writeLastTrackToFlash(currentTrack);
   }
   delay(1000);
 }
@@ -707,6 +760,14 @@ void waitForTrackToFinish() {
   } while (isPlaying());
 }
 
+void resetEEPROM()
+{
+  Serial.println(F("Reset -> EEPROM wird gelöscht"));
+  for (int i = 0; i < EEPROM.length(); i++) {
+    EEPROM.update(i, 0);
+  }
+}
+
 void setup() {
 
   Serial.begin(115200); // Es gibt ein paar Debug Ausgaben über die serielle Schnittstelle
@@ -732,9 +793,9 @@ void setup() {
   // Busy Pin
   pinMode(busyPin, INPUT);
 
-  // load Settings from EEPROM
-  loadSettingsFromFlash();
-
+  // load data from EEPROM
+  loadDataFromFlash();
+  
   // activate standby timer
   setstandbyTimer();
 
@@ -766,15 +827,10 @@ void setup() {
   pinMode(shutdownPin, OUTPUT);
   digitalWrite(shutdownPin, LOW);
 
-
   // RESET --- ALLE DREI KNÖPFE BEIM STARTEN GEDRÜCKT HALTEN -> alle EINSTELLUNGEN werden gelöscht
-  if (digitalRead(buttonPause) == LOW && digitalRead(buttonNext) == LOW &&
-      digitalRead(buttonPrevious) == LOW) {
-    Serial.println(F("Reset -> EEPROM wird gelöscht"));
-    for (int i = 0; i < EEPROM.length(); i++) {
-      EEPROM.update(i, 0);
-    }
-    loadSettingsFromFlash();
+  if (digitalRead(buttonPause) == LOW && digitalRead(buttonNext) == LOW && digitalRead(buttonPrevious) == LOW) {
+    resetEEPROM();
+    loadDataFromFlash();
   }
 
   // play startup sound
@@ -782,6 +838,10 @@ void setup() {
   mp3.playAdvertisement(261);
   mp3.pause();
   delay(1000);
+  
+  // load last folder 
+  myFolder = &lastFolder;
+  loadFolder();
 }
 
 void readButtons() {
@@ -825,9 +885,15 @@ void doPreviousButton() {
   delay(1000);
 }
 
-void playFolder() {
-  Serial.println(F("== playFolder()")) ;
-  disablestandbyTimer();
+void loadAndPlayFolder() 
+{
+  loadFolder();
+  playFolder();
+}
+
+void loadFolder() 
+{
+  Serial.println(F("== loadFolder()")) ;
   knownCard = true;
   _lastTrackFinished = 0;
   numTracksInFolder = mp3.getFolderTrackCount(myFolder->folder);
@@ -840,50 +906,37 @@ void playFolder() {
   if (myFolder->mode == 1) {
     Serial.println(F("Hörspielmodus -> zufälligen Track wiedergeben"));
     currentTrack = random(1, numTracksInFolder + 1);
-    Serial.println(currentTrack);
-    mp3.playFolderTrack(myFolder->folder, currentTrack);
   }
   // Album Modus: kompletten Ordner spielen
   if (myFolder->mode == 2) {
     Serial.println(F("Album Modus -> kompletten Ordner wiedergeben"));
     currentTrack = 1;
-    mp3.playFolderTrack(myFolder->folder, currentTrack);
   }
   // Party Modus: Ordner in zufälliger Reihenfolge
   if (myFolder->mode == 3) {
-    Serial.println(
-      F("Party Modus -> Ordner in zufälliger Reihenfolge wiedergeben"));
+    Serial.println(F("Party Modus -> Ordner in zufälliger Reihenfolge wiedergeben"));
     shuffleQueue();
     currentTrack = 1;
-    mp3.playFolderTrack(myFolder->folder, queue[currentTrack - 1]);
   }
   // Einzel Modus: eine Datei aus dem Ordner abspielen
   if (myFolder->mode == 4) {
-    Serial.println(
-      F("Einzel Modus -> eine Datei aus dem Odrdner abspielen"));
+    Serial.println(F("Einzel Modus -> eine Datei aus dem Odrdner abspielen"));
     currentTrack = myFolder->special;
-    mp3.playFolderTrack(myFolder->folder, currentTrack);
   }
   // Hörbuch Modus: kompletten Ordner spielen und Fortschritt merken
   if (myFolder->mode == 5) {
-    Serial.println(F("Hörbuch Modus -> kompletten Ordner spielen und "
-                     "Fortschritt merken"));
-    currentTrack = EEPROM.read(myFolder->folder);
-    if (currentTrack == 0 || currentTrack > numTracksInFolder) {
-      currentTrack = 1;
-    }
-    mp3.playFolderTrack(myFolder->folder, currentTrack);
+    Serial.println(F("Hörbuch Modus -> kompletten Ordner spielen und Fortschritt merken"));
+    loadLastTrackFromFlash();
   }
   // Spezialmodus Von-Bin: Hörspiel: eine zufällige Datei aus dem Ordner
-  if (myFolder->mode == 7) {
+  if (myFolder->mode == 7) 
+  {
     Serial.println(F("Spezialmodus Von-Bin: Hörspiel -> zufälligen Track wiedergeben"));
     Serial.print(myFolder->special);
     Serial.print(F(" bis "));
     Serial.println(myFolder->special2);
     numTracksInFolder = myFolder->special2;
     currentTrack = random(myFolder->special, numTracksInFolder + 1);
-    Serial.println(currentTrack);
-    mp3.playFolderTrack(myFolder->folder, currentTrack);
   }
 
   // Spezialmodus Von-Bis: Album: alle Dateien zwischen Start und Ende spielen
@@ -894,19 +947,46 @@ void playFolder() {
     Serial.println(myFolder->special2);
     numTracksInFolder = myFolder->special2;
     currentTrack = myFolder->special;
-    mp3.playFolderTrack(myFolder->folder, currentTrack);
   }
 
   // Spezialmodus Von-Bis: Party Ordner in zufälliger Reihenfolge
   if (myFolder->mode == 9) {
-    Serial.println(
-      F("Spezialmodus Von-Bis: Party -> Ordner in zufälliger Reihenfolge wiedergeben"));
+    Serial.println(F("Spezialmodus Von-Bis: Party -> Ordner in zufälliger Reihenfolge wiedergeben"));
     firstTrack = myFolder->special;
     numTracksInFolder = myFolder->special2;
     shuffleQueue();
     currentTrack = 1;
-    mp3.playFolderTrack(myFolder->folder, queue[currentTrack - 1]);
   }
+
+  Serial.println(currentTrack);
+}
+
+bool anyFolderStarted = false;
+
+void playFolder() 
+{
+    anyFolderStarted = true;
+  
+    Serial.println(F("== playFolder()")) ;
+    disablestandbyTimer();
+    
+    // 1) Hörspielmodus: eine zufällige Datei aus dem Ordner
+    // 2) Album Modus: kompletten Ordner spielen
+    // 4) Einzel Modus: eine Datei aus dem Ordner abspielen
+    // 5) Hörbuch Modus: kompletten Ordner spielen und Fortschritt merken
+    // 7) Spezialmodus Von-Bis: Hörspiel: eine zufällige Datei aus dem Ordner
+    // 8) Spezialmodus Von-Bis: Album: alle Dateien zwischen Start und Ende spielen
+    if (myFolder->mode == 1 || myFolder->mode == 2 || myFolder->mode == 4 ||
+        myFolder->mode == 5 || myFolder->mode == 7 || myFolder->mode == 8) 
+    {
+        mp3.playFolderTrack(myFolder->folder, currentTrack);
+    }
+    // 3) Party Modus: Ordner in zufälliger Reihenfolge
+    // 9) Spezialmodus Von-Bis: Party Ordner in zufälliger Reihenfolge
+    if (myFolder->mode == 3 || myFolder->mode == 9) 
+    {
+        mp3.playFolderTrack(myFolder->folder, queue[currentTrack - 1]);
+    }
 }
 
 void playShortCut(uint8_t shortCut) {
@@ -914,7 +994,7 @@ void playShortCut(uint8_t shortCut) {
   Serial.println(shortCut);
   if (mySettings.shortCuts[shortCut].folder != 0) {
     myFolder = &mySettings.shortCuts[shortCut];
-    playFolder();
+    loadAndPlayFolder();
     disablestandbyTimer();
     delay(1000);
   }
@@ -967,6 +1047,9 @@ void loop() {
         }
         else if (knownCard) 
         {
+          if (!anyFolderStarted) {
+            playFolder();
+          }
           mp3.start();
           disablestandbyTimer();
         }
@@ -1031,11 +1114,15 @@ void loop() {
   if (!mfrc522.PICC_ReadCardSerial())
     return;
 
-  if (readCard(&myCard) == true) {
-    if (myCard.cookie == cardCookie && myCard.nfcFolderSettings.folder != 0 && myCard.nfcFolderSettings.mode != 0) {
-      playFolder();
+  if (readCard(&myCard) == true) 
+  {
+    if (myCard.cookie == cardCookie && myCard.nfcFolderSettings.folder != 0 && myCard.nfcFolderSettings.mode != 0) 
+    {
+      loadAndPlayFolder();
+      // Save last folder for next power up
+      lastFolder = myCard.nfcFolderSettings;
+      writeLastFolderToFlash();
     }
-
     // Neue Karte konfigurieren
     else if (myCard.cookie != cardCookie) {
       knownCard = false;
@@ -1219,10 +1306,7 @@ void adminMenu(bool fromCard = false) {
     }
   }
   else if (subMenu == 11) {
-    Serial.println(F("Reset -> EEPROM wird gelöscht"));
-    for (int i = 0; i < EEPROM.length(); i++) {
-      EEPROM.update(i, 0);
-    }
+    resetEEPROM();
     resetSettings();
     mp3.playMp3FolderTrack(999);
   }
@@ -1403,9 +1487,6 @@ bool setupFolder(folderSettings * theFolder) {
   // Wiedergabemodus abfragen
   theFolder->mode = voiceMenu(9, 310, 310, false, 0, 0, true);
   if (theFolder->mode == 0) return false;
-
-  //  // Hörbuchmodus -> Fortschritt im EEPROM auf 1 setzen
-  //  EEPROM.update(theFolder->folder, 1);
 
   // Einzelmodus -> Datei abfragen
   if (theFolder->mode == 4)
