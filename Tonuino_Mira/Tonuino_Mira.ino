@@ -143,9 +143,9 @@ void resetSettings() {
   Serial.println(F("=== resetSettings()"));
   mySettings.cookie = cardCookie;
   mySettings.version = 2;
-  mySettings.maxVolume = 25;
-  mySettings.minVolume = 5;
-  mySettings.initVolume = 15;
+  mySettings.maxVolume = 10;
+  mySettings.minVolume = 1;
+  mySettings.initVolume = 5;
   mySettings.eq = 1;
   mySettings.locked = false;
   mySettings.standbyTimer = 0;
