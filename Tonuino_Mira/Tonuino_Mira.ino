@@ -960,7 +960,9 @@ void loop() {
     readButtons();
 
     // admin menu
-    if ((pauseButton.pressedFor(LONG_PRESS) || upButton.pressedFor(LONG_PRESS) || downButton.pressedFor(LONG_PRESS)) && pauseButton.isPressed() && upButton.isPressed() && downButton.isPressed()) {
+    if ((pauseButton.pressedFor(LONG_PRESS) || upButton.pressedFor(LONG_PRESS) || downButton.pressedFor(LONG_PRESS)) 
+        && pauseButton.isPressed() && upButton.isPressed() && downButton.isPressed()) 
+    {
       mp3.pause();
       do {
         readButtons();
@@ -970,121 +972,160 @@ void loop() {
       break;
     }
 
-    if (pauseButton.wasReleased()) {
+    if (pauseButton.wasReleased()) 
+    {
       if (activeModifier != NULL)
+      {
         if (activeModifier->handlePause() == true)
           return;
+      }
       if (ignorePauseButton == false)
-        if (isPlaying()) {
+      {
+        if (isPlaying()) 
+        {
           mp3.pause();
           setstandbyTimer();
         }
-        else if (knownCard) {
+        else if (knownCard) 
+        {
           mp3.start();
           disablestandbyTimer();
         }
+      }
       ignorePauseButton = false;
-    } else if (pauseButton.pressedFor(LONG_PRESS) &&
-               ignorePauseButton == false) {
+    } else if (pauseButton.pressedFor(LONG_PRESS) && ignorePauseButton == false) 
+    {
       if (activeModifier != NULL)
+      {
         if (activeModifier->handlePause() == true)
           return;
-      if (isPlaying()) {
-        uint8_t advertTrack;
-        if (myFolder->mode == 3 || myFolder->mode == 9) {
+      }
+      if (isPlaying()) 
+      {
+        uint8_t advertTrack = currentTrack;
+        if (myFolder->mode == 3 || myFolder->mode == 9) 
+        {
           advertTrack = (queue[currentTrack - 1]);
         }
-        else {
-          advertTrack = currentTrack;
-        }
         // Spezialmodus Von-Bis für Album und Party gibt die Dateinummer relativ zur Startposition wieder
-        if (myFolder->mode == 8 || myFolder->mode == 9) {
+        if (myFolder->mode == 8 || myFolder->mode == 9) 
+        {
           advertTrack = advertTrack - myFolder->special + 1;
         }
         mp3.playAdvertisement(advertTrack);
       }
-      else {
+      else 
+      {
         playShortCut(0);
       }
       ignorePauseButton = true;
     }
 
-    if (upButton.pressedFor(LONG_PRESS)) {
+    if (upButton.pressedFor(LONG_PRESS)) 
+    {
 #ifndef FIVEBUTTONS
-      if (isPlaying()) {
-        if (!mySettings.invertVolumeButtons) {
-          volumeUpButton();
-        }
-        else {
+      if (isPlaying()) 
+      {
+        if (mySettings.invertVolumeButtons) 
+        {
           nextButton();
         }
+        else 
+        {
+          volumeUpButton();
+        }
       }
-      else {
+      else 
+      {
         playShortCut(1);
       }
       ignoreUpButton = true;
 #endif
-    } else if (upButton.wasReleased()) {
+    } else if (upButton.wasReleased()) 
+    {
       if (!ignoreUpButton)
-        if (!mySettings.invertVolumeButtons) {
-          nextButton();
-        }
-        else {
+      {
+        if (mySettings.invertVolumeButtons) 
+        {
           volumeUpButton();
         }
+        else 
+        {
+          nextButton();
+        }
+      }
       ignoreUpButton = false;
     }
 
-    if (downButton.pressedFor(LONG_PRESS)) {
+    if (downButton.pressedFor(LONG_PRESS)) 
+    {
 #ifndef FIVEBUTTONS
-      if (isPlaying()) {
-        if (!mySettings.invertVolumeButtons) {
-          volumeDownButton();
-        }
-        else {
+      if (isPlaying()) 
+      {
+        if (mySettings.invertVolumeButtons) 
+        {
           previousButton();
         }
+        else 
+        {
+          volumeDownButton();
+        }
       }
-      else {
+      else 
+      {
         playShortCut(2);
       }
       ignoreDownButton = true;
 #endif
-    } else if (downButton.wasReleased()) {
-      if (!ignoreDownButton) {
-        if (!mySettings.invertVolumeButtons) {
-          previousButton();
-        }
-        else {
+    } else if (downButton.wasReleased()) 
+    {
+      if (!ignoreDownButton) 
+      {
+        if (mySettings.invertVolumeButtons) 
+        {
           volumeDownButton();
+        }
+        else 
+        {
+          previousButton();
         }
       }
       ignoreDownButton = false;
     }
 #ifdef FIVEBUTTONS
-    if (buttonFour.wasReleased()) {
-      if (isPlaying()) {
-        if (!mySettings.invertVolumeButtons) {
-          volumeUpButton();
-        }
-        else {
+    if (buttonFour.wasReleased()) 
+    {
+      if (isPlaying()) 
+      {
+        if (mySettings.invertVolumeButtons) 
+        {
           nextButton();
         }
+        else 
+        {
+          volumeUpButton();
+        }
       }
-      else {
+      else 
+      {
         playShortCut(1);
       }
     }
-    if (buttonFive.wasReleased()) {
-      if (isPlaying()) {
-        if (!mySettings.invertVolumeButtons) {
-          volumeDownButton();
-        }
-        else {
+    if (buttonFive.wasReleased()) 
+    {
+      if (isPlaying()) 
+      {
+        if (mySettings.invertVolumeButtons) 
+        {
           previousButton();
         }
+        else 
+        {
+          volumeDownButton();
+        }
       }
-      else {
+      else 
+      {
         playShortCut(2);
       }
     }
@@ -1349,7 +1390,9 @@ uint8_t voiceMenu(int numberOfOptions, int startMessage, int messageOffset,
                   bool preview = false, int previewFromFolder = 0, int defaultValue = 0, bool exitWithLongPress = false) {
   uint8_t returnValue = defaultValue;
   if (startMessage != 0)
+  {
     mp3.playMp3FolderTrack(startMessage);
+  }
   Serial.print(F("=== voiceMenu() ("));
   Serial.print(numberOfOptions);
   Serial.println(F(" Options)"));
@@ -1390,13 +1433,20 @@ uint8_t voiceMenu(int numberOfOptions, int startMessage, int messageOffset,
           mp3.playFolderTrack(previewFromFolder, returnValue);
         }*/
       ignoreUpButton = true;
-    } else if (upButton.wasReleased()) {
-      if (!ignoreUpButton) {
+    } else if (upButton.wasReleased()) 
+    {
+      if (ignoreUpButton) 
+      {
+        ignoreUpButton = false;
+      } 
+      else 
+      {
         returnValue = min(returnValue + 1, numberOfOptions);
         Serial.println(returnValue);
         //mp3.pause();
         mp3.playMp3FolderTrack(messageOffset + returnValue);
-        if (preview) {
+        if (preview) 
+        {
           waitForTrackToFinish();
           if (previewFromFolder == 0) {
             mp3.playFolderTrack(returnValue, 1);
@@ -1405,8 +1455,6 @@ uint8_t voiceMenu(int numberOfOptions, int startMessage, int messageOffset,
           }
           delay(1000);
         }
-      } else {
-        ignoreUpButton = false;
       }
     }
 
@@ -1423,8 +1471,14 @@ uint8_t voiceMenu(int numberOfOptions, int startMessage, int messageOffset,
           mp3.playFolderTrack(previewFromFolder, returnValue);
         }*/
       ignoreDownButton = true;
-    } else if (downButton.wasReleased()) {
-      if (!ignoreDownButton) {
+    } else if (downButton.wasReleased()) 
+    {
+      if (ignoreDownButton) 
+      {
+        ignoreDownButton = false; 
+      } 
+      else 
+      {
         returnValue = max(returnValue - 1, 1);
         Serial.println(returnValue);
         //mp3.pause();
@@ -1439,8 +1493,6 @@ uint8_t voiceMenu(int numberOfOptions, int startMessage, int messageOffset,
           }
           delay(1000);
         }
-      } else {
-        ignoreDownButton = false;
       }
     }
   } while (true);
@@ -1513,6 +1565,22 @@ void setupCard() {
   }
   delay(1000);
 }
+
+void playAdvertisement(int advertisement)
+{
+  if (isPlaying()) 
+  {
+    mp3.playAdvertisement(advertisement);
+  }
+  else {
+    mp3.start();
+    delay(100);
+    mp3.playAdvertisement(advertisement);
+    delay(100);
+    mp3.pause();
+  }
+}
+
 bool readCard(nfcTagObject * nfcTag) {
   nfcTagObject tempCard;
   // Show some details of the PICC (that is: the tag/card)
@@ -1627,44 +1695,30 @@ bool readCard(nfcTagObject * nfcTag) {
   tempCard.nfcFolderSettings.special = buffer[7];
   tempCard.nfcFolderSettings.special2 = buffer[8];
 
-  if (tempCard.cookie == cardCookie) {
-
+  if (tempCard.cookie == cardCookie) 
+  {
     if (activeModifier != NULL && tempCard.nfcFolderSettings.folder != 0) {
       if (activeModifier->handleRFID(&tempCard) == true) {
         return false;
       }
     }
 
-    if (tempCard.nfcFolderSettings.folder == 0) {
-      if (activeModifier != NULL) {
-        if (activeModifier->getActive() == tempCard.nfcFolderSettings.mode) {
+    if (tempCard.nfcFolderSettings.folder == 0) 
+    {
+      if (activeModifier != NULL) 
+      {
+        if (activeModifier->getActive() == tempCard.nfcFolderSettings.mode) 
+        {
           activeModifier = NULL;
           Serial.println(F("modifier removed"));
-          if (isPlaying()) {
-            mp3.playAdvertisement(261);
-          }
-          else {
-            mp3.start();
-            delay(100);
-            mp3.playAdvertisement(261);
-            delay(100);
-            mp3.pause();
-          }
+          playAdvertisement(261);
           delay(2000);
           return false;
         }
       }
-      if (tempCard.nfcFolderSettings.mode != 0 && tempCard.nfcFolderSettings.mode != 255) {
-        if (isPlaying()) {
-          mp3.playAdvertisement(260);
-        }
-        else {
-          mp3.start();
-          delay(100);
-          mp3.playAdvertisement(260);
-          delay(100);
-          mp3.pause();
-        }
+      if (tempCard.nfcFolderSettings.mode != 0 && tempCard.nfcFolderSettings.mode != 255) 
+      {
+        playAdvertisement(260);
       }
       switch (tempCard.nfcFolderSettings.mode ) {
         case 0:
