@@ -777,9 +777,11 @@ void setup() {
     loadSettingsFromFlash();
   }
 
-
-  // Start Shortcut "at Startup" - e.g. Welcome Sound
-  playShortCut(3);
+  // play startup sound
+  mp3.start();
+  mp3.playAdvertisement(261);
+  mp3.pause();
+  delay(1000);
 }
 
 void readButtons() {
