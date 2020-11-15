@@ -4,6 +4,15 @@ Die DIY Musikbox (nicht nur) für Kinder
 
 # Change Log
 
+## Version 2.1 Mira (15.11.2020)
+- Stop LED an digital Pin 6 hinzugefügt (leuchtet wenn DFPlayer nicht busy ist, d.h. gestoppt ist)
+- Letzte Karte (d.h. Ordner und Modus) wird im EEPROM gespeichert und bei (Neu)Start geladen (sodass beim Neustart die letzte Karte nicht noch einmal aufgelegt werden muss) 
+- Bei Start den Sound 261 abspielen (anstelle Shortcut 3)
+- Lautstärke Default-Werte und Limits verringert (für Verstärker PAM8403)
+- Lautstärke-Drehregler (Poti an A2) ersetzt die Lautstärke-Tasten
+- Programmcode aufgeräumt
+
+
 ## Version 2.1 (xx.xx.xxxx) noch WIP
 - Partymodus hat nun eine Queue -> jedes Lied kommt nur genau 1x vorkommt
 - Neue Wiedergabe-Modi "Spezialmodus Von-Bis" - Hörspiel, Album und Party -> erlaubt z.B. verschiedene Alben in einem Ordner zu haben und je mit einer Karte zu verknüpfen
