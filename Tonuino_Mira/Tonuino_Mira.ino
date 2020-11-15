@@ -689,6 +689,7 @@ MFRC522::StatusCode status;
 #define buttonNext A3
 #define buttonPrevious A4
 #define busyPin 4
+#define stopLED 6
 #define shutdownPin 7
 #define openAnalogPin A6
 
@@ -821,6 +822,8 @@ void setup() {
   pinMode(buttonNext, INPUT_PULLUP);
   pinMode(buttonPrevious, INPUT_PULLUP);
   pinMode(PotiPin, INPUT_PULLUP);
+
+  pinMode(stopLED, OUTPUT);
   
   pinMode(shutdownPin, OUTPUT);
   digitalWrite(shutdownPin, LOW);
@@ -999,10 +1002,31 @@ void playShortCut(uint8_t shortCut) {
     Serial.println(F("Shortcut not configured!"));
 }
 
+void setStopLight()
+{
+  if (isPlaying())
+  {
+    digitalWrite(stopLED, LOW);
+  }
+  else
+  {
+    digitalWrite(stopLED, HIGH);
+  }
+}
+
+bool m_lastPlayState = true;
+
 void loop() {
   do {
     checkStandbyAtMillis();
     mp3.loop();
+
+    bool isCurrentlyPlaying = isPlaying();
+    if (m_lastPlayState != isCurrentlyPlaying)
+    {
+      setStopLight();
+      m_lastPlayState = isCurrentlyPlaying;
+    }
 
     // Modifier : WIP!
     if (activeModifier != NULL) {
@@ -1037,7 +1061,7 @@ void loop() {
       }
       if (ignorePauseButton == false)
       {
-        if (isPlaying()) 
+        if (isCurrentlyPlaying) 
         {
           mp3.pause();
           setstandbyTimer();
@@ -1059,7 +1083,7 @@ void loop() {
         if (activeModifier->handlePause() == true)
           return;
       }
-      if (isPlaying()) 
+      if (isCurrentlyPlaying) 
       {
         uint8_t advertTrack = currentTrack;
         if (myFolder->mode == 3 || myFolder->mode == 9) 
@@ -1082,7 +1106,7 @@ void loop() {
 
     if (nextButton.wasReleased()) 
     {
-      if (isPlaying()) 
+      if (isCurrentlyPlaying) 
       {
         doNextButton();
       }
@@ -1093,7 +1117,7 @@ void loop() {
     }
     if (previousButton.wasReleased()) 
     {
-      if (isPlaying()) 
+      if (isCurrentlyPlaying) 
       {
         doPreviousButton();
       }
