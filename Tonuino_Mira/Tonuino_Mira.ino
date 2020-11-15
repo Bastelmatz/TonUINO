@@ -686,7 +686,6 @@ byte trailerBlock = 7;
 MFRC522::StatusCode status;
 
 #define buttonPause A1
-#define buttonTwice A0
 #define buttonNext A3
 #define buttonPrevious A4
 #define busyPin 4
@@ -701,7 +700,6 @@ int oldPotiValue;                             // old Poti Value, Volumen
 #define LONG_PRESS 1000
 
 Button pauseButton(buttonPause);
-Button twiceButton(buttonTwice);
 Button nextButton(buttonNext);
 Button previousButton(buttonPrevious);
 
@@ -846,7 +844,6 @@ void setup() {
 
 void readButtons() {
   pauseButton.read();
-  twiceButton.read();
   nextButton.read();
   previousButton.read();
 }
@@ -1031,7 +1028,7 @@ void loop() {
       break;
     }
 
-    if (pauseButton.wasReleased() || twiceButton.wasReleased()) 
+    if (pauseButton.wasReleased()) 
     {
       if (activeModifier != NULL)
       {
@@ -1342,7 +1339,7 @@ bool askCode(uint8_t *code) {
     readButtons();
     if (pauseButton.pressedFor(LONG_PRESS))
       break;
-    if (pauseButton.wasReleased() || twiceButton.wasReleased())
+    if (pauseButton.wasReleased())
       code[x++] = 1;
     if (nextButton.wasReleased())
       code[x++] = 2;
