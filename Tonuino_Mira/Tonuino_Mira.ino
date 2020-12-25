@@ -17,6 +17,11 @@
     Information and contribution at https://tonuino.de.
 */
 
+// ****************************************
+// Options
+static bool StopPlayOnCardRemoval = false;
+// *******************************************
+
 static const uint32_t cardCookie = 322417479;
 
 // DFPlayer Mini
@@ -66,6 +71,7 @@ folderSettings *myFolder;
 folderSettings lastFolder;
 unsigned long sleepAtMillis = 0;
 static uint16_t _lastTrackFinished;
+static bool hasCard = false;
 
 static void nextTrack(uint16_t track);
 uint8_t voiceMenu(int numberOfOptions, int startMessage, int messageOffset,
@@ -271,6 +277,18 @@ void loadDataFromFlash()
   loadLastFolderFromFlash();
 }
 
+void pauseAndStandBy()
+{
+  mp3.pause();
+  setstandbyTimer();
+}
+
+void playTitle()
+{
+  mp3.start();
+  disablestandbyTimer();
+}
+
 class Modifier {
   public:
     virtual void loop() {}
@@ -316,8 +334,7 @@ class SleepTimer: public Modifier {
     void loop() {
       if (this->sleepAtMillis != 0 && millis() > this->sleepAtMillis) {
         Serial.println(F("=== SleepTimer::loop() -> SLEEP!"));
-        mp3.pause();
-        setstandbyTimer();
+        pauseAndStandBy();
         activeModifier = NULL;
         delete this;
       }
@@ -1002,6 +1019,119 @@ void playShortCut(uint8_t shortCut) {
     Serial.println(F("Shortcut not configured!"));
 }
 
+bool cardSerialFound()
+{
+  bool found = mfrc522.PICC_ReadCardSerial();
+  return found;
+}
+
+bool cardDetected()
+{
+  bool detected = mfrc522.PICC_IsNewCardPresent();
+  return detected;
+}
+
+static byte lastCardUid[4];
+static byte retries;
+const byte maxRetries = 2;
+static bool lastCardWasUL;
+
+const byte PCS_NO_CHANGE     = 0; // no change detected since last pollCard() call
+const byte PCS_NEW_CARD      = 1; // card with new UID detected (had no card or other card before)
+const byte PCS_CARD_GONE     = 2; // card is not reachable anymore
+const byte PCS_CARD_IS_BACK  = 3; // card was gone, and is now back again
+
+
+byte pollCard()
+{
+  if (hasCard)
+  {
+    if (isCardGone())
+    {
+      hasCard = false;
+      return PCS_CARD_GONE;
+    }
+  }
+  else
+  {
+    if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial() && readCard(&myCard))
+    {
+      retries = maxRetries;
+      hasCard = true;
+      return isSameCardAsLastOne() ? PCS_CARD_IS_BACK : PCS_NEW_CARD;
+    }
+    return PCS_NO_CHANGE;
+  }
+  return PCS_NO_CHANGE;
+}
+
+bool isCardGone()
+{
+  // perform a dummy read command just to see whether the card is in range
+  byte buffer[18];
+  byte size = sizeof(buffer);
+
+  if (mfrc522.MIFARE_Read(lastCardWasUL ? 8 : blockAddr, buffer, &size) != MFRC522::STATUS_OK)
+  {
+    if (retries > 0)
+    {
+        retries--;
+    }
+    else
+    {
+        Serial.println(F("card gone"));
+        mfrc522.PICC_HaltA();
+        mfrc522.PCD_StopCrypto1();
+        return true;
+    }
+  }
+  else
+  {
+      retries = maxRetries;
+  }
+  return false;
+}
+
+bool isSameCardAsLastOne()
+{
+  bool bSameUID = !memcmp(lastCardUid, mfrc522.uid.uidByte, 4);
+  Serial.print(F("IsSameAsLastUID="));
+  Serial.println(bSameUID);
+  // store info about current card
+  memcpy(lastCardUid, mfrc522.uid.uidByte, 4);
+  lastCardWasUL = mfrc522.PICC_GetType(mfrc522.uid.sak) == MFRC522::PICC_TYPE_MIFARE_UL;
+  return bSameUID;
+}
+
+void handleCardReader()
+{
+  // poll card only every 100ms
+  static uint8_t lastCardPoll = 0;
+  uint8_t now = millis();
+
+  if (static_cast<uint8_t>(now - lastCardPoll) > 100)
+  {
+    lastCardPoll = now;
+    switch (pollCard())
+    {
+    case PCS_NEW_CARD:
+      onNewCard();
+      break;
+
+    case PCS_CARD_GONE:
+      if (StopPlayOnCardRemoval)
+      {
+        pauseAndStandBy();
+      }
+      break;
+
+    case PCS_CARD_IS_BACK:
+      playTitle();
+      break;
+    }    
+  }
+}
+
 void setStopLight()
 {
   if (isPlaying())
@@ -1016,8 +1146,8 @@ void setStopLight()
 
 bool m_lastPlayState = true;
 
-void loop() {
-  do {
+void loop() 
+{
     checkStandbyAtMillis();
     mp3.loop();
 
@@ -1049,7 +1179,7 @@ void loop() {
       } while (pauseButton.isPressed() || nextButton.isPressed() || previousButton.isPressed());
       readButtons();
       adminMenu();
-      break;
+      return;
     }
 
     if (pauseButton.wasReleased()) 
@@ -1063,16 +1193,14 @@ void loop() {
       {
         if (isCurrentlyPlaying) 
         {
-          mp3.pause();
-          setstandbyTimer();
+          pauseAndStandBy();
         }
         else if (knownCard) 
         {
           if (!anyFolderStarted) {
             playFolder();
           }
-          mp3.start();
-          disablestandbyTimer();
+          playTitle();
         }
       }
       ignorePauseButton = false;
@@ -1128,32 +1256,27 @@ void loop() {
     }
 
     // Ende der Buttons
-  } while (!mfrc522.PICC_IsNewCardPresent());
 
-  // RFID Karte wurde aufgelegt
+    handleCardReader();
+}
 
-  if (!mfrc522.PICC_ReadCardSerial())
-    return;
-
-  if (readCard(&myCard) == true) 
+void onNewCard()
+{
+  if (myCard.cookie == cardCookie && myCard.nfcFolderSettings.folder != 0 && myCard.nfcFolderSettings.mode != 0) 
   {
-    if (myCard.cookie == cardCookie && myCard.nfcFolderSettings.folder != 0 && myCard.nfcFolderSettings.mode != 0) 
-    {
-      loadAndPlayFolder();
-      // Save last folder for next power up
-      lastFolder = myCard.nfcFolderSettings;
-      writeLastFolderToFlash();
-    }
-    // Neue Karte konfigurieren
-    else if (myCard.cookie != cardCookie) {
-      knownCard = false;
-      mp3.playMp3FolderTrack(300);
-      waitForTrackToFinish();
-      setupCard();
-    }
+    loadAndPlayFolder();
+    // Save last folder for next power up
+    lastFolder = myCard.nfcFolderSettings;
+    writeLastFolderToFlash();
   }
-  mfrc522.PICC_HaltA();
-  mfrc522.PCD_StopCrypto1();
+  // Neue Karte konfigurieren
+  else if (myCard.cookie != cardCookie) 
+  {
+    knownCard = false;
+    mp3.playMp3FolderTrack(300);
+    waitForTrackToFinish();
+    setupCard();
+  }
 }
 
 void waitForNewCard()
@@ -1166,7 +1289,7 @@ void waitForNewCard()
       mp3.playMp3FolderTrack(802);
       return true;
     }
-  } while (!mfrc522.PICC_IsNewCardPresent());
+  } while (!cardDetected());
 }
 
 void adminMenu(bool fromCard = false) {
@@ -1269,7 +1392,7 @@ void adminMenu(bool fromCard = false) {
       waitForNewCard();
 
       // RFID Karte wurde aufgelegt
-      if (mfrc522.PICC_ReadCardSerial()) {
+      if (cardSerialFound()) {
         Serial.println(F("schreibe Karte..."));
         writeCard(tempCard);
         delay(100);
@@ -1316,7 +1439,7 @@ void adminMenu(bool fromCard = false) {
       waitForNewCard();
 
       // RFID Karte wurde aufgelegt
-      if (mfrc522.PICC_ReadCardSerial()) {
+      if (cardSerialFound()) {
         Serial.println(F("schreibe Karte..."));
         writeCard(tempCard);
         delay(100);
@@ -1493,7 +1616,7 @@ void resetCard() {
   mp3.playMp3FolderTrack(800);
   waitForNewCard();
 
-  if (!mfrc522.PICC_ReadCardSerial())
+  if (!cardSerialFound())
     return;
 
   Serial.print(F("Karte wird neu konfiguriert!"));
