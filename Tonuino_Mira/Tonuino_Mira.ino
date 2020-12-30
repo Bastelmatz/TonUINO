@@ -67,11 +67,11 @@ struct adminSettings {
 
 adminSettings mySettings;
 nfcTagObject myCard;
+nfcTagObject tempCard;
 folderSettings *myFolder;
 folderSettings lastFolder;
 unsigned long sleepAtMillis = 0;
 static uint16_t _lastTrackFinished;
-static bool hasCard = false;
 
 static void nextTrack(uint16_t track);
 uint8_t voiceMenu(int numberOfOptions, int startMessage, int messageOffset,
@@ -1031,38 +1031,55 @@ bool cardDetected()
   return detected;
 }
 
-static byte lastCardUid[4];
+static bool hasMusicCard = false;
+static bool hasModifierCard = false;
+static bool hasAnyCard() { return hasMusicCard || hasModifierCard; }
+
+static byte lastMusicCardUid[4];
 static byte retries;
 const byte maxRetries = 2;
-static bool lastCardWasUL;
+static bool lastMusicCardWasUL;
+static bool lastModifierCardWasUL;
 
-const byte PCS_NO_CHANGE     = 0; // no change detected since last pollCard() call
-const byte PCS_NEW_CARD      = 1; // card with new UID detected (had no card or other card before)
-const byte PCS_CARD_GONE     = 2; // card is not reachable anymore
-const byte PCS_CARD_IS_BACK  = 3; // card was gone, and is now back again
+const byte MUSICCARD_NO_CHANGE = 0; // no change detected since last pollCard() call
+const byte MUSICCARD_NEW       = 1; // card with new UID detected (had no card or other card before)
+const byte ALLCARDS_GONE       = 2; // card is not reachable anymore
+const byte MUSICCARD_IS_BACK   = 3; // card was gone, and is now back again
 
 
 byte pollCard()
 {
-  if (hasCard)
+  if (hasAnyCard())
   {
     if (isCardGone())
     {
-      hasCard = false;
-      return PCS_CARD_GONE;
+      hasMusicCard = false;
+      hasModifierCard = false;
+         
+      return ALLCARDS_GONE;
     }
   }
   else
   {
-    if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial() && readCard(&myCard))
+    if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial() && readCard())
     {
       retries = maxRetries;
-      hasCard = true;
-      return isSameCardAsLastOne() ? PCS_CARD_IS_BACK : PCS_NEW_CARD;
+      bool currentCardIsUL = mfrc522.PICC_GetType(mfrc522.uid.sak) == MFRC522::PICC_TYPE_MIFARE_UL;
+      if (evaluateCardData(tempCard, &myCard))
+      {
+        hasMusicCard = true;
+        lastMusicCardWasUL = currentCardIsUL;
+        return isSameMusicCardAsLastOne() ? MUSICCARD_IS_BACK : MUSICCARD_NEW;
+      }
+      else
+      {
+        hasModifierCard = true;
+        lastModifierCardWasUL = currentCardIsUL;
+      }
     }
-    return PCS_NO_CHANGE;
+    return MUSICCARD_NO_CHANGE;
   }
-  return PCS_NO_CHANGE;
+  return MUSICCARD_NO_CHANGE;
 }
 
 bool isCardGone()
@@ -1071,7 +1088,12 @@ bool isCardGone()
   byte buffer[18];
   byte size = sizeof(buffer);
 
-  if (mfrc522.MIFARE_Read(lastCardWasUL ? 8 : blockAddr, buffer, &size) != MFRC522::STATUS_OK)
+  bool lastCardWasUL = hasMusicCard ? lastMusicCardWasUL : lastModifierCardWasUL;
+  if (mfrc522.MIFARE_Read(lastCardWasUL ? 8 : blockAddr, buffer, &size) == MFRC522::STATUS_OK)
+  {
+    retries = maxRetries;
+  }
+  else
   {
     if (retries > 0)
     {
@@ -1085,21 +1107,16 @@ bool isCardGone()
         return true;
     }
   }
-  else
-  {
-      retries = maxRetries;
-  }
   return false;
 }
 
-bool isSameCardAsLastOne()
-{
-  bool bSameUID = !memcmp(lastCardUid, mfrc522.uid.uidByte, 4);
-  Serial.print(F("IsSameAsLastUID="));
+bool isSameMusicCardAsLastOne()
+{ 
+  bool bSameUID = !memcmp(lastMusicCardUid, mfrc522.uid.uidByte, 4);
+  Serial.print(F("IsSameAsLastMusicCardUID="));
   Serial.println(bSameUID);
   // store info about current card
-  memcpy(lastCardUid, mfrc522.uid.uidByte, 4);
-  lastCardWasUL = mfrc522.PICC_GetType(mfrc522.uid.sak) == MFRC522::PICC_TYPE_MIFARE_UL;
+  memcpy(lastMusicCardUid, mfrc522.uid.uidByte, 4);
   return bSameUID;
 }
 
@@ -1114,18 +1131,18 @@ void handleCardReader()
     lastCardPoll = now;
     switch (pollCard())
     {
-    case PCS_NEW_CARD:
+    case MUSICCARD_NEW:
       onNewCard();
       break;
 
-    case PCS_CARD_GONE:
+    case ALLCARDS_GONE:
       if (StopPlayOnCardRemoval)
       {
         pauseAndStandBy();
       }
       break;
 
-    case PCS_CARD_IS_BACK:
+    case MUSICCARD_IS_BACK:
       playTitle();
       break;
     }    
@@ -1682,8 +1699,8 @@ void playAdvertisement(int advertisement)
   }
 }
 
-bool readCard(nfcTagObject * nfcTag) {
-  nfcTagObject tempCard;
+bool readCard() 
+{
   // Show some details of the PICC (that is: the tag/card)
   Serial.print(F("Card UID:"));
   dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size);
@@ -1796,6 +1813,11 @@ bool readCard(nfcTagObject * nfcTag) {
   tempCard.nfcFolderSettings.special = buffer[7];
   tempCard.nfcFolderSettings.special2 = buffer[8];
 
+  return true;
+}
+
+bool evaluateCardData(nfcTagObject tempCard, nfcTagObject * nfcTag)
+{
   if (tempCard.cookie == cardCookie) 
   {
     if (activeModifier != NULL && tempCard.nfcFolderSettings.folder != 0) {
