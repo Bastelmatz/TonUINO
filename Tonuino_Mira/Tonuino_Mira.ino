@@ -335,6 +335,7 @@ class SleepTimer: public Modifier {
       if (this->sleepAtMillis != 0 && millis() > this->sleepAtMillis) {
         Serial.println(F("=== SleepTimer::loop() -> SLEEP!"));
         pauseAndStandBy();
+        delete activeModifier;
         activeModifier = NULL;
         delete this;
       }
@@ -1832,6 +1833,7 @@ bool evaluateCardData(nfcTagObject tempCard, nfcTagObject * nfcTag)
       {
         if (activeModifier->getActive() == tempCard.nfcFolderSettings.mode) 
         {
+          delete activeModifier;
           activeModifier = NULL;
           Serial.println(F("modifier removed"));
           playAdvertisement(261);
