@@ -113,8 +113,8 @@ namespace Tonuino_RFID_Creator
         private static bool collectCardData = false;
         private static List<string> collectedData = new List<string>();
 
-        private static string KEYRead_TriggerBEGIN { get; } = "Tonuino_Admin_Tool_BEGIN";
-        private static string KEYRead_TriggerEND { get; } = "Tonuino_Admin_Tool_END";
+        private static string KEYRead_TriggerBEGIN { get; } = "Tonuino_RFID_Tool_BEGIN";
+        private static string KEYRead_TriggerEND { get; } = "Tonuino_RFID_Tool_END";
         private static string KEYRead_CardData { get; } = "CardData";
         private static char Read_KeyValueSeparator { get; } = ':';
 
