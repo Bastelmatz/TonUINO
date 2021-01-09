@@ -5,10 +5,18 @@ namespace Tonuino_RFID_Creator
 {
     public interface ICardData
     {
-        int Raw_Mode { get; }
-        int Raw_Folder { get; }
-        int Raw_Special { get; }
-        int Raw_Special2 { get; }
+        byte Raw_Mode { get; }
+        byte Raw_Folder { get; }
+        byte Raw_Special { get; }
+        byte Raw_Special2 { get; }
+    }
+
+    public class CardDataRaw : ICardData
+    {
+        public byte Raw_Mode { get; set; }
+        public byte Raw_Folder { get; set; }
+        public byte Raw_Special { get; set; }
+        public byte Raw_Special2 { get; set; }
     }
 
     public class CardData
@@ -34,16 +42,16 @@ namespace Tonuino_RFID_Creator
     public class MusicCardData : CardData, ICardData
     {
         public MusicMode Mode { get; }
-        public int Folder { get; }
-        public int StartPos { get; }
-        public int EndPos { get; }
+        public byte Folder { get; }
+        public byte StartPos { get; }
+        public byte EndPos { get; }
 
-        public int Raw_Mode => Mode.Index;
-        public int Raw_Folder => Folder;
-        public int Raw_Special => StartPos;
-        public int Raw_Special2 => EndPos;
+        public byte Raw_Mode => Mode.Index;
+        public byte Raw_Folder => Folder;
+        public byte Raw_Special => StartPos;
+        public byte Raw_Special2 => EndPos;
 
-        public MusicCardData(long rfid, int cookie, EMusicMode mode, int folder, int startPos, int endPos)
+        public MusicCardData(long rfid, int cookie, EMusicMode mode, byte folder, byte startPos, byte endPos)
             : base (rfid, cookie)
         {
             Mode = new MusicMode(mode);

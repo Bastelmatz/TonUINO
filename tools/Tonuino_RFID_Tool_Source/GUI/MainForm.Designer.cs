@@ -52,7 +52,6 @@
             this.btnWriteMusicCard = new System.Windows.Forms.Button();
             this.checkExtendCard = new System.Windows.Forms.CheckBox();
             this.pnlModes = new System.Windows.Forms.Panel();
-            this.comboBox_MusicCardModes = new Tonuino_RFID_Creator.ExtendedComboBox();
             this.lblComment = new System.Windows.Forms.Label();
             this.textBoxComment = new System.Windows.Forms.TextBox();
             this.lblLastCommentCaption = new System.Windows.Forms.Label();
@@ -60,29 +59,11 @@
             this.pnlCardDetected = new System.Windows.Forms.Panel();
             this.lblSleepTimeReadCaption = new System.Windows.Forms.Label();
             this.lblSleepTime = new System.Windows.Forms.Label();
-            this.pnlAdminSettings = new System.Windows.Forms.Panel();
-            this.pnlEqualizer = new System.Windows.Forms.Panel();
-            this.comboBox_Equalizer = new Tonuino_RFID_Creator.ExtendedComboBox();
-            this.btnReset = new System.Windows.Forms.Button();
-            this.lblStandybyTimeUnit = new System.Windows.Forms.Label();
-            this.lblVolume = new System.Windows.Forms.Label();
-            this.lblStandbyTime = new System.Windows.Forms.Label();
-            this.textBoxSetting_StandbyTime = new System.Windows.Forms.TextBox();
-            this.lblVolumeMin = new System.Windows.Forms.Label();
-            this.lblVolumeInit = new System.Windows.Forms.Label();
-            this.btnWriteAdminSettings = new System.Windows.Forms.Button();
-            this.lblVolumeMax = new System.Windows.Forms.Label();
-            this.textBoxSetting_VolMax = new System.Windows.Forms.TextBox();
-            this.lblEqualizerCaption = new System.Windows.Forms.Label();
-            this.textBoxSetting_VolInit = new System.Windows.Forms.TextBox();
-            this.textBoxSetting_VolMin = new System.Windows.Forms.TextBox();
-            this.lblTonuinoSettings = new System.Windows.Forms.Label();
             this.pnlModiCardAction = new System.Windows.Forms.Panel();
             this.lblSleepTimeUnit = new System.Windows.Forms.Label();
             this.lblSleepTimeCaption = new System.Windows.Forms.Label();
             this.textBox_SleepTime = new System.Windows.Forms.TextBox();
             this.pnlModeCardOptions = new System.Windows.Forms.Panel();
-            this.comboBox_ModiCardOptions = new Tonuino_RFID_Creator.ExtendedComboBox();
             this.btnWriteModiCard = new System.Windows.Forms.Button();
             this.pnlMusicCardAction = new System.Windows.Forms.Panel();
             this.radio_MusicCard = new System.Windows.Forms.RadioButton();
@@ -90,12 +71,12 @@
             this.pnlCardAction = new System.Windows.Forms.Panel();
             this.pnlSeparator = new System.Windows.Forms.Panel();
             this.pnlPorts = new System.Windows.Forms.Panel();
-            this.comboBox_Ports = new Tonuino_RFID_Creator.ExtendedComboBox();
             this.lblPorts = new System.Windows.Forms.Label();
+            this.comboBox_Ports = new Tonuino_RFID_Creator.ExtendedComboBox();
+            this.comboBox_MusicCardModes = new Tonuino_RFID_Creator.ExtendedComboBox();
+            this.comboBox_ModiCardOptions = new Tonuino_RFID_Creator.ExtendedComboBox();
             this.pnlModes.SuspendLayout();
             this.pnlCardDetected.SuspendLayout();
-            this.pnlAdminSettings.SuspendLayout();
-            this.pnlEqualizer.SuspendLayout();
             this.pnlModiCardAction.SuspendLayout();
             this.pnlModeCardOptions.SuspendLayout();
             this.pnlMusicCardAction.SuspendLayout();
@@ -127,6 +108,7 @@
             this.logTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.logTextBox.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.logTextBox.Location = new System.Drawing.Point(425, 12);
             this.logTextBox.Name = "logTextBox";
             this.logTextBox.ReadOnly = true;
@@ -138,7 +120,7 @@
             // 
             this.lblCardDetected.AutoSize = true;
             this.lblCardDetected.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCardDetected.Location = new System.Drawing.Point(22, 236);
+            this.lblCardDetected.Location = new System.Drawing.Point(22, 56);
             this.lblCardDetected.Name = "lblCardDetected";
             this.lblCardDetected.Size = new System.Drawing.Size(94, 16);
             this.lblCardDetected.TabIndex = 5;
@@ -329,19 +311,6 @@
             this.pnlModes.Size = new System.Drawing.Size(158, 23);
             this.pnlModes.TabIndex = 27;
             // 
-            // comboBox_MusicCardModes
-            // 
-            this.comboBox_MusicCardModes.BackColor = System.Drawing.SystemColors.Window;
-            this.comboBox_MusicCardModes.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.comboBox_MusicCardModes.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox_MusicCardModes.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.comboBox_MusicCardModes.FormattingEnabled = true;
-            this.comboBox_MusicCardModes.Location = new System.Drawing.Point(0, 0);
-            this.comboBox_MusicCardModes.Name = "comboBox_MusicCardModes";
-            this.comboBox_MusicCardModes.Size = new System.Drawing.Size(156, 21);
-            this.comboBox_MusicCardModes.TabIndex = 16;
-            this.comboBox_MusicCardModes.SelectedValueChanged += new System.EventHandler(this.comboBoxCardModes_SelectedValueChanged);
-            // 
             // lblComment
             // 
             this.lblComment.AutoSize = true;
@@ -395,7 +364,7 @@
             this.pnlCardDetected.Controls.Add(this.lblStartPos);
             this.pnlCardDetected.Controls.Add(this.lblEndPosCaption);
             this.pnlCardDetected.Controls.Add(this.lblEndPos);
-            this.pnlCardDetected.Location = new System.Drawing.Point(3, 261);
+            this.pnlCardDetected.Location = new System.Drawing.Point(3, 81);
             this.pnlCardDetected.Name = "pnlCardDetected";
             this.pnlCardDetected.Size = new System.Drawing.Size(229, 289);
             this.pnlCardDetected.TabIndex = 36;
@@ -418,187 +387,6 @@
             this.lblSleepTime.TabIndex = 35;
             this.lblSleepTime.Text = "label10";
             // 
-            // pnlAdminSettings
-            // 
-            this.pnlAdminSettings.Controls.Add(this.pnlEqualizer);
-            this.pnlAdminSettings.Controls.Add(this.btnReset);
-            this.pnlAdminSettings.Controls.Add(this.lblStandybyTimeUnit);
-            this.pnlAdminSettings.Controls.Add(this.lblVolume);
-            this.pnlAdminSettings.Controls.Add(this.lblStandbyTime);
-            this.pnlAdminSettings.Controls.Add(this.textBoxSetting_StandbyTime);
-            this.pnlAdminSettings.Controls.Add(this.lblVolumeMin);
-            this.pnlAdminSettings.Controls.Add(this.lblVolumeInit);
-            this.pnlAdminSettings.Controls.Add(this.btnWriteAdminSettings);
-            this.pnlAdminSettings.Controls.Add(this.lblVolumeMax);
-            this.pnlAdminSettings.Controls.Add(this.textBoxSetting_VolMax);
-            this.pnlAdminSettings.Controls.Add(this.lblEqualizerCaption);
-            this.pnlAdminSettings.Controls.Add(this.textBoxSetting_VolInit);
-            this.pnlAdminSettings.Controls.Add(this.textBoxSetting_VolMin);
-            this.pnlAdminSettings.Location = new System.Drawing.Point(3, 88);
-            this.pnlAdminSettings.Name = "pnlAdminSettings";
-            this.pnlAdminSettings.Size = new System.Drawing.Size(416, 128);
-            this.pnlAdminSettings.TabIndex = 38;
-            // 
-            // pnlEqualizer
-            // 
-            this.pnlEqualizer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pnlEqualizer.Controls.Add(this.comboBox_Equalizer);
-            this.pnlEqualizer.Location = new System.Drawing.Point(248, 38);
-            this.pnlEqualizer.Name = "pnlEqualizer";
-            this.pnlEqualizer.Size = new System.Drawing.Size(86, 23);
-            this.pnlEqualizer.TabIndex = 30;
-            // 
-            // comboBox_Equalizer
-            // 
-            this.comboBox_Equalizer.BackColor = System.Drawing.SystemColors.Window;
-            this.comboBox_Equalizer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.comboBox_Equalizer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox_Equalizer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.comboBox_Equalizer.FormattingEnabled = true;
-            this.comboBox_Equalizer.Location = new System.Drawing.Point(0, 0);
-            this.comboBox_Equalizer.Name = "comboBox_Equalizer";
-            this.comboBox_Equalizer.Size = new System.Drawing.Size(84, 21);
-            this.comboBox_Equalizer.TabIndex = 16;
-            this.comboBox_Equalizer.SelectedIndexChanged += new System.EventHandler(this.comboBox_Equalizer_SelectedIndexChanged);
-            // 
-            // btnReset
-            // 
-            this.btnReset.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
-            this.btnReset.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnReset.Location = new System.Drawing.Point(46, 95);
-            this.btnReset.Name = "btnReset";
-            this.btnReset.Size = new System.Drawing.Size(98, 23);
-            this.btnReset.TabIndex = 29;
-            this.btnReset.Text = "Reset Tonuino";
-            this.btnReset.UseVisualStyleBackColor = false;
-            this.btnReset.Click += new System.EventHandler(this.btnReset_Click);
-            // 
-            // lblStandybyTimeUnit
-            // 
-            this.lblStandybyTimeUnit.AutoSize = true;
-            this.lblStandybyTimeUnit.Location = new System.Drawing.Point(297, 15);
-            this.lblStandybyTimeUnit.Name = "lblStandybyTimeUnit";
-            this.lblStandybyTimeUnit.Size = new System.Drawing.Size(23, 13);
-            this.lblStandybyTimeUnit.TabIndex = 28;
-            this.lblStandybyTimeUnit.Text = "min";
-            // 
-            // lblVolume
-            // 
-            this.lblVolume.Location = new System.Drawing.Point(13, 15);
-            this.lblVolume.Name = "lblVolume";
-            this.lblVolume.Size = new System.Drawing.Size(56, 13);
-            this.lblVolume.TabIndex = 27;
-            this.lblVolume.Text = "Volume:";
-            this.lblVolume.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // lblStandbyTime
-            // 
-            this.lblStandbyTime.AutoSize = true;
-            this.lblStandbyTime.Location = new System.Drawing.Point(171, 15);
-            this.lblStandbyTime.Name = "lblStandbyTime";
-            this.lblStandbyTime.Size = new System.Drawing.Size(75, 13);
-            this.lblStandbyTime.TabIndex = 25;
-            this.lblStandbyTime.Text = "Standby Time:";
-            this.lblStandbyTime.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // textBoxSetting_StandbyTime
-            // 
-            this.textBoxSetting_StandbyTime.Location = new System.Drawing.Point(248, 12);
-            this.textBoxSetting_StandbyTime.MaxLength = 3;
-            this.textBoxSetting_StandbyTime.Name = "textBoxSetting_StandbyTime";
-            this.textBoxSetting_StandbyTime.Size = new System.Drawing.Size(43, 20);
-            this.textBoxSetting_StandbyTime.TabIndex = 26;
-            this.textBoxSetting_StandbyTime.TextChanged += new System.EventHandler(this.textBoxSetting_Time_TextChanged);
-            // 
-            // lblVolumeMin
-            // 
-            this.lblVolumeMin.AutoSize = true;
-            this.lblVolumeMin.Location = new System.Drawing.Point(72, 15);
-            this.lblVolumeMin.Name = "lblVolumeMin";
-            this.lblVolumeMin.Size = new System.Drawing.Size(27, 13);
-            this.lblVolumeMin.TabIndex = 6;
-            this.lblVolumeMin.Text = "Min:";
-            this.lblVolumeMin.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // lblVolumeInit
-            // 
-            this.lblVolumeInit.AutoSize = true;
-            this.lblVolumeInit.Location = new System.Drawing.Point(75, 41);
-            this.lblVolumeInit.Name = "lblVolumeInit";
-            this.lblVolumeInit.Size = new System.Drawing.Size(24, 13);
-            this.lblVolumeInit.TabIndex = 8;
-            this.lblVolumeInit.Text = "Init:";
-            this.lblVolumeInit.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // btnWriteAdminSettings
-            // 
-            this.btnWriteAdminSettings.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
-            this.btnWriteAdminSettings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnWriteAdminSettings.Location = new System.Drawing.Point(248, 95);
-            this.btnWriteAdminSettings.Name = "btnWriteAdminSettings";
-            this.btnWriteAdminSettings.Size = new System.Drawing.Size(158, 23);
-            this.btnWriteAdminSettings.TabIndex = 24;
-            this.btnWriteAdminSettings.Text = "Write Admin Settings";
-            this.btnWriteAdminSettings.UseVisualStyleBackColor = false;
-            this.btnWriteAdminSettings.Click += new System.EventHandler(this.btnWriteAdminSettings_Click);
-            // 
-            // lblVolumeMax
-            // 
-            this.lblVolumeMax.AutoSize = true;
-            this.lblVolumeMax.Location = new System.Drawing.Point(69, 67);
-            this.lblVolumeMax.Name = "lblVolumeMax";
-            this.lblVolumeMax.Size = new System.Drawing.Size(30, 13);
-            this.lblVolumeMax.TabIndex = 10;
-            this.lblVolumeMax.Text = "Max:";
-            this.lblVolumeMax.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // textBoxSetting_VolMax
-            // 
-            this.textBoxSetting_VolMax.Location = new System.Drawing.Point(101, 64);
-            this.textBoxSetting_VolMax.MaxLength = 3;
-            this.textBoxSetting_VolMax.Name = "textBoxSetting_VolMax";
-            this.textBoxSetting_VolMax.Size = new System.Drawing.Size(43, 20);
-            this.textBoxSetting_VolMax.TabIndex = 22;
-            this.textBoxSetting_VolMax.TextChanged += new System.EventHandler(this.textBoxSetting_Volume_TextChanged);
-            // 
-            // lblEqualizerCaption
-            // 
-            this.lblEqualizerCaption.AutoSize = true;
-            this.lblEqualizerCaption.Location = new System.Drawing.Point(193, 43);
-            this.lblEqualizerCaption.Name = "lblEqualizerCaption";
-            this.lblEqualizerCaption.Size = new System.Drawing.Size(53, 13);
-            this.lblEqualizerCaption.TabIndex = 12;
-            this.lblEqualizerCaption.Text = "Equalizer:";
-            this.lblEqualizerCaption.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // textBoxSetting_VolInit
-            // 
-            this.textBoxSetting_VolInit.Location = new System.Drawing.Point(101, 38);
-            this.textBoxSetting_VolInit.MaxLength = 3;
-            this.textBoxSetting_VolInit.Name = "textBoxSetting_VolInit";
-            this.textBoxSetting_VolInit.Size = new System.Drawing.Size(43, 20);
-            this.textBoxSetting_VolInit.TabIndex = 20;
-            this.textBoxSetting_VolInit.TextChanged += new System.EventHandler(this.textBoxSetting_Volume_TextChanged);
-            // 
-            // textBoxSetting_VolMin
-            // 
-            this.textBoxSetting_VolMin.Location = new System.Drawing.Point(101, 12);
-            this.textBoxSetting_VolMin.MaxLength = 2;
-            this.textBoxSetting_VolMin.Name = "textBoxSetting_VolMin";
-            this.textBoxSetting_VolMin.Size = new System.Drawing.Size(43, 20);
-            this.textBoxSetting_VolMin.TabIndex = 19;
-            this.textBoxSetting_VolMin.TextChanged += new System.EventHandler(this.textBoxSetting_Volume_TextChanged);
-            // 
-            // lblTonuinoSettings
-            // 
-            this.lblTonuinoSettings.AutoSize = true;
-            this.lblTonuinoSettings.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTonuinoSettings.Location = new System.Drawing.Point(23, 61);
-            this.lblTonuinoSettings.Name = "lblTonuinoSettings";
-            this.lblTonuinoSettings.Size = new System.Drawing.Size(171, 16);
-            this.lblTonuinoSettings.TabIndex = 37;
-            this.lblTonuinoSettings.Text = "Tonuino Admin Settings";
-            // 
             // pnlModiCardAction
             // 
             this.pnlModiCardAction.Controls.Add(this.lblSleepTimeUnit);
@@ -606,7 +394,7 @@
             this.pnlModiCardAction.Controls.Add(this.textBox_SleepTime);
             this.pnlModiCardAction.Controls.Add(this.pnlModeCardOptions);
             this.pnlModiCardAction.Controls.Add(this.btnWriteModiCard);
-            this.pnlModiCardAction.Location = new System.Drawing.Point(435, 292);
+            this.pnlModiCardAction.Location = new System.Drawing.Point(435, 112);
             this.pnlModiCardAction.Name = "pnlModiCardAction";
             this.pnlModiCardAction.Size = new System.Drawing.Size(181, 258);
             this.pnlModiCardAction.TabIndex = 39;
@@ -647,19 +435,6 @@
             this.pnlModeCardOptions.Size = new System.Drawing.Size(158, 23);
             this.pnlModeCardOptions.TabIndex = 27;
             // 
-            // comboBox_ModiCardOptions
-            // 
-            this.comboBox_ModiCardOptions.BackColor = System.Drawing.SystemColors.Window;
-            this.comboBox_ModiCardOptions.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.comboBox_ModiCardOptions.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox_ModiCardOptions.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.comboBox_ModiCardOptions.FormattingEnabled = true;
-            this.comboBox_ModiCardOptions.Location = new System.Drawing.Point(0, 0);
-            this.comboBox_ModiCardOptions.Name = "comboBox_ModiCardOptions";
-            this.comboBox_ModiCardOptions.Size = new System.Drawing.Size(156, 21);
-            this.comboBox_ModiCardOptions.TabIndex = 16;
-            this.comboBox_ModiCardOptions.SelectedIndexChanged += new System.EventHandler(this.comboBox_ModiCardOptions_SelectedIndexChanged);
-            // 
             // btnWriteModiCard
             // 
             this.btnWriteModiCard.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
@@ -686,7 +461,7 @@
             this.pnlMusicCardAction.Controls.Add(this.textBoxEndOnSD);
             this.pnlMusicCardAction.Controls.Add(this.btnBrowsMusic);
             this.pnlMusicCardAction.Controls.Add(this.btnWriteMusicCard);
-            this.pnlMusicCardAction.Location = new System.Drawing.Point(238, 292);
+            this.pnlMusicCardAction.Location = new System.Drawing.Point(238, 112);
             this.pnlMusicCardAction.Name = "pnlMusicCardAction";
             this.pnlMusicCardAction.Size = new System.Drawing.Size(181, 258);
             this.pnlMusicCardAction.TabIndex = 40;
@@ -719,7 +494,7 @@
             // 
             this.pnlCardAction.Controls.Add(this.radio_MusicCard);
             this.pnlCardAction.Controls.Add(this.radio_ModiCard);
-            this.pnlCardAction.Location = new System.Drawing.Point(238, 261);
+            this.pnlCardAction.Location = new System.Drawing.Point(238, 81);
             this.pnlCardAction.Name = "pnlCardAction";
             this.pnlCardAction.Size = new System.Drawing.Size(181, 28);
             this.pnlCardAction.TabIndex = 43;
@@ -727,7 +502,7 @@
             // pnlSeparator
             // 
             this.pnlSeparator.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.pnlSeparator.Location = new System.Drawing.Point(234, 261);
+            this.pnlSeparator.Location = new System.Drawing.Point(234, 81);
             this.pnlSeparator.Name = "pnlSeparator";
             this.pnlSeparator.Size = new System.Drawing.Size(1, 289);
             this.pnlSeparator.TabIndex = 44;
@@ -741,6 +516,16 @@
             this.pnlPorts.Size = new System.Drawing.Size(86, 23);
             this.pnlPorts.TabIndex = 46;
             // 
+            // lblPorts
+            // 
+            this.lblPorts.AutoSize = true;
+            this.lblPorts.Location = new System.Drawing.Point(12, 23);
+            this.lblPorts.Name = "lblPorts";
+            this.lblPorts.Size = new System.Drawing.Size(61, 13);
+            this.lblPorts.TabIndex = 45;
+            this.lblPorts.Text = "COM Ports:";
+            this.lblPorts.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // comboBox_Ports
             // 
             this.comboBox_Ports.BackColor = System.Drawing.SystemColors.Window;
@@ -753,15 +538,31 @@
             this.comboBox_Ports.Size = new System.Drawing.Size(84, 21);
             this.comboBox_Ports.TabIndex = 16;
             // 
-            // lblPorts
+            // comboBox_MusicCardModes
             // 
-            this.lblPorts.AutoSize = true;
-            this.lblPorts.Location = new System.Drawing.Point(12, 23);
-            this.lblPorts.Name = "lblPorts";
-            this.lblPorts.Size = new System.Drawing.Size(61, 13);
-            this.lblPorts.TabIndex = 45;
-            this.lblPorts.Text = "COM Ports:";
-            this.lblPorts.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.comboBox_MusicCardModes.BackColor = System.Drawing.SystemColors.Window;
+            this.comboBox_MusicCardModes.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.comboBox_MusicCardModes.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox_MusicCardModes.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.comboBox_MusicCardModes.FormattingEnabled = true;
+            this.comboBox_MusicCardModes.Location = new System.Drawing.Point(0, 0);
+            this.comboBox_MusicCardModes.Name = "comboBox_MusicCardModes";
+            this.comboBox_MusicCardModes.Size = new System.Drawing.Size(156, 21);
+            this.comboBox_MusicCardModes.TabIndex = 16;
+            this.comboBox_MusicCardModes.SelectedValueChanged += new System.EventHandler(this.comboBoxCardModes_SelectedValueChanged);
+            // 
+            // comboBox_ModiCardOptions
+            // 
+            this.comboBox_ModiCardOptions.BackColor = System.Drawing.SystemColors.Window;
+            this.comboBox_ModiCardOptions.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.comboBox_ModiCardOptions.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox_ModiCardOptions.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.comboBox_ModiCardOptions.FormattingEnabled = true;
+            this.comboBox_ModiCardOptions.Location = new System.Drawing.Point(0, 0);
+            this.comboBox_ModiCardOptions.Name = "comboBox_ModiCardOptions";
+            this.comboBox_ModiCardOptions.Size = new System.Drawing.Size(156, 21);
+            this.comboBox_ModiCardOptions.TabIndex = 16;
+            this.comboBox_ModiCardOptions.SelectedIndexChanged += new System.EventHandler(this.comboBox_ModiCardOptions_SelectedIndexChanged);
             // 
             // MainForm
             // 
@@ -774,8 +575,6 @@
             this.Controls.Add(this.pnlCardAction);
             this.Controls.Add(this.pnlMusicCardAction);
             this.Controls.Add(this.pnlModiCardAction);
-            this.Controls.Add(this.pnlAdminSettings);
-            this.Controls.Add(this.lblTonuinoSettings);
             this.Controls.Add(this.pnlCardDetected);
             this.Controls.Add(this.lblCardDetected);
             this.Controls.Add(this.logTextBox);
@@ -788,9 +587,6 @@
             this.pnlModes.ResumeLayout(false);
             this.pnlCardDetected.ResumeLayout(false);
             this.pnlCardDetected.PerformLayout();
-            this.pnlAdminSettings.ResumeLayout(false);
-            this.pnlAdminSettings.PerformLayout();
-            this.pnlEqualizer.ResumeLayout(false);
             this.pnlModiCardAction.ResumeLayout(false);
             this.pnlModiCardAction.PerformLayout();
             this.pnlModeCardOptions.ResumeLayout(false);
@@ -835,21 +631,6 @@
         private System.Windows.Forms.Label lblLastCommentCaption;
         private System.Windows.Forms.Label lblLastComment;
         private System.Windows.Forms.Panel pnlCardDetected;
-        private System.Windows.Forms.Panel pnlAdminSettings;
-        private System.Windows.Forms.Label lblVolumeMin;
-        private System.Windows.Forms.Label lblVolumeInit;
-        private System.Windows.Forms.Button btnWriteAdminSettings;
-        private System.Windows.Forms.Label lblVolumeMax;
-        private System.Windows.Forms.TextBox textBoxSetting_VolMax;
-        private System.Windows.Forms.Label lblEqualizerCaption;
-        private System.Windows.Forms.TextBox textBoxSetting_VolInit;
-        private System.Windows.Forms.TextBox textBoxSetting_VolMin;
-        private System.Windows.Forms.Label lblTonuinoSettings;
-        private System.Windows.Forms.Label lblStandbyTime;
-        private System.Windows.Forms.TextBox textBoxSetting_StandbyTime;
-        private System.Windows.Forms.Label lblStandybyTimeUnit;
-        private System.Windows.Forms.Label lblVolume;
-        private System.Windows.Forms.Button btnReset;
         private System.Windows.Forms.Panel pnlModiCardAction;
         private System.Windows.Forms.Label lblSleepTimeUnit;
         private System.Windows.Forms.Label lblSleepTimeCaption;
@@ -861,8 +642,6 @@
         private System.Windows.Forms.RadioButton radio_MusicCard;
         private System.Windows.Forms.RadioButton radio_ModiCard;
         private System.Windows.Forms.Panel pnlCardAction;
-        private System.Windows.Forms.Panel pnlEqualizer;
-        private Tonuino_RFID_Creator.ExtendedComboBox comboBox_Equalizer;
         private System.Windows.Forms.Panel pnlSeparator;
         private System.Windows.Forms.Panel pnlPorts;
         private Tonuino_RFID_Creator.ExtendedComboBox comboBox_Ports;

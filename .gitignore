@@ -31,7 +31,7 @@ Temporary Items
 /tools/*.pyc
 
 # Tonuino RFID Tool
-/tools/Tonuino RFID Tool Source/bin
-/tools/Tonuino RFID Tool Source/obj
-/tools/Tonuino RFID Tool Source/.vs
+/tools/Tonuino_RFID_Tool_Source/bin
+/tools/Tonuino_RFID_Tool_Source/obj
+/tools/Tonuino_RFID_Tool_Source/.vs
 

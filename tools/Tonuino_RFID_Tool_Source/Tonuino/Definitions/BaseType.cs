@@ -7,11 +7,11 @@ namespace Tonuino_RFID_Creator
 {
     public class Ident<T>
     {
-        public int Index { get; }
+        public byte Index { get; }
         public T Value { get; }
         public string NameString { get; }
 
-        public Ident(int index, T value, string name)
+        public Ident(byte index, T value, string name)
         {
             Index = index;
             Value = value;
@@ -52,7 +52,7 @@ namespace Tonuino_RFID_Creator
 
 
 
-        public static T FromNumber(int number)
+        public static T FromNumber(byte number)
         {
             foreach (Ident<T> ident in m_allocation)
             {
@@ -64,7 +64,7 @@ namespace Tonuino_RFID_Creator
             return m_allocation[0].Value;
         }
 
-        public int Index => Ident.Index;
+        public byte Index => Ident.Index;
 
         public string Name => Ident.NameString;
 

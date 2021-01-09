@@ -72,10 +72,6 @@ namespace Tonuino_RFID_Creator
             // set modi card options
             List<ModiType> modiTypes = ModiType.AllValidModes();
             comboBox_ModiCardOptions.SetItems(modiTypes);
-
-            // set equalizer options
-            List<EqualizerType> eqTypes = EqualizerType.AllValidModes();
-            comboBox_Equalizer.SetItems(eqTypes);
         }
 
         // *****************************
@@ -162,7 +158,6 @@ namespace Tonuino_RFID_Creator
         {
             try
             {
-                UpdateAdminSettings();
                 UpdateCardData();
             }
             catch (Exception ex)
@@ -252,24 +247,6 @@ namespace Tonuino_RFID_Creator
             }
         }
 
-        public void UpdateAdminSettings()
-        {
-            doAction(() => updateAdminSettings());
-        }
-
-        private void updateAdminSettings()
-        {
-            AdminSettings settings = SerialComm.AdminSettingsRead;
-            bool exists = settings.Exists && SerialComm.IsListening;
-            pnlAdminSettings.Visible = exists;
-
-            setText(textBoxSetting_VolMin, settings.MinVolume);
-            setText(textBoxSetting_VolMax, settings.MaxVolume);
-            setText(textBoxSetting_VolInit, settings.InitVolume);
-            setText(textBoxSetting_StandbyTime, settings.StandbyTime.Minutes);
-            comboBox_Equalizer.SelectEntry(settings.Equalizer);
-        }
-
         private void setText(Control label, int nText)
         {
             label.Text = nText.ToString();
@@ -317,14 +294,54 @@ namespace Tonuino_RFID_Creator
             }
         }
 
-        private int getVolume(TextBox textBox, int defaultValue)
+        #endregion
+
+        // *****************************
+        // Data Handling
+        // ***************************** 
+        #region Data Handling
+
+        private byte getByte(TextBox textBox)
         {
-            int nVol;
-            if (int.TryParse(textBox.Text, out nVol))
+            string text = textBox.Text;
+            byte parsedByte = 0;
+            if (textBox.Visible && byte.TryParse(text, out parsedByte))
             {
-                return nVol;
+                return parsedByte;
             }
-            return defaultValue;
+            return 0;
+        }
+
+        private ICardData getMusicCardData()
+        {
+            MusicMode mode = (MusicMode)comboBox_MusicCardModes.SelectedItem;
+            byte folder = getByte(textBoxFolderOnSD);
+            byte startTrack = getByte(textBoxStartOnSD);
+            byte endTrack = getByte(textBoxEndOnSD);
+
+            ICardData musicData = new CardDataRaw()
+            {
+                Raw_Folder = folder,
+                Raw_Mode = mode.Ident.Index,
+                Raw_Special = startTrack,
+                Raw_Special2 = endTrack
+            };
+            return musicData;
+        }
+
+        private ICardData getModiCardData()
+        {
+            ModiType modiType = (ModiType)comboBox_ModiCardOptions.SelectedItem;
+            byte sleepTime = getByte(textBox_SleepTime);
+
+            ICardData modiData = new CardDataRaw()
+            {
+                Raw_Folder = 0,
+                Raw_Mode = modiType.Ident.Index,
+                Raw_Special = sleepTime,
+                Raw_Special2 = 0
+            };
+            return modiData;
         }
 
         #endregion
@@ -347,47 +364,21 @@ namespace Tonuino_RFID_Creator
             }
         }
 
-        private void btnReset_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void btnWriteAdminSettings_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void btnWriteMusicCard_Click(object sender, EventArgs e)
         {
-
+            ICardData cardData = getMusicCardData();
+            SerialComm.Write(cardData);
         }
 
         private void btnWriteModiCard_Click(object sender, EventArgs e)
         {
-
+            ICardData cardData = getModiCardData();
+            SerialComm.Write(cardData);
         }
 
         private void radio_Card_CheckedChanged(object sender, EventArgs e)
         {
             updateCardActionVisibility();
-        }
-
-        private void textBoxSetting_Volume_TextChanged(object sender, EventArgs e)
-        {
-            int minimum = 1;
-            int maximum = 30;
-            TextBox textBox = (TextBox)sender;
-            // Ensure min <= init <= max
-            if (textBox == textBoxSetting_VolInit)
-            {
-                minimum = getVolume(textBoxSetting_VolMin, minimum);
-                maximum = getVolume(textBoxSetting_VolMax, maximum);
-            }
-            if (textBox == textBoxSetting_VolMax)
-            {
-                minimum = getVolume(textBoxSetting_VolMin, minimum);
-            }
-            limitText(textBox, minimum, maximum);
         }
 
         private void textBoxSetting_Time_TextChanged(object sender, EventArgs e)
@@ -419,11 +410,6 @@ namespace Tonuino_RFID_Creator
         private void comboBox_ModiCardOptions_SelectedIndexChanged(object sender, EventArgs e)
         {
             updateWriteDataControls();
-        }
-
-        private void comboBox_Equalizer_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
         }
 
         #endregion

@@ -109,7 +109,6 @@ namespace Tonuino_RFID_Creator
         #region Card Data Handling
 
         public static CardData CurrentCardRead { get; set; } = new CardData();
-        public static AdminSettings AdminSettingsRead { get; set; } = new AdminSettings();
 
         private static bool collectCardData = false;
         private static List<string> collectedData = new List<string>();
@@ -117,7 +116,6 @@ namespace Tonuino_RFID_Creator
         private static string KEYRead_TriggerBEGIN { get; } = "Tonuino_Admin_Tool_BEGIN";
         private static string KEYRead_TriggerEND { get; } = "Tonuino_Admin_Tool_END";
         private static string KEYRead_CardData { get; } = "CardData";
-        private static string KEYRead_AdminSettings { get; } = "AdminSettings";
         private static char Read_KeyValueSeparator { get; } = ':';
 
         private static void collectForCardData(string receivedText)
@@ -138,11 +136,6 @@ namespace Tonuino_RFID_Creator
                 {
                     CurrentCardRead = getCardData(collectedData);
                     MainForm.Instance.UpdateCardData();
-                }
-                if (section.Contains(KEYRead_AdminSettings))
-                {
-                    AdminSettingsRead = getAdminSettings(collectedData);
-                    MainForm.Instance.UpdateAdminSettings();
                 }
                 collectCardData = false;
             }
@@ -165,38 +158,27 @@ namespace Tonuino_RFID_Creator
                 // Defined order - has to be in sync with Tonuino sketch!!
                 long rfid = getLong(textLines[0]);
                 int cookie = getInt(textLines[1]);
-                int folder = getInt(textLines[2]);
+                byte folder = getByte(textLines[2]);
                 if (folder == 0)
                 {
-                    EModiType modiType = ModiType.FromNumber(getInt(textLines[3]));
-                    TimeSpan sleepTime = TimeSpan.FromMinutes(getInt(textLines[4]));
+                    EModiType modiType = ModiType.FromNumber(getByte(textLines[3]));
+                    TimeSpan sleepTime = TimeSpan.FromMinutes(getByte(textLines[4]));
                     data = new ModiCardData(rfid, cookie, modiType, sleepTime);
                 }
                 else
                 {
-                    EMusicMode mode = MusicMode.FromNumber(getInt(textLines[3]));
-                    int start = getInt(textLines[4]);
-                    int end = getInt(textLines[5]);
+                    EMusicMode mode = MusicMode.FromNumber(getByte(textLines[3]));
+                    byte start = getByte(textLines[4]);
+                    byte end = getByte(textLines[5]);
                     data = new MusicCardData(rfid, cookie, mode, folder, start, end);
                 }
             }
             return data;
         }
 
-        private static AdminSettings getAdminSettings(List<string> textLines)
+        private static byte getByte(string text)
         {
-            AdminSettings data = new AdminSettings();
-            if (textLines.Count == 5)
-            {
-                // Defined order - has to be in sync with Tonuino sketch!!
-                int minVol = getInt(textLines[0]);
-                int maxVol = getInt(textLines[1]);
-                int initVol = getInt(textLines[2]);
-                TimeSpan standbyTime = TimeSpan.FromMinutes(getInt(textLines[3]));
-                EEqualizerType equalizer = EqualizerType.FromNumber(getInt(textLines[4]));
-                data = new AdminSettings(minVol, initVol, maxVol, standbyTime, equalizer);
-            }
-            return data;
+            return (byte)getLong(text);
         }
 
         private static int getInt(string text)
@@ -225,30 +207,27 @@ namespace Tonuino_RFID_Creator
             return 0;
         }
 
-        public void Write(CardData cardData)
+        public static void Write(ICardData cardData)
         {
-            string formattedLineText = cardData.ToString();
-
+            string formattedLineText = toString(cardData);
             WriteLine(formattedLineText);
         }
 
-        private static char SEPARATOR { get; } = ';';
+        private const string SEPARATOR = ";";
 
-        private static string toString(MusicCardData data)
+        private static string toString(ICardData data)
         {
             // Defined order - has to be in sync with Tonuino sketch - don't change!!
-            List<object> items = new List<object>()
+            List<byte> items = new List<byte>()
             {
-                data.RFID,
-                data.Folder,
-                data.Mode.Index,
-                data.StartPos,
-                data.EndPos
+                data.Raw_Folder,
+                data.Raw_Mode,
+                data.Raw_Special,
+                data.Raw_Special2
             };
-            return string.Join(SEPARATOR.ToString(), items);
+            return string.Join(SEPARATOR, items);
         }
 
         #endregion
-
     }
 }

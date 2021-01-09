@@ -44,12 +44,8 @@ struct nfcTagObject {
   uint32_t cookie;
   uint8_t version;
   folderSettings nfcFolderSettings;
-  //  uint8_t folder;
-  //  uint8_t mode;
-  //  uint8_t special;
-  //  uint8_t special2;
 };
-
+ 
 // admin settings stored in eeprom
 struct adminSettings {
   uint32_t cookie;
@@ -269,8 +265,6 @@ void loadSettingsFromFlash() {
   Serial.print(mySettings.adminMenuPin[1]);
   Serial.print(mySettings.adminMenuPin[2]);
   Serial.println(mySettings.adminMenuPin[3]);
-
-  transmitAdminSettings(mySettings);
 }
 
 void loadDataFromFlash()
@@ -1156,6 +1150,82 @@ void handleCardReader()
   }
 }
 
+char readSerialString[20];
+
+void handleAdminToolCommand()
+{
+  Serial.println("Admin_Tool_Command_Received");
+  Serial.println(readSerialString);
+
+  folderSettings receivedFS;
+  int index = 0;
+  char* command = strtok(readSerialString, ";");
+  while(command != NULL) 
+  {
+    int charToInt = atoi(command);
+    byte parsedByte = (byte)charToInt;
+    switch (index)
+    {
+      case 0: receivedFS.folder = parsedByte; break;
+      case 1: receivedFS.mode = parsedByte; break;
+      case 2: receivedFS.special = parsedByte; break;
+      case 3: receivedFS.special2 = parsedByte; break;
+    }
+    index++;
+    // create next part
+    command = strtok(NULL, ";");
+  }
+
+  Serial.println(receivedFS.folder);
+  Serial.println(receivedFS.mode);
+  Serial.println(receivedFS.special);
+  Serial.println(receivedFS.special2);
+
+  nfcTagObject tempCard;
+  tempCard.cookie = cardCookie;
+  tempCard.version = 1;
+  tempCard.nfcFolderSettings.folder = receivedFS.folder;
+  tempCard.nfcFolderSettings.special = receivedFS.special;
+  tempCard.nfcFolderSettings.special2 = receivedFS.special2;
+  tempCard.nfcFolderSettings.mode = receivedFS.mode;
+
+  writeCard(tempCard);
+  delay(100);
+  mfrc522.PICC_HaltA();
+  mfrc522.PCD_StopCrypto1();
+
+  // force new card detection
+  transmitCardData(tempCard);
+  hasMusicCard = false;
+  hasModifierCard = false;
+}
+
+void listenToAdminTool()
+{
+  byte index = 0;
+  while (Serial.available()) 
+  {
+    if (index > sizeof(readSerialString))
+    {
+      break;
+    }
+    delay(3);  
+    char c = Serial.read();
+    readSerialString[index] = c; 
+    index++;
+    
+    // readSerialString = Serial.readString();
+  }
+  if (index > 0)
+  {
+    handleAdminToolCommand();
+    for(int i = 0; i < sizeof(readSerialString); ++i)
+    {
+      readSerialString[i] = (char)0;
+    }
+  }
+}
+
 void setStopLight()
 {
   if (isPlaying())
@@ -1182,6 +1252,8 @@ void loop()
       m_lastPlayState = isCurrentlyPlaying;
     }
 
+    listenToAdminTool();
+    
     // Modifier : WIP!
     if (activeModifier != NULL) {
       activeModifier->loop();
@@ -1704,25 +1776,6 @@ void playAdvertisement(int advertisement)
     delay(100);
     mp3.pause();
   }
-}
-
-void transmitAdminSettings(adminSettings settings)
-{
-  // this information is required for Tonuino Admin Tool
-  // the formatting and order of the transmitted data is defined and must be in sync with the tool
-  transmitAdminToolTrigger(true);
-  Serial.println("AdminSettings");
-  Serial.print("MinVolume:");
-  Serial.println(settings.minVolume);
-  Serial.print("MaxVolume:");
-  Serial.println(settings.maxVolume);
-  Serial.print("InitVolume:");
-  Serial.println(settings.initVolume);
-  Serial.print("StandbyTime:");
-  Serial.println(settings.standbyTimer);
-  Serial.print("Equaliizer:");
-  Serial.println(settings.eq);
-  transmitAdminToolTrigger(false);
 }
 
 void transmitCardData(nfcTagObject nfcTag)
