@@ -1,10 +1,9 @@
 
-#include "Tonuino_Defines.h"
+#include "Tonuino_Defines_Tools.h"
 
 #ifdef TONUINO_MIRA
 
 #include "Tonuino_Mira.h"
-
 
 #include <EEPROM.h>
 #include <DFMiniMp3.h>
@@ -1906,16 +1905,6 @@ void writeCard(nfcTagObject nfcTag)
 }
 
 
-
-/**
-  Helper routine to dump a byte array as hex values to Serial.
-*/
-void dump_byte_array(byte * buffer, byte bufferSize) {
-  for (byte i = 0; i < bufferSize; i++) {
-    Serial.print(buffer[i] < 0x10 ? " 0" : " ");
-    Serial.print(buffer[i], HEX);
-  }
-}
 
 ///////////////////////////////////////// Check Bytes   ///////////////////////////////////
 bool checkTwo ( uint8_t a[], uint8_t b[] ) {

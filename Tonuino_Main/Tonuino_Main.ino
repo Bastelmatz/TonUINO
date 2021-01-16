@@ -2,8 +2,9 @@
 // HOW TO: including files
 // - from the libraries folder, and subfolders, uses <> around the path/file name.
 // - from the sketch folder, and subfolders, uses "" around the path/file name.
+// + local includes from included files must be stated here already
 
-#include "Tonuino_Defines.h"
+#include "src/Tonuino_Defines_Tools.h"
 
 // ******************************************
 //  Tonuino Tool
@@ -11,7 +12,10 @@
 
 #ifdef TONUINO_RFID_TOOL
 
-#include "Tonuino_RFID_Tool.h";
+#include "src/Tonuino_RFID_Tool.h";
+
+// local includes from included files must be stated here already
+#include "src/shared/Tonuino_RFID.h"
 
 void setup()
 {
@@ -30,7 +34,7 @@ void loop()
 
 #ifdef TONUINO_MIRA
 
-#include "Tonuino_Mira.h";
+#include "src/Tonuino_Mira.h";
 
 void setup()
 {
