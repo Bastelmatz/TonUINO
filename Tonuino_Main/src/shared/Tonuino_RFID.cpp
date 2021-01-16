@@ -30,6 +30,12 @@ bool Tonuino_RFID_Reader::cardDetected()
   return detected;
 }
 
+void Tonuino_RFID_Reader::haltAndStop()
+{
+  mfrc522.PICC_HaltA();
+  mfrc522.PCD_StopCrypto1();
+}
+
 byte Tonuino_RFID_Reader::pollCard()
 {
   if (hasAnyCard())
@@ -87,8 +93,7 @@ bool Tonuino_RFID_Reader::isCardGone()
 	else
 	{
 		Serial.println(F("card gone"));
-		mfrc522.PICC_HaltA();
-		mfrc522.PCD_StopCrypto1();
+		haltAndStop();
 		return true;
 	}
   }

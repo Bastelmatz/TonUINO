@@ -6,7 +6,6 @@
 #include "Tonuino_Mira.h"
 
 
-#include <EEPROM.h>
 #include <DFMiniMp3.h>
 #include <JC_Button.h>
 #include <MFRC522.h>
@@ -41,22 +40,8 @@ uint16_t firstTrack;
 uint8_t queue[255];
 uint8_t volume;
 
-// admin settings stored in eeprom
-struct adminSettings {
-  uint32_t cookie;
-  byte version;
-  uint8_t maxVolume;
-  uint8_t minVolume;
-  uint8_t initVolume;
-  uint8_t eq;
-  bool locked;
-  long standbyTimer;
-  folderSettings shortCuts[4];
-  uint8_t adminMenuLocked;
-  uint8_t adminMenuPin[4];
-};
+TonuinoEEPROM tonuinoEEPROM;
 
-adminSettings mySettings;
 nfcTagObject myCard;
 folderSettings *myFolder;
 folderSettings lastFolder;
@@ -128,143 +113,6 @@ void shuffleQueue() {
     for (uint8_t x = 0; x < numTracksInFolder - firstTrack + 1 ; x++)
       Serial.println(queue[x]);
   */
-}
-
-int lastFolderSize = 4;
-
-int flashAddress_Track() {
-  return lastFolderSize + myFolder->folder;
-}
-
-int flashAddress_Settings() {
-  return lastFolderSize + sizeof(myFolder->folder) * 100;
-}
-
-void writeLastFolderToFlash() {
-  Serial.println(F("=== writeLastFolderToFlash()"));
-  EEPROM.put(0, lastFolder);
-}
-
-void loadLastFolderFromFlash() {
-  Serial.println(F("=== loadLastFolderFromFlash()"));
-  EEPROM.get(0, lastFolder);
-  
-  Serial.print(F("Last folder: "));
-  Serial.println(lastFolder.folder);
-  Serial.print(F("Last mode: "));
-  Serial.println(lastFolder.mode);
-  Serial.print(F("Last special: "));
-  Serial.println(lastFolder.special);
-  Serial.print(F("Last special2: "));
-  Serial.println(lastFolder.special2);
-}
-
-void writeLastTrackToFlash(uint8_t track) {
-  Serial.println(F("=== writeLastTrackToFlash()"));
-  EEPROM.update(flashAddress_Track(), track);
-}
-
-void loadLastTrackFromFlash() {
-  Serial.println(F("=== loadLastTrackFromFlash()"));
-  currentTrack = EEPROM.read(flashAddress_Track());
-  
-  Serial.print(F("Last track: "));
-  Serial.println(currentTrack);
-  
-  if (currentTrack == 0 || currentTrack > numTracksInFolder) 
-  {
-    currentTrack = 1;
-  }
-}
-
-void writeSettingsToFlash() {
-  Serial.println(F("=== writeSettingsToFlash()"));
-  int address = flashAddress_Settings();
-  EEPROM.put(address, mySettings);
-}
-
-void resetSettings() {
-  Serial.println(F("=== resetSettings()"));
-  mySettings.cookie = cardCookie;
-  mySettings.version = 2;
-  mySettings.maxVolume = 10;
-  mySettings.minVolume = 1;
-  mySettings.initVolume = 5;
-  mySettings.eq = 1;
-  mySettings.locked = false;
-  mySettings.standbyTimer = 0;
-  mySettings.shortCuts[0].folder = 0;
-  mySettings.shortCuts[1].folder = 0;
-  mySettings.shortCuts[2].folder = 0;
-  mySettings.shortCuts[3].folder = 0;
-  mySettings.adminMenuLocked = 0;
-  mySettings.adminMenuPin[0] = 1;
-  mySettings.adminMenuPin[1] = 1;
-  mySettings.adminMenuPin[2] = 1;
-  mySettings.adminMenuPin[3] = 1;
-
-  writeSettingsToFlash();
-}
-
-void migrateSettings(int oldVersion) {
-  if (oldVersion == 1) {
-    Serial.println(F("=== resetSettings()"));
-    Serial.println(F("1 -> 2"));
-    mySettings.version = 2;
-    mySettings.adminMenuLocked = 0;
-    mySettings.adminMenuPin[0] = 1;
-    mySettings.adminMenuPin[1] = 1;
-    mySettings.adminMenuPin[2] = 1;
-    mySettings.adminMenuPin[3] = 1;
-    writeSettingsToFlash();
-  }
-}
-
-void loadSettingsFromFlash() {
-  Serial.println(F("=== loadSettingsFromFlash()"));
-  int address = flashAddress_Settings();
-  EEPROM.get(address, mySettings);
-  if (mySettings.cookie != cardCookie)
-  {
-    resetSettings();
-  }
-  migrateSettings(mySettings.version);
-
-  Serial.print(F("Version: "));
-  Serial.println(mySettings.version);
-
-  Serial.print(F("Maximal Volume: "));
-  Serial.println(mySettings.maxVolume);
-
-  Serial.print(F("Minimal Volume: "));
-  Serial.println(mySettings.minVolume);
-
-  Serial.print(F("Initial Volume: "));
-  Serial.println(mySettings.initVolume);
-
-  Serial.print(F("EQ: "));
-  Serial.println(mySettings.eq);
-
-  Serial.print(F("Locked: "));
-  Serial.println(mySettings.locked);
-
-  Serial.print(F("Sleep Timer: "));
-  Serial.println(mySettings.standbyTimer);
-
-  Serial.print(F("Admin Menu locked: "));
-  Serial.println(mySettings.adminMenuLocked);
-
-  Serial.print(F("Admin Menu Pin: "));
-  Serial.print(mySettings.adminMenuPin[0]);
-  Serial.print(mySettings.adminMenuPin[1]);
-  Serial.print(mySettings.adminMenuPin[2]);
-  Serial.println(mySettings.adminMenuPin[3]);
-}
-
-void loadDataFromFlash()
-{
-  loadSettingsFromFlash();
-  loadLastFolderFromFlash();
 }
 
 void pauseAndStandBy()
@@ -539,7 +387,7 @@ class RepeatSingleModifier: public Modifier {
 class FeedbackModifier: public Modifier {
   public:
     virtual bool handleVolumeDown() {
-      if (volume > mySettings.minVolume) {
+      if (volume > tonuinoEEPROM.mySettings.minVolume) {
         mp3.playAdvertisement(volume - 1);
       }
       else {
@@ -550,7 +398,7 @@ class FeedbackModifier: public Modifier {
       return false;
     }
     virtual bool handleVolumeUp() {
-      if (volume < mySettings.maxVolume) {
+      if (volume < tonuinoEEPROM.mySettings.maxVolume) {
         mp3.playAdvertisement(volume + 1);
       }
       else {
@@ -593,8 +441,8 @@ bool ignorePreviousButton = false;
 
 void setstandbyTimer() {
   Serial.println(F("=== setstandbyTimer()"));
-  if (mySettings.standbyTimer != 0)
-    sleepAtMillis = millis() + (mySettings.standbyTimer * 60 * 1000);
+  if (tonuinoEEPROM.mySettings.standbyTimer != 0)
+    sleepAtMillis = millis() + (tonuinoEEPROM.mySettings.standbyTimer * 60 * 1000);
   else
     sleepAtMillis = 0;
   Serial.println(sleepAtMillis);
@@ -638,6 +486,17 @@ void waitForTrackToFinish() {
   do {
     mp3.loop();
   } while (isPlaying());
+}
+
+void loadDataFromFlash()
+{
+  tonuinoEEPROM.loadSettingsFromFlash();
+  lastFolder = tonuinoEEPROM.loadLastFolderFromFlash();
+}
+
+void writeLastTrackToFlash(uint8_t track)
+{
+  tonuinoEEPROM.writeLastTrackToFlash(track, myFolder);
 }
 
 // Leider kann das Modul selbst keine Queue abspielen, daher müssen wir selbst die Queue verwalten
@@ -756,14 +615,6 @@ static void previousTrack() {
   delay(1000);
 }
 
-void resetEEPROM()
-{
-  Serial.println(F("Reset -> EEPROM wird gelöscht"));
-  for (int i = 0; i < EEPROM.length(); i++) {
-    EEPROM.update(i, 0);
-  }
-}
-
 void setupTonuino() {
 
   Serial.begin(115200); // Es gibt ein paar Debug Ausgaben über die serielle Schnittstelle
@@ -799,10 +650,10 @@ void setupTonuino() {
   mp3.begin();
   // Zwei Sekunden warten bis der DFPlayer Mini initialisiert ist
   delay(2000);
-  volume = mySettings.initVolume;
+  volume = tonuinoEEPROM.mySettings.initVolume;
   oldPotiValue = volume;
   mp3.setVolume(volume);
-  mp3.setEq(mySettings.eq - 1);
+  mp3.setEq(tonuinoEEPROM.mySettings.eq - 1);
   // Fix für das Problem mit dem Timeout (ist jetzt in Upstream daher nicht mehr nötig!)
   //mySoftwareSerial.setTimeout(10000);
 
@@ -820,8 +671,9 @@ void setupTonuino() {
   digitalWrite(shutdownPin, LOW);
 
   // RESET --- ALLE DREI KNÖPFE BEIM STARTEN GEDRÜCKT HALTEN -> alle EINSTELLUNGEN werden gelöscht
-  if (digitalRead(buttonPause) == LOW && digitalRead(buttonNext) == LOW && digitalRead(buttonPrevious) == LOW) {
-    resetEEPROM();
+  if (digitalRead(buttonPause) == LOW && digitalRead(buttonNext) == LOW && digitalRead(buttonPrevious) == LOW) 
+  {
+    tonuinoEEPROM.resetEEPROM();
     loadDataFromFlash();
   }
 
@@ -844,11 +696,11 @@ void readButtons() {
 
 void readPotentiometer() {     
     PotiValue = analogRead(PotiPin);
-    PotiValue = map(PotiValue,0,1024,mySettings.minVolume,mySettings.maxVolume);
+    PotiValue = map(PotiValue,0,1024,tonuinoEEPROM.mySettings.minVolume,tonuinoEEPROM.mySettings.maxVolume);
     // Vergleiche aktueller Lautstärke-Potistellung mit der alten Stellung inkl. Hysterese 
     // pressing A0 pause button causes low level for poti voltage = max volume
-    if ((PotiValue > oldPotiValue + PotiHysterese && PotiValue <= mySettings.maxVolume)
-     || (PotiValue < oldPotiValue - PotiHysterese && PotiValue >= mySettings.minVolume))  
+    if ((PotiValue > oldPotiValue + PotiHysterese && PotiValue <= tonuinoEEPROM.mySettings.maxVolume)
+     || (PotiValue < oldPotiValue - PotiHysterese && PotiValue >= tonuinoEEPROM.mySettings.minVolume))  
     {
         Serial.print("Potentiometer Volumen: ");
         Serial.println(PotiValue);       
@@ -888,30 +740,39 @@ void loadFolder()
   Serial.println(myFolder->folder);
 
   // Hörspielmodus: eine zufällige Datei aus dem Ordner
-  if (myFolder->mode == 1) {
+  if (myFolder->mode == 1) 
+  {
     Serial.println(F("Hörspielmodus -> zufälligen Track wiedergeben"));
     currentTrack = random(1, numTracksInFolder + 1);
   }
   // Album Modus: kompletten Ordner spielen
-  if (myFolder->mode == 2) {
+  if (myFolder->mode == 2) 
+  {
     Serial.println(F("Album Modus -> kompletten Ordner wiedergeben"));
     currentTrack = 1;
   }
   // Party Modus: Ordner in zufälliger Reihenfolge
-  if (myFolder->mode == 3) {
+  if (myFolder->mode == 3) 
+  {
     Serial.println(F("Party Modus -> Ordner in zufälliger Reihenfolge wiedergeben"));
     shuffleQueue();
     currentTrack = 1;
   }
   // Einzel Modus: eine Datei aus dem Ordner abspielen
-  if (myFolder->mode == 4) {
+  if (myFolder->mode == 4) 
+  {
     Serial.println(F("Einzel Modus -> eine Datei aus dem Odrdner abspielen"));
     currentTrack = myFolder->special;
   }
   // Hörbuch Modus: kompletten Ordner spielen und Fortschritt merken
-  if (myFolder->mode == 5) {
+  if (myFolder->mode == 5) 
+  {
     Serial.println(F("Hörbuch Modus -> kompletten Ordner spielen und Fortschritt merken"));
-    loadLastTrackFromFlash();
+    currentTrack = tonuinoEEPROM.loadLastTrackFromFlash(myFolder);
+	if (currentTrack == 0 || currentTrack > numTracksInFolder) 
+    {
+      currentTrack = 1;
+    }
   }
   // Spezialmodus Von-Bin: Hörspiel: eine zufällige Datei aus dem Ordner
   if (myFolder->mode == 7) 
@@ -983,8 +844,8 @@ void loadAndPlayFolder()
 void playShortCut(uint8_t shortCut) {
   Serial.println(F("=== playShortCut()"));
   Serial.println(shortCut);
-  if (mySettings.shortCuts[shortCut].folder != 0) {
-    myFolder = &mySettings.shortCuts[shortCut];
+  if (tonuinoEEPROM.mySettings.shortCuts[shortCut].folder != 0) {
+    myFolder = &tonuinoEEPROM.mySettings.shortCuts[shortCut];
     loadAndPlayFolder();
     disablestandbyTimer();
     delay(1000);
@@ -1167,7 +1028,7 @@ void onNewCard()
     loadAndPlayFolder();
     // Save last folder for next power up
     lastFolder = myCard.nfcFolderSettings;
-    writeLastFolderToFlash();
+    tonuinoEEPROM.writeLastFolderToFlash(lastFolder);
   }
   // Neue Karte konfigurieren
   else if (myCard.cookie != cardCookie) 
@@ -1199,15 +1060,15 @@ void adminMenu(bool fromCard = false) {
   knownCard = false;
   if (fromCard == false) {
     // Admin menu has been locked - it still can be trigged via admin card
-    if (mySettings.adminMenuLocked == 1) {
+    if (tonuinoEEPROM.mySettings.adminMenuLocked == 1) {
       return;
     }
     // Pin check
-    else if (mySettings.adminMenuLocked == 2) {
+    else if (tonuinoEEPROM.mySettings.adminMenuLocked == 2) {
       uint8_t pin[4];
       mp3.playMp3FolderTrack(991);
       if (askCode(pin) == true) {
-        if (checkTwo(pin, mySettings.adminMenuPin) == false) {
+        if (checkTwo(pin, tonuinoEEPROM.mySettings.adminMenuPin) == false) {
           return;
         }
       } else {
@@ -1215,7 +1076,7 @@ void adminMenu(bool fromCard = false) {
       }
     }
     // Match check
-    else if (mySettings.adminMenuLocked == 3) {
+    else if (tonuinoEEPROM.mySettings.adminMenuLocked == 3) {
       uint8_t a = random(10, 20);
       uint8_t b = random(1, 10);
       uint8_t c;
@@ -1247,27 +1108,27 @@ void adminMenu(bool fromCard = false) {
   int subMenu = voiceMenu(12, 900, 900, false, false, 0, true);
   if (subMenu == 0)
     return;
-  if (subMenu == 1) {
+  if (subMenu == 1) 
+  {
     resetCard();
-    mfrc522.PICC_HaltA();
-    mfrc522.PCD_StopCrypto1();
+    tonuinoRFID.haltAndStop();
   }
   else if (subMenu == 2) {
     // Maximum Volume
-    mySettings.maxVolume = voiceMenu(30 - mySettings.minVolume, 930, mySettings.minVolume, false, false, mySettings.maxVolume - mySettings.minVolume) + mySettings.minVolume;
+    tonuinoEEPROM.mySettings.maxVolume = voiceMenu(30 - tonuinoEEPROM.mySettings.minVolume, 930, tonuinoEEPROM.mySettings.minVolume, false, false, tonuinoEEPROM.mySettings.maxVolume - tonuinoEEPROM.mySettings.minVolume) + tonuinoEEPROM.mySettings.minVolume;
   }
   else if (subMenu == 3) {
     // Minimum Volume
-    mySettings.minVolume = voiceMenu(mySettings.maxVolume - 1, 931, 0, false, false, mySettings.minVolume);
+    tonuinoEEPROM.mySettings.minVolume = voiceMenu(tonuinoEEPROM.mySettings.maxVolume - 1, 931, 0, false, false, tonuinoEEPROM.mySettings.minVolume);
   }
   else if (subMenu == 4) {
     // Initial Volume
-    mySettings.initVolume = voiceMenu(mySettings.maxVolume - mySettings.minVolume + 1, 932, mySettings.minVolume - 1, false, false, mySettings.initVolume - mySettings.minVolume + 1) + mySettings.minVolume - 1;
+    tonuinoEEPROM.mySettings.initVolume = voiceMenu(tonuinoEEPROM.mySettings.maxVolume - tonuinoEEPROM.mySettings.minVolume + 1, 932, tonuinoEEPROM.mySettings.minVolume - 1, false, false, tonuinoEEPROM.mySettings.initVolume - tonuinoEEPROM.mySettings.minVolume + 1) + tonuinoEEPROM.mySettings.minVolume - 1;
   }
   else if (subMenu == 5) {
     // EQ
-    mySettings.eq = voiceMenu(6, 920, 920, false, false, mySettings.eq);
-    mp3.setEq(mySettings.eq - 1);
+    tonuinoEEPROM.mySettings.eq = voiceMenu(6, 920, 920, false, false, tonuinoEEPROM.mySettings.eq);
+    mp3.setEq(tonuinoEEPROM.mySettings.eq - 1);
   }
   else if (subMenu == 6) {
     // create modifier card
@@ -1296,24 +1157,23 @@ void adminMenu(bool fromCard = false) {
         Serial.println(F("schreibe Karte..."));
         writeCard(tempCard);
         delay(100);
-        mfrc522.PICC_HaltA();
-        mfrc522.PCD_StopCrypto1();
+        tonuinoRFID.haltAndStop();
         waitForTrackToFinish();
       }
     }
   }
   else if (subMenu == 7) {
     uint8_t shortcut = voiceMenu(4, 940, 940);
-    setupFolder(&mySettings.shortCuts[shortcut - 1]);
+    setupFolder(&tonuinoEEPROM.mySettings.shortCuts[shortcut - 1]);
     mp3.playMp3FolderTrack(400);
   }
   else if (subMenu == 8) {
     switch (voiceMenu(5, 960, 960)) {
-      case 1: mySettings.standbyTimer = 5; break;
-      case 2: mySettings.standbyTimer = 15; break;
-      case 3: mySettings.standbyTimer = 30; break;
-      case 4: mySettings.standbyTimer = 60; break;
-      case 5: mySettings.standbyTimer = 0; break;
+      case 1: tonuinoEEPROM.mySettings.standbyTimer = 5; break;
+      case 2: tonuinoEEPROM.mySettings.standbyTimer = 15; break;
+      case 3: tonuinoEEPROM.mySettings.standbyTimer = 30; break;
+      case 4: tonuinoEEPROM.mySettings.standbyTimer = 60; break;
+      case 5: tonuinoEEPROM.mySettings.standbyTimer = 0; break;
     }
   }
   else if (subMenu == 9) {
@@ -1343,40 +1203,40 @@ void adminMenu(bool fromCard = false) {
         Serial.println(F("schreibe Karte..."));
         writeCard(tempCard);
         delay(100);
-        mfrc522.PICC_HaltA();
-        mfrc522.PCD_StopCrypto1();
+        tonuinoRFID.haltAndStop();
         waitForTrackToFinish();
       }
     }
   }
-  else if (subMenu == 11) {
-    resetEEPROM();
-    resetSettings();
+  else if (subMenu == 11) 
+  {
+    tonuinoEEPROM.resetEEPROM();
+    tonuinoEEPROM.resetSettings();
     mp3.playMp3FolderTrack(999);
   }
   // lock admin menu
   else if (subMenu == 12) {
     int temp = voiceMenu(4, 980, 980, false);
     if (temp == 1) {
-      mySettings.adminMenuLocked = 0;
+      tonuinoEEPROM.mySettings.adminMenuLocked = 0;
     }
     else if (temp == 2) {
-      mySettings.adminMenuLocked = 1;
+      tonuinoEEPROM.mySettings.adminMenuLocked = 1;
     }
     else if (temp == 3) {
       int8_t pin[4];
       mp3.playMp3FolderTrack(991);
       if (askCode(pin)) {
-        memcpy(mySettings.adminMenuPin, pin, 4);
-        mySettings.adminMenuLocked = 2;
+        memcpy(tonuinoEEPROM.mySettings.adminMenuPin, pin, 4);
+        tonuinoEEPROM.mySettings.adminMenuLocked = 2;
       }
     }
     else if (temp == 4) {
-      mySettings.adminMenuLocked = 3;
+      tonuinoEEPROM.mySettings.adminMenuLocked = 3;
     }
 
   }
-  writeSettingsToFlash();
+  tonuinoEEPROM.writeSettingsToFlash();
   setstandbyTimer();
 }
 
@@ -1613,7 +1473,7 @@ bool evaluateCardData(nfcTagObject tempCard, nfcTagObject * nfcTag)
       switch (tempCard.nfcFolderSettings.mode ) {
         case 0:
         case 255:
-          mfrc522.PICC_HaltA(); mfrc522.PCD_StopCrypto1(); adminMenu(true);  break;
+          tonuinoRFID.haltAndStop(); adminMenu(true);  break;
         case 1: activeModifier = new SleepTimer(tempCard.nfcFolderSettings.special); break;
         case 2: activeModifier = new FreezeDance(); break;
         case 3: activeModifier = new Locked(); break;

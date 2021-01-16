@@ -2,6 +2,10 @@
 #include <SPI.h>
 #include <avr/sleep.h>
 
+// prevent multiple definitions
+#ifndef TONUINO_RFID_INCLUDED
+#define TONUINO_RFID_INCLUDED
+
 static const uint32_t cardCookie = 322417479;
 
 struct folderSettings {
@@ -58,11 +62,11 @@ public:
 
 	bool cardSerialFound();
 	bool cardDetected();
-
+	void haltAndStop();
+	
 	byte tryPollCard();
 
 	bool writeCard(nfcTagObject nfcTag);
-
 
 private:
 	byte pollCard();
@@ -71,3 +75,4 @@ private:
 	bool readCard();
 };
 
+#endif
