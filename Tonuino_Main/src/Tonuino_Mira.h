@@ -2,6 +2,8 @@
 #include <avr/sleep.h> // for byte type
 #include "shared/Tonuino_RFID.h"
 #include "shared/Tonuino_EEPROM.h"
+#include "shared/Tonuino_Player.h"
+#include <SPI.h>
 
 void loopTonuino();
 void setupTonuino();

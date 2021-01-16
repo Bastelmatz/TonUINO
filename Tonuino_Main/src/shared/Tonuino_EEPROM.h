@@ -1,5 +1,4 @@
 
-// #include <SPI.h>
 #include "Tonuino_RFID.h"
 
 // prevent multiple definitions
