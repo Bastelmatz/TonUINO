@@ -1,0 +1,3 @@
+
+void setupTool();
+void loopTool();
