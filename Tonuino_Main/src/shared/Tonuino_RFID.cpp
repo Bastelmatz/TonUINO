@@ -205,7 +205,7 @@ bool Tonuino_RFID_Reader::readCard()
   return true;
 }
 
-void Tonuino_RFID_Reader::writeCard(nfcTagObject nfcTag) 
+bool Tonuino_RFID_Reader::writeCard(nfcTagObject nfcTag) 
 {
   byte buffer[16] = {0x13, 0x37, 0xb3, 0x47, // 0x1337 0xb347 magic cookie to identify our nfc tags
 					 0x02,                   // version 1
@@ -238,7 +238,7 @@ void Tonuino_RFID_Reader::writeCard(nfcTagObject nfcTag)
   {
 	Serial.print(F("PCD_Authenticate() failed: "));
 	Serial.println(mfrc522.GetStatusCodeName(status));
-	return;
+	return false;
   }
 
   // Write data to the block
@@ -272,6 +272,8 @@ void Tonuino_RFID_Reader::writeCard(nfcTagObject nfcTag)
   }
   Serial.println();
   delay(2000);
+  
+  return status == MFRC522::STATUS_OK;
 }
 
 /**

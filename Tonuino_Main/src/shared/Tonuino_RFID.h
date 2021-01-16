@@ -61,7 +61,7 @@ public:
 
 	byte tryPollCard();
 
-	void writeCard(nfcTagObject nfcTag);
+	bool writeCard(nfcTagObject nfcTag);
 
 
 private:

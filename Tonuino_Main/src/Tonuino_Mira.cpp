@@ -5,6 +5,7 @@
 
 #include "Tonuino_Mira.h"
 
+
 #include <EEPROM.h>
 #include <DFMiniMp3.h>
 #include <JC_Button.h>
@@ -29,7 +30,8 @@
 static bool StopPlayOnCardRemoval = false;
 // *******************************************
 
-static const uint32_t cardCookie = 322417479;
+// RFID reader
+Tonuino_RFID_Reader tonuinoRFID;
 
 // DFPlayer Mini
 SoftwareSerial mySoftwareSerial(2, 3); // RX, TX
@@ -56,7 +58,6 @@ struct adminSettings {
 
 adminSettings mySettings;
 nfcTagObject myCard;
-nfcTagObject tempCard;
 folderSettings *myFolder;
 folderSettings lastFolder;
 unsigned long sleepAtMillis = 0;
@@ -565,16 +566,6 @@ class FeedbackModifier: public Modifier {
     }
 };
 
-// MFRC522
-#define RST_PIN 9                 // Configurable, see typical pin layout above
-#define SS_PIN 10                 // Configurable, see typical pin layout above
-MFRC522 mfrc522(SS_PIN, RST_PIN); // Create MFRC522
-MFRC522::MIFARE_Key key;
-const byte sector = 1;
-const byte blockAddr = 4;
-const byte trailerBlock = 7;
-MFRC522::StatusCode status;
-
 #define buttonPause A1
 #define buttonNext A3
 #define buttonPrevious A4
@@ -816,12 +807,7 @@ void setupTonuino() {
   //mySoftwareSerial.setTimeout(10000);
 
   // NFC Leser initialisieren
-  SPI.begin();        // Init SPI bus
-  mfrc522.PCD_Init(); // Init MFRC522
-  mfrc522.PCD_DumpVersionToSerial(); // Show details of PCD - MFRC522 Card Reader
-  for (byte i = 0; i < 6; i++) {
-    key.keyByte[i] = 0xFF;
-  }
+  tonuinoRFID.setupRFID();
 
   pinMode(buttonPause, INPUT_PULLUP);
   pinMode(buttonNext, INPUT_PULLUP);
@@ -1007,107 +993,6 @@ void playShortCut(uint8_t shortCut) {
     Serial.println(F("Shortcut not configured!"));
 }
 
-bool cardSerialFound()
-{
-  bool found = mfrc522.PICC_ReadCardSerial();
-  return found;
-}
-
-bool cardDetected()
-{
-  bool detected = mfrc522.PICC_IsNewCardPresent();
-  return detected;
-}
-
-static bool hasMusicCard = false;
-static bool hasModifierCard = false;
-static bool hasAnyCard() { return hasMusicCard || hasModifierCard; }
-
-static byte lastMusicCardUid[4];
-static byte retries;
-const byte maxRetries = 2;
-static bool lastMusicCardWasUL;
-static bool lastModifierCardWasUL;
-
-const byte MUSICCARD_NO_CHANGE = 0; // no change detected since last pollCard() call
-const byte MUSICCARD_NEW       = 1; // card with new UID detected (had no card or other card before)
-const byte ALLCARDS_GONE       = 2; // card is not reachable anymore
-const byte MUSICCARD_IS_BACK   = 3; // card was gone, and is now back again
-
-
-byte pollCard()
-{
-  if (hasAnyCard())
-  {
-    if (isCardGone())
-    {
-      hasMusicCard = false;
-      hasModifierCard = false;
-         
-      return ALLCARDS_GONE;
-    }
-  }
-  else
-  {
-    if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial() && readCard())
-    {
-      retries = maxRetries;
-      bool currentCardIsUL = mfrc522.PICC_GetType(mfrc522.uid.sak) == MFRC522::PICC_TYPE_MIFARE_UL;
-      if (evaluateCardData(tempCard, &myCard))
-      {
-        hasMusicCard = true;
-        lastMusicCardWasUL = currentCardIsUL;
-        return isSameMusicCardAsLastOne() ? MUSICCARD_IS_BACK : MUSICCARD_NEW;
-      }
-      else
-      {
-        hasModifierCard = true;
-        lastModifierCardWasUL = currentCardIsUL;
-      }
-    }
-    return MUSICCARD_NO_CHANGE;
-  }
-  return MUSICCARD_NO_CHANGE;
-}
-
-bool isCardGone()
-{
-  // perform a dummy read command just to see whether the card is in range
-  byte buffer[18];
-  byte size = sizeof(buffer);
-
-  bool lastCardWasUL = hasMusicCard ? lastMusicCardWasUL : lastModifierCardWasUL;
-  if (mfrc522.MIFARE_Read(lastCardWasUL ? 8 : blockAddr, buffer, &size) == MFRC522::STATUS_OK)
-  {
-    retries = maxRetries;
-  }
-  else
-  {
-    if (retries > 0)
-    {
-        retries--;
-    }
-    else
-    {
-        Serial.println(F("card gone"));
-        mfrc522.PICC_HaltA();
-        mfrc522.PCD_StopCrypto1();
-        return true;
-    }
-  }
-  return false;
-}
-
-bool isSameMusicCardAsLastOne()
-{ 
-  bool bSameUID = !memcmp(lastMusicCardUid, mfrc522.uid.uidByte, 4);
-  Serial.print(F("IsSameAsLastMusicCardUID="));
-  Serial.println(bSameUID);
-  // store info about current card
-  memcpy(lastMusicCardUid, mfrc522.uid.uidByte, 4);
-  return bSameUID;
-}
-
 void handleCardReader()
 {
   // poll card only every 100ms
@@ -1117,7 +1002,17 @@ void handleCardReader()
   if (static_cast<uint8_t>(now - lastCardPoll) > 100)
   {
     lastCardPoll = now;
-    switch (pollCard())
+	
+	byte pollCardResult = tonuinoRFID.tryPollCard();
+	
+	if (pollCardResult == MUSICCARD_NEW || 
+		pollCardResult == MUSICCARD_IS_BACK ||
+		pollCardResult == MODIFIERCARD_NEW)
+	{
+		evaluateCardData(tonuinoRFID.readCardData, &myCard);
+	}
+	
+    switch (pollCardResult)
     {
     case MUSICCARD_NEW:
       onNewCard();
@@ -1294,7 +1189,7 @@ void waitForNewCard()
       mp3.playMp3FolderTrack(802);
       return true;
     }
-  } while (!cardDetected());
+  } while (!tonuinoRFID.cardDetected());
 }
 
 void adminMenu(bool fromCard = false) {
@@ -1397,7 +1292,7 @@ void adminMenu(bool fromCard = false) {
       waitForNewCard();
 
       // RFID Karte wurde aufgelegt
-      if (cardSerialFound()) {
+      if (tonuinoRFID.cardSerialFound()) {
         Serial.println(F("schreibe Karte..."));
         writeCard(tempCard);
         delay(100);
@@ -1444,7 +1339,7 @@ void adminMenu(bool fromCard = false) {
       waitForNewCard();
 
       // RFID Karte wurde aufgelegt
-      if (cardSerialFound()) {
+      if (tonuinoRFID.cardSerialFound()) {
         Serial.println(F("schreibe Karte..."));
         writeCard(tempCard);
         delay(100);
@@ -1621,7 +1516,7 @@ void resetCard() {
   mp3.playMp3FolderTrack(800);
   waitForNewCard();
 
-  if (!cardSerialFound())
+  if (!tonuinoRFID.cardSerialFound())
     return;
 
   Serial.print(F("Karte wird neu konfiguriert!"));
@@ -1687,90 +1582,6 @@ void playAdvertisement(int advertisement)
   }
 }
 
-bool readCard() 
-{
-  // Show some details of the PICC (that is: the tag/card)
-  Serial.print(F("Card UID:"));
-  dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size);
-  Serial.println();
-  Serial.print(F("PICC type: "));
-  MFRC522::PICC_Type piccType = mfrc522.PICC_GetType(mfrc522.uid.sak);
-  Serial.println(mfrc522.PICC_GetTypeName(piccType));
-  const bool bIsMifareUL = piccType == MFRC522::PICC_TYPE_MIFARE_UL;
-  
-  byte buffer[18+12];   // add more room at the end so that UL read with offset of up to 12 bytes fits
-  byte size = 18;
-
-  // Authenticate using key A
-  if (bIsMifareUL)
-  {
-    byte pACK[] = {0, 0}; //16 bit PassWord ACK returned by the tempCard
-    Serial.println(F("Authenticating MIFARE UL..."));
-    status = mfrc522.PCD_NTAG216_AUTH(key.keyByte, pACK);
-  }
-  else // Mifare Mini, 1K, 4K
-  {
-    Serial.println(F("Authenticating Classic using key A..."));
-    status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, trailerBlock, &key, &(mfrc522.uid));
-  }
-
-  if (status != MFRC522::STATUS_OK) 
-  {
-    Serial.print(F("PCD_Authenticate() failed: "));
-    Serial.println(mfrc522.GetStatusCodeName(status));
-    return false;
-  }
-
-  // Read data from the block
-  if (bIsMifareUL)
-  {
-    // UL cards read 4 bytes at once -> 4 parts for 16 bytes
-    for (byte part = 0; part < 4; part++)
-    {
-      status = mfrc522.MIFARE_Read(8 + part, buffer + 4 * part, &size);
-      if (status != MFRC522::STATUS_OK) {
-        Serial.print(F("MIFARE_Read() failed: "));
-        Serial.println(mfrc522.GetStatusCodeName(status));
-        return false;
-      }
-    }
-  }
-  else // Mifare Mini, 1K, 4K
-  {
-    Serial.print(F("Reading data from block "));
-    Serial.print(blockAddr);
-    Serial.println(F(" ..."));
-    // classic cards read 16 bytes at once
-    status = mfrc522.MIFARE_Read(blockAddr, buffer, &size);
-    if (status != MFRC522::STATUS_OK) {
-      Serial.print(F("MIFARE_Read() failed: "));
-      Serial.println(mfrc522.GetStatusCodeName(status));
-      return false;
-    }
-  }
-
-  Serial.print(F("Data on Card "));
-  Serial.println(F(":"));
-  dump_byte_array(buffer, 16);
-  Serial.println();
-  Serial.println();
-
-  uint32_t tempCookie;
-  tempCookie = (uint32_t)buffer[0] << 24;
-  tempCookie += (uint32_t)buffer[1] << 16;
-  tempCookie += (uint32_t)buffer[2] << 8;
-  tempCookie += (uint32_t)buffer[3];
-
-  tempCard.cookie = tempCookie;
-  tempCard.version = buffer[4];
-  tempCard.nfcFolderSettings.folder = buffer[5];
-  tempCard.nfcFolderSettings.mode = buffer[6];
-  tempCard.nfcFolderSettings.special = buffer[7];
-  tempCard.nfcFolderSettings.special2 = buffer[8];
-
-  return true;
-}
-
 bool evaluateCardData(nfcTagObject tempCard, nfcTagObject * nfcTag)
 {
   if (tempCard.cookie == cardCookie) 
@@ -1828,82 +1639,11 @@ bool evaluateCardData(nfcTagObject tempCard, nfcTagObject * nfcTag)
   }
 }
 
-
 void writeCard(nfcTagObject nfcTag) 
 {
-  byte buffer[16] = {0x13, 0x37, 0xb3, 0x47, // 0x1337 0xb347 magic cookie to identify our nfc tags
-                     0x02,                   // version 1
-                     nfcTag.nfcFolderSettings.folder,  // the folder picked by the user
-                     nfcTag.nfcFolderSettings.mode,    // the playback mode picked by the user
-                     nfcTag.nfcFolderSettings.special, // track or function for admin cards
-                     nfcTag.nfcFolderSettings.special2,
-                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-                    };
-
-  byte size = sizeof(buffer);
-
-  MFRC522::PICC_Type mifareType = mfrc522.PICC_GetType(mfrc522.uid.sak);
-  const bool bIsMifareUL = mifareType == MFRC522::PICC_TYPE_MIFARE_UL;
-  
-  // authentificate with the card and set card specific parameters
-  if (bIsMifareUL)
-  {
-    byte pACK[] = {0, 0}; //16 bit PassWord ACK returned by the NFCtag
-    Serial.println(F("Authenticating UL..."));
-    status = mfrc522.PCD_NTAG216_AUTH(key.keyByte, pACK);
-  }
-  else // Mifare Mini, 1K, 4K
-  {
-    Serial.println(F("Authenticating again using key A..."));
-    status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, trailerBlock, &key, &(mfrc522.uid));
-  }
-
-  if (status != MFRC522::STATUS_OK) 
-  {
-    Serial.print(F("PCD_Authenticate() failed: "));
-    Serial.println(mfrc522.GetStatusCodeName(status));
-    mp3.playMp3FolderTrack(401);
-    return;
-  }
-
-  // Write data to the block
-  Serial.print(F("Writing data into block "));
-  Serial.print(blockAddr);
-  Serial.println(F(" ..."));
-  dump_byte_array(buffer, 16);
-  Serial.println();
-
-  if (bIsMifareUL)
-  {
-    byte buffer2[16];
-    byte size2 = sizeof(buffer2);
-    
-    for (byte part = 0; part < 4; part++)
-    {
-      memset(buffer2, 0, size2);
-      memcpy(buffer2, buffer + (4 * part), 4);
-      status = mfrc522.MIFARE_Write(8 + part, buffer2, 16);
-    }
-  }
-  else // Mifare Mini, 1K, 4K
-  {
-    status = mfrc522.MIFARE_Write(blockAddr, buffer, 16);
-  }
-
-  if (status != MFRC522::STATUS_OK) 
-  {
-    Serial.print(F("MIFARE_Write() failed: "));
-    Serial.println(mfrc522.GetStatusCodeName(status));
-    mp3.playMp3FolderTrack(401);
-  }
-  else
-  {
-    mp3.playMp3FolderTrack(400);
-  }
-  Serial.println();
-  delay(2000);
+	bool statusOK = tonuinoRFID.writeCard(nfcTag);
+	mp3.playMp3FolderTrack(statusOK ? 400 : 401);
 }
-
 
 
 ///////////////////////////////////////// Check Bytes   ///////////////////////////////////

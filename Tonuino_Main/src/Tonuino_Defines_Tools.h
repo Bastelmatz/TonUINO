@@ -1,3 +1,3 @@
 
-//#define TONUINO_MIRA
-#define TONUINO_RFID_TOOL
+#define TONUINO_MIRA
+//#define TONUINO_RFID_TOOL

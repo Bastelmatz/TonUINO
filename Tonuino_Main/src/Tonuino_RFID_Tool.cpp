@@ -120,42 +120,42 @@ void handleCardReader()
   }
   switch (pollCardResult)
   {
-  case MUSICCARD_NEW:
-	// placeholder: do something on new card detection
-	break;
+	case MUSICCARD_NEW:
+		// placeholder: do something on new card detection
+		break;
 
-  case ALLCARDS_GONE:
-	// placeholder: do something if all cards are gone
-	break;
+	case ALLCARDS_GONE:
+		// placeholder: do something if all cards are gone
+		break;
 
-  case MUSICCARD_IS_BACK:
-	// placeholder: do somethind if music card is back
-	break;
+	case MUSICCARD_IS_BACK:
+		// placeholder: do somethind if music card is back
+		break;
   }    
 }
 
 void listenToRFIDTool()
 {
-  byte index = 0;
-  while (Serial.available()) 
-  {
-  	if (index > sizeof(readSerialString))
-  	{
-  	  break;
-  	}
-  	delay(3);  
-  	char c = Serial.read();
-  	readSerialString[index] = c; 
-  	index++;
-    }
-    if (index > 0)
-    {
-  	handleRFIDToolCommand();
-  	for(int i = 0; i < sizeof(readSerialString); ++i)
-  	{
-  	  readSerialString[i] = (char)0;
-  	}
-  }
+	byte index = 0;
+	while (Serial.available()) 
+	{
+		if (index > sizeof(readSerialString))
+		{
+			break;
+		}
+		delay(3);  
+		char c = Serial.read();
+		readSerialString[index] = c; 
+		index++;
+	}
+	if (index > 0)
+	{
+		handleRFIDToolCommand();
+		for(int i = 0; i < sizeof(readSerialString); ++i)
+		{
+		  readSerialString[i] = (char)0;
+		}
+	}
 }
 
 void loopTool() 
