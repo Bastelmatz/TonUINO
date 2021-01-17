@@ -19,14 +19,24 @@ typedef enum EPlayerMode
 	Section_Audiobook = 10
 };
 
+class TonuinoTimer
+{
+	public:
+	static unsigned long activeTime;
+	static long timeInMin;
+	
+	void activate();
+	void disable();
+};
+
 class TonuinoPlayer
 {
 	public:
 	static bool anyFolderStarted;
 	static uint8_t lastTrackFinished;
 		
-	static unsigned long activeStandbyTime;
-	void setStandbyTimer(long timeInMinutes);
+	static TonuinoTimer sleepTimer;
+	static TonuinoTimer standbyTimer;
 	
 	uint8_t currentTrack();
 	uint8_t currentTrackInRange();
@@ -54,13 +64,15 @@ class TonuinoPlayer
 
 	uint8_t allTracksCount();
 	bool useSection();
+	bool useRandomSingle();
 	bool useRandomQueue();
-	
+	bool useSingleTrack();
+	bool useAllRepetition();
+	bool useSingleRepetition();
+	bool reShuffleOnEnd();
+		
 	void shuffleQueue();
-	
-	void activateStandbyTimer();
-	void disableStandbyTimer();
-	
+
 };
 
 #endif

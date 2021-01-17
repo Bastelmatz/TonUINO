@@ -228,35 +228,6 @@ class Modifier {
 
 Modifier *activeModifier = NULL;
 
-class SleepTimer: public Modifier {
-  private:
-    unsigned long sleepAtMillis = 0;
-
-  public:
-    void loop() {
-      if (this->sleepAtMillis != 0 && millis() > this->sleepAtMillis) {
-        Serial.println(F("=== SleepTimer::loop() -> SLEEP!"));
-        pauseAndStandBy();
-        delete activeModifier;
-        activeModifier = NULL;
-        delete this;
-      }
-    }
-
-    SleepTimer(uint8_t minutes) {
-      Serial.println(F("=== SleepTimer()"));
-      Serial.println(minutes);
-      this->sleepAtMillis = millis() + minutes * 60000;
-      //      if (isPlaying())
-      //        mp3.playAdvertisement(302);
-      //      delay(500);
-    }
-    uint8_t getActive() {
-      Serial.println(F("== SleepTimer::getActive()"));
-      return 1;
-    }
-};
-
 class FreezeDance: public Modifier {
   private:
     unsigned long nextStopAtMillis = 0;
@@ -474,11 +445,19 @@ class FeedbackModifier: public Modifier {
     }
 };
 
-/// Funktionen für den Standby Timer (z.B. über Pololu-Switch oder Mosfet)
+void checkSleepAtMillis()
+{
+	unsigned long sleepTime = tonuinoPlayer.sleepTimer.activeTime;
+	if (sleepTime > 0 && millis() > sleepTime) 
+	{
+		pauseAndStandBy();
+	}
+}
 
+// Funktion für den Standby Timer (z.B. über Pololu-Switch oder Mosfet)
 void checkStandbyAtMillis() 
 {
-  unsigned long standbyTime = tonuinoPlayer.activeStandbyTime;
+  unsigned long standbyTime = tonuinoPlayer.standbyTimer.activeTime;
   if (standbyTime > 0 && millis() > standbyTime) 
   {
     Serial.println(F("=== power off!"));
@@ -576,7 +555,12 @@ void waitForTrackToFinish()
 
 void setStandbyTimerValue()
 {
-	tonuinoPlayer.setStandbyTimer(tonuinoEEPROM.mySettings.standbyTimer);
+	tonuinoPlayer.standbyTimer.timeInMin = tonuinoEEPROM.mySettings.standbyTimer;
+}
+
+void setSleepTimerValue()
+{
+	tonuinoPlayer.sleepTimer.timeInMin = 0;
 }
 
 void setupTonuino() {
@@ -611,6 +595,8 @@ void setupTonuino() {
   setStandbyTimerValue();
   tonuinoPlayer.pauseAndStandBy();
 
+  setSleepTimerValue();
+  
   // DFPlayer Mini initialisieren
   mp3.begin();
   // Zwei Sekunden warten bis der DFPlayer Mini initialisiert ist
@@ -748,6 +734,7 @@ bool m_lastPlayState = true;
 
 void loopTonuino() 
 {
+	checkSleepAtMillis();
     checkStandbyAtMillis();
     mp3.loop();
 
@@ -1297,7 +1284,6 @@ bool evaluateCardData(nfcTagObject tempCard, nfcTagObject * nfcTag)
         case 0:
         case 255:
           tonuinoRFID.haltAndStop(); adminMenu(true);  break;
-        case 1: activeModifier = new SleepTimer(tempCard.nfcFolderSettings.special); break;
         case 2: activeModifier = new FreezeDance(); break;
         case 3: activeModifier = new Locked(); break;
         case 4: activeModifier = new ToddlerMode(); break;
