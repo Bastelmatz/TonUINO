@@ -104,6 +104,8 @@ int oldPotiValue;                             // old Poti Value, Volumen
 
 #define LONG_PRESS 1000
 
+bool usePotentiometer = false;
+
 Button pauseButton(buttonPause);
 Button nextButton(buttonNext);
 Button previousButton(buttonPrevious);
@@ -629,7 +631,12 @@ void readButtons() {
   previousButton.read();
 }
 
-void readPotentiometer() {     
+void readPotentiometer() 
+{     
+	if (!usePotentiometer)
+	{
+		return;
+	}
     PotiValue = analogRead(PotiPin);
     PotiValue = map(PotiValue,0,1024,tonuinoEEPROM.mySettings.minVolume,tonuinoEEPROM.mySettings.maxVolume);
     // Vergleiche aktueller Lautstärke-Potistellung mit der alten Stellung inkl. Hysterese 
