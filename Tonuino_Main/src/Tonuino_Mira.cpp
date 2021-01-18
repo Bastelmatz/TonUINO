@@ -39,7 +39,7 @@ TonuinoEEPROM tonuinoEEPROM;
 TonuinoPlayer tonuinoPlayer;
 
 
-void nextTrack();
+void trackFinished();
 
 // implement a notification class,
 // its member methods will get called
@@ -59,7 +59,7 @@ class Mp3Notify {
       Serial.println(action);
     }
     static void OnPlayFinished(DfMp3_PlaySources source, uint16_t track) {
-      nextTrack();
+      trackFinished();
     }
     static void OnPlaySourceOnline(DfMp3_PlaySources source) {
       PrintlnSourceAction(source, "online");
@@ -87,7 +87,7 @@ void writeCard(nfcTagObject nfcTag);
 void dump_byte_array(byte * buffer, byte bufferSize);
 void adminMenu(bool fromCard = false);
 bool knownCard = false;
-
+bool anyFolderStarted = false;
 
 #define buttonPause A1
 #define buttonNext A3
@@ -116,17 +116,18 @@ bool ignorePreviousButton = false;
 
 void loadDataFromFlash()
 {
-  tonuinoEEPROM.loadSettingsFromFlash();
-  lastFolder = tonuinoEEPROM.loadLastFolderFromFlash();
+	tonuinoEEPROM.loadSettingsFromFlash();
+	lastFolder = tonuinoEEPROM.loadLastFolderFromFlash();
 }
 
 void writeLastTrackToFlash(uint8_t track)
 {
-  tonuinoEEPROM.writeLastTrackToFlash(track, myFolder);
+	tonuinoEEPROM.writeLastTrackToFlash(track, myFolder);
 }
 
-bool isPlaying() {
-  return !digitalRead(busyPin);
+bool isPlaying() 
+{
+	return !digitalRead(busyPin);
 }
 
 void loadFolder()
@@ -139,22 +140,35 @@ void loadFolder()
 		lastTrack = tonuinoEEPROM.loadLastTrackFromFlash(myFolder);
 		if (lastTrack == 0 || lastTrack > numTracks) 
 		{
-		  lastTrack = 1;
+			lastTrack = 1;
 		}
 	}
 	
 	tonuinoPlayer.loadFolder(numTracks, myFolder->mode, myFolder->special, myFolder->special2, lastTrack);
 }
 
-void playTitle(uint16_t track)
+void playTrack(uint8_t track)
 {
-	mp3.playFolderTrack(myFolder->folder, track);
+	if (track > 0)
+	{
+		Serial.print(F("Spiele Titel:"));
+		Serial.println(track);
+		mp3.playFolderTrack(myFolder->folder, track);
+		if (myFolder->mode == AudioBook)
+		{
+			// Fortschritt im EEPROM abspeichern
+			writeLastTrackToFlash(track);
+		}
+		tonuinoPlayer.playTitle();
+	}
+	delay(1000);
 }
 
 void playFolder()
 {
-	uint16_t track = tonuinoPlayer.playFolder();
-	playTitle(track);
+	anyFolderStarted = true;     
+    uint8_t track = tonuinoPlayer.currentTrack();
+	playTrack(track);
 }
 
 void loadAndPlayFolder()
@@ -163,7 +177,7 @@ void loadAndPlayFolder()
 	playFolder();
 }
 
-void playTitle()
+void continueTitle()
 {
 	mp3.start();
 	tonuinoPlayer.playTitle();
@@ -183,11 +197,14 @@ void togglePlay()
 	}
 	else if (knownCard) 
 	{
-		if (!tonuinoPlayer.anyFolderStarted) 
+		if (anyFolderStarted) 
+		{
+			continueTitle();
+		}
+		else
 		{
 			playFolder();
 		}
-		playTitle();
 	}
 }
 
@@ -391,26 +408,6 @@ class KindergardenMode: public Modifier {
     }
 };
 
-class RepeatSingleModifier: public Modifier {
-  public:
-    virtual bool handleNext() {
-      Serial.println(F("== RepeatSingleModifier::handleNext() -> REPEAT CURRENT TRACK"));
-      delay(50);
-      if (isPlaying()) return true;
-	  uint16_t track = tonuinoPlayer.currentTrack();
-      playTitle(track);
-      tonuinoPlayer.lastTrackFinished = 0;
-      return true;
-    }
-    RepeatSingleModifier() {
-      Serial.println(F("=== RepeatSingleModifier()"));
-    }
-    uint8_t getActive() {
-      Serial.println(F("== RepeatSingleModifier::getActive()"));
-      return 6;
-    }
-};
-
 // An modifier can also do somethings in addition to the modified action
 // by returning false (not handled) at the end
 // This simple FeedbackModifier will tell the volume before changing it and
@@ -506,36 +503,23 @@ void nextTrack()
 		return;
 	}
 
-	bool playNext = tonuinoPlayer.playNextTrack();
-	if (playNext)
-	{
-		uint16_t track = tonuinoPlayer.currentTrack();
-		Serial.print(F("Nächster Titel:"));
-		Serial.println(track);
-		mp3.playFolderTrack(myFolder->folder, track);
-		if (myFolder->mode == AudioBook)
-		{
-			// Fortschritt im EEPROM abspeichern
-			writeLastTrackToFlash(track);
-		}
-	}
-	delay(500);
+	uint8_t track = tonuinoPlayer.getNextTrack();
+	playTrack(track);
 }
 
 void previousTrack()
 {
-	tonuinoPlayer.playPreviousTrack();
-	
-	uint16_t track = tonuinoPlayer.currentTrack();
-	Serial.print(F("Vorheriger Titel:"));
-	Serial.println(track);
-	mp3.playFolderTrack(myFolder->folder, track);
-	if (myFolder->mode == AudioBook)
+	uint8_t track = tonuinoPlayer.getPreviousTrack();
+	playTrack(track);
+}
+
+void trackFinished()
+{
+	tonuinoPlayer.trackFinished();
+	if (tonuinoPlayer.isPlaying)
 	{
-		// Fortschritt im EEPROM abspeichern
-		writeLastTrackToFlash(track);
+		nextTrack();
 	}
-	delay(1000);
 }
 
 void waitForTrackToFinish() 
@@ -712,7 +696,7 @@ void handleCardReader()
       break;
 
     case MUSICCARD_IS_BACK:
-      playTitle();
+      continueTitle();
       break;
     }    
   }
@@ -1280,7 +1264,8 @@ bool evaluateCardData(nfcTagObject tempCard, nfcTagObject * nfcTag)
       {
         playAdvertisement(260);
       }
-      switch (tempCard.nfcFolderSettings.mode ) {
+      switch (tempCard.nfcFolderSettings.mode ) 
+	  {
         case 0:
         case 255:
           tonuinoRFID.haltAndStop(); adminMenu(true);  break;
@@ -1288,8 +1273,6 @@ bool evaluateCardData(nfcTagObject tempCard, nfcTagObject * nfcTag)
         case 3: activeModifier = new Locked(); break;
         case 4: activeModifier = new ToddlerMode(); break;
         case 5: activeModifier = new KindergardenMode(); break;
-        case 6: activeModifier = new RepeatSingleModifier(); break;
-
       }
       delay(2000);
       return false;

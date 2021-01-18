@@ -31,33 +31,32 @@ class TonuinoTimer
 
 class TonuinoPlayer
 {
-	public:
-	static bool anyFolderStarted;
-	static uint8_t lastTrackFinished;
-		
+	public:	
 	static TonuinoTimer sleepTimer;
 	static TonuinoTimer standbyTimer;
 	
+	static bool isPlaying;
+		
 	uint8_t currentTrack();
 	uint8_t currentTrackInRange();
 	
 	void playTitle();
 	void pauseNoStandBy();
 	void pauseAndStandBy();
+	void trackFinished();
 	
-	bool playNextTrack();
-	void playPreviousTrack();
+	uint8_t getNextTrack();
+	uint8_t getPreviousTrack();
 	
 	void loadFolder(uint8_t numTracks, uint8_t folderMode, uint8_t startTrack, uint8_t endTrack, uint8_t lastTrack);
-	uint8_t playFolder();
 	
 	private:
 	static uint8_t mode;
-	static bool isPlaying;
 	
-	static uint8_t numTracksInFolder;
 	static uint8_t currentTrackIndex;
 	static uint8_t firstTrack;
+	static uint8_t endTrack;
+	static bool currentTrackFinished;
 	
 	static uint8_t queue[255];
 	static long standbyTimeInMin;
@@ -72,7 +71,7 @@ class TonuinoPlayer
 	bool reShuffleOnEnd();
 		
 	void shuffleQueue();
-
+	uint8_t getTrack(bool next);
 };
 
 #endif

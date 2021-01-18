@@ -1,15 +1,14 @@
 
 #include "Tonuino_Player.h"
 
-bool TonuinoPlayer::anyFolderStarted = false;
 bool TonuinoPlayer::isPlaying = false;
+bool TonuinoPlayer::currentTrackFinished = false;
 
 uint8_t TonuinoPlayer::mode = 0;
 
-uint8_t TonuinoPlayer::numTracksInFolder = 0;
 uint8_t TonuinoPlayer::currentTrackIndex = 0;
 uint8_t TonuinoPlayer::firstTrack = 0;
-uint8_t TonuinoPlayer::lastTrackFinished  = 0;
+uint8_t TonuinoPlayer::endTrack = 0;
 uint8_t TonuinoPlayer::queue[255];
 
 // *********************************
@@ -42,7 +41,7 @@ TonuinoTimer TonuinoPlayer::sleepTimer;
 
 uint8_t TonuinoPlayer::allTracksCount()
 {
-	return numTracksInFolder - firstTrack + 1;
+	return endTrack - firstTrack + 1;
 }
 
 bool TonuinoPlayer::useSection()
@@ -82,11 +81,11 @@ bool TonuinoPlayer::useSingleRepetition()
 
 uint8_t TonuinoPlayer::currentTrack()
 {
-  if (useRandomQueue()) 
-  {
-    return queue[currentTrackIndex - 1];
-  }
-  return currentTrackIndex;
+	if (useRandomQueue()) 
+	{
+		return queue[currentTrackIndex - 1];
+	}
+	return currentTrackIndex;
 }
 
 uint8_t TonuinoPlayer::currentTrackInRange()
@@ -124,6 +123,7 @@ void TonuinoPlayer::shuffleQueue()
 void TonuinoPlayer::playTitle()
 {
 	isPlaying = true;
+	currentTrackFinished = false;
 	standbyTimer.disable();
 	sleepTimer.activate();
 }
@@ -142,151 +142,164 @@ void TonuinoPlayer::pauseAndStandBy()
 	sleepTimer.disable();
 }
 
-bool TonuinoPlayer::playNextTrack() 
+void TonuinoPlayer::trackFinished()
 {
 	Serial.print("Track finished: ");
 	Serial.println(currentTrack());
-
-	if (currentTrackIndex == lastTrackFinished) 
+	currentTrackFinished = true;
+	
+	// repeat current track
+	if (useSingleRepetition())
 	{
 		return;
 	}
-	lastTrackFinished = currentTrackIndex;
-
-	Serial.println(F("=== nextTrack()"));
-
+	
 	if (useSingleTrack()) 
 	{
 		Serial.println(F("Nur einen Titel spielen -> keinen neuen Titel spielen"));
 		pauseAndStandBy();
 	}
+}
+
+uint8_t TonuinoPlayer::getNextTrack() 
+{
+	return getTrack(true);
+}
+
+uint8_t TonuinoPlayer::getPreviousTrack() 
+{
+	return getTrack(false);
+}
+
+uint8_t TonuinoPlayer::getTrack(bool next) 
+{
+	// repeat current track
+	if (useSingleRepetition())
+	{
+		return currentTrack();
+	}
+	
+	if (useSingleTrack()) 
+	{
+		if (useRandomSingle()) 
+		{
+			Serial.println(F("Einen zufälligen Titel wiedergeben"));
+			currentTrackIndex = random(firstTrack, endTrack + 1);
+		}
+	}
 	else
 	{
 		if (useRandomQueue()) 
 		{
-			if (currentTrackIndex < allTracksCount()) 
+			if (next)
 			{
-				Serial.println(F("Weiter in der Queue"));
-				currentTrackIndex++;
-			} 
-			else 
-			{
-				Serial.println(F("Ende der Queue -> beginne von vorne"));
-				currentTrackIndex = 1;
-				if (reShuffleOnEnd())
+				if (currentTrackIndex < allTracksCount()) 
 				{
-					Serial.println(F("Ende der Queue -> mische neu"));
-					shuffleQueue();
+					Serial.println(F("Weiter in der Queue"));
+					currentTrackIndex++;
+				} 
+				else 
+				{
+					Serial.println(F("Ende der Queue -> beginne von vorne"));
+					currentTrackIndex = 1;
+					if (reShuffleOnEnd())
+					{
+						Serial.println(F("Ende der Queue -> mische neu"));
+						shuffleQueue();
+					}
+				}
+			}
+			else
+			{
+				if (currentTrackIndex > 1) 
+				{
+					Serial.println(F("Zurück in der Queue"));
+					currentTrackIndex--;
+				}
+				else
+				{
+					Serial.println(F("Anfang der Queue -> springe ans Ende"));
+					currentTrackIndex = allTracksCount();
 				}
 			}
 		}
 		else // fixed numerical order
 		{
-			if (currentTrackIndex < numTracksInFolder) 
+			if (next)
 			{
-				currentTrackIndex++;
-			} 
-			else
-			{ 
-				pauseAndStandBy();
-			}
-		}
-	}
-
-  return isPlaying;
-}
-
-void TonuinoPlayer::playPreviousTrack() 
-{
-	Serial.println(F("=== previousTrack()"));
-
-	if (useSingleTrack()) 
-	{
-		return;
-	}
-	else
-	{
-		if (useRandomQueue()) 
-		{
-			if (currentTrackIndex > 1) 
-			{
-				Serial.println(F("Zurück in der Queue"));
-				currentTrackIndex--;
+				if (currentTrackIndex < endTrack) 
+				{
+					currentTrackIndex++;
+				} 
+				else
+				{ 
+					currentTrackIndex = firstTrack;
+				}
 			}
 			else
 			{
-				Serial.println(F("Anfang der Queue -> springe ans Ende"));
-				currentTrackIndex = allTracksCount();
-			}
-		}
-		else // fixed numerical order
-		{
-			Serial.println(F("Vorheriger Titel"));
-			if (currentTrackIndex > firstTrack) 
-			{
-				currentTrackIndex--;
+				if (currentTrackIndex > firstTrack) 
+				{
+					currentTrackIndex--;
+				}
+				else
+				{
+					currentTrackIndex = endTrack;
+				}
 			}
 		}
 	}
-}
-
-void TonuinoPlayer::loadFolder(uint8_t numTracks, uint8_t folderMode, uint8_t startTrack, uint8_t endTrack, uint8_t lastTrack) 
-{
-  Serial.println(F("== loadFolder()")) ;
-  mode = folderMode;
-  lastTrackFinished = 0;
-  numTracksInFolder = numTracks;
-  firstTrack = 1;
-  Serial.print(numTracksInFolder);
-  Serial.println(F(" Dateien in Ordner "));
-
-  if (useSection())
-  {
-	Serial.println(F("Spezialmodus Von-Bis:"));
-    Serial.print(startTrack);
-    Serial.print(F(" bis "));
-    Serial.println(endTrack);
-    firstTrack = startTrack;
-    numTracksInFolder = endTrack;
-  }
-  
-  currentTrackIndex = firstTrack;
 	
-  if (useRandomQueue())
-  {
-	Serial.println(F("Alle Titel in zufälliger Reihenfolge wiedergeben"));
-    currentTrackIndex = 1;
-	shuffleQueue();
-  }
-  if (useRandomSingle()) 
-  {
-    Serial.println(F("Einen zufälligen Titel wiedergeben"));
-    currentTrackIndex = random(firstTrack, numTracksInFolder + 1);
-  }
-  
-  if (mode == Single) 
-  {
-    Serial.println(F("Einzel Modus -> eine Datei aus dem Odrdner abspielen"));
-    currentTrackIndex = startTrack;
-  }
-  if (mode == AudioBook) 
-  {
-    Serial.println(F("Hörbuch Modus -> kompletten Ordner spielen und Fortschritt merken"));
-    currentTrackIndex = lastTrack;
-  }
-
-  Serial.println(currentTrackIndex);
+	return isPlaying ? currentTrack() : 0;
 }
 
-uint8_t TonuinoPlayer::playFolder() 
+void TonuinoPlayer::loadFolder(uint8_t numTracksInFolder, uint8_t folderMode, uint8_t startTrack, uint8_t finalTrack, uint8_t lastTrack) 
 {
-    anyFolderStarted = true;
-  
-    Serial.println(F("== playFolder()")) ;
-    playTitle();
-       
-    return currentTrack();
+	Serial.println(F("== loadFolder()")) ;
+	mode = folderMode;
+	endTrack = numTracksInFolder;
+	firstTrack = 1;
+	Serial.print(numTracksInFolder);
+	Serial.println(F(" Dateien in Ordner "));
+
+	if (useSection())
+	{
+		Serial.println(F("Spezialmodus Von-Bis:"));
+		Serial.print(startTrack);
+		Serial.print(F(" bis "));
+		Serial.println(finalTrack);
+		firstTrack = startTrack;
+		endTrack = finalTrack;
+	}
+
+	currentTrackIndex = firstTrack;
+
+	if (useRandomQueue())
+	{
+		Serial.println(F("Alle Titel in zufälliger Reihenfolge wiedergeben"));
+		currentTrackIndex = 1;
+		shuffleQueue();
+	}
+	if (useRandomSingle()) 
+	{
+		Serial.println(F("Einen zufälligen Titel wiedergeben"));
+		currentTrackIndex = random(firstTrack, endTrack + 1);
+	}
+
+	if (mode == Single) 
+	{
+		Serial.println(F("Einzel Modus -> eine Datei aus dem Odrdner abspielen"));
+		currentTrackIndex = startTrack;
+	}
+	if (mode == AudioBook) 
+	{
+		Serial.println(F("Hörbuch Modus -> kompletten Ordner spielen und Fortschritt merken"));
+		currentTrackIndex = lastTrack;
+	}
+
+	Serial.println(currentTrackIndex);
 }
+
 
 
 
