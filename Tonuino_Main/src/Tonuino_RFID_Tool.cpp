@@ -22,7 +22,9 @@ void setupTool()
   Serial.println(F("  |_| |___|_|_|_____|_____|_|___|_____|\n"));
   Serial.println(F("TonUINO RFID Tool"));
   Serial.println(F("created by Bastelmatz."));
-
+  // give some time to transmit serial
+  delay(1000);
+  
   tonuinoRFID.setupRFID();
 }
 
@@ -46,7 +48,8 @@ void transmitCardData(nfcTagObject nfcTag)
   transmitRFIDToolTrigger(true);
   Serial.println("CardData");
   Serial.print("RFID:");
-  dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size);
+  // dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size); // doesn't work for some reason
+  dump_byte_array(tonuinoRFID.currentCardUid, sizeof(tonuinoRFID.currentCardUid));
   Serial.println();
   Serial.print("Cookie:");
   Serial.println(nfcTag.cookie);
@@ -59,6 +62,24 @@ void transmitCardData(nfcTagObject nfcTag)
   Serial.print("Special2:");
   Serial.println(nfcTag.nfcFolderSettings.special2);
   transmitRFIDToolTrigger(false);
+}
+
+void transmitCardRemoval()
+{
+	transmitRFIDToolTrigger(true);
+	Serial.println("CardData");
+	transmitRFIDToolTrigger(false);
+}
+
+void writeCard(nfcTagObject nfcTag)
+{
+  tonuinoRFID.writeCard(tempCard);
+  tonuinoRFID.haltAndStop();
+  
+  // force new card detection
+  transmitCardData(tempCard);
+  tonuinoRFID.hasMusicCard = false;
+  tonuinoRFID.hasModifierCard = false;
 }
 
 void handleRFIDToolCommand()
@@ -98,22 +119,14 @@ void handleRFIDToolCommand()
   tempCard.nfcFolderSettings.special2 = receivedFS.special2;
   tempCard.nfcFolderSettings.mode = receivedFS.mode;
 
-  tonuinoRFID.writeCard(tempCard);
-  delay(100);
-  mfrc522.PICC_HaltA();
-  mfrc522.PCD_StopCrypto1();
-
-  // force new card detection
-  transmitCardData(tempCard);
-  tonuinoRFID.hasMusicCard = false;
-  tonuinoRFID.hasModifierCard = false;
+  writeCard(tempCard);
 }
 
 void handleCardReader()
 {
   byte pollCardResult = tonuinoRFID.tryPollCard();
 
-  if (pollCardResult == MODIFIERCARD_NEW || pollCardResult == MUSICCARD_NEW)
+  if (pollCardResult == MODIFIERCARD_NEW || pollCardResult == MUSICCARD_NEW || pollCardResult == MUSICCARD_IS_BACK)
   {
   	// transmit data over serial for Tonuino RFID Tool
   	transmitCardData(tonuinoRFID.readCardData);
@@ -125,8 +138,10 @@ void handleCardReader()
 		break;
 
 	case ALLCARDS_GONE:
-		// placeholder: do something if all cards are gone
+	{
+		transmitCardRemoval();
 		break;
+	}
 
 	case MUSICCARD_IS_BACK:
 		// placeholder: do somethind if music card is back

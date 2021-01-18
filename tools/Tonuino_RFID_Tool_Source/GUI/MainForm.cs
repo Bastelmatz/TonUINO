@@ -180,9 +180,11 @@ namespace Tonuino_RFID_Creator
             bool useStartEndTrack = false;
             bool useSingleTrack = false;
             bool isModifierCard = false;
+            bool isMusicCard = false;
             bool isSleepModi = false;
             if (data is MusicCardData)
             {
+                isMusicCard = true;
                 MusicCardData musicData = (MusicCardData)data;
                 useStartEndTrack = musicData.Mode.UseStartEndTrack;
                 useSingleTrack = musicData.Mode.UseSingleTrack;
@@ -207,14 +209,19 @@ namespace Tonuino_RFID_Creator
             lblRFID.Text = data.RFID + " | Hex: " + data.RFIDHex;
 
             // Visibility
-            radio_ModiCard.Checked = isModifierCard;
-            radio_MusicCard.Checked = !isModifierCard; // in case control isn't visible
+            if (!data.IsNewCard)
+            {
+                radio_ModiCard.Checked = isModifierCard;
+                radio_MusicCard.Checked = !isModifierCard; // in case control isn't visible
+            }
             pnlCardDetected.Visible = pnlCardAction.Visible = exists;
             updateCardActionVisibility();
 
-            lblFolderCaption.Visible = lblFolder.Visible = !isModifierCard;
-            lblEndPosCaption.Visible = lblEndPos.Visible = useStartEndTrack;
-            lblStartPosCaption.Visible = lblStartPos.Visible = useStartEndTrack || useSingleTrack;
+            bool isDefinedCard = isMusicCard || isModifierCard;
+            lblModeCaption.Visible = lblMode.Visible = isDefinedCard;
+            lblFolderCaption.Visible = lblFolder.Visible = isDefinedCard && !isModifierCard;
+            lblEndPosCaption.Visible = lblEndPos.Visible = isDefinedCard && useStartEndTrack;
+            lblStartPosCaption.Visible = lblStartPos.Visible = isDefinedCard && (useStartEndTrack || useSingleTrack);
             lblSleepTimeReadCaption.Visible = lblSleepTime.Visible = isModifierCard && isSleepModi;
         }
 

@@ -156,21 +156,28 @@ namespace Tonuino_RFID_Creator
             if (textLines.Count == 6)
             {
                 // Defined order - has to be in sync with Tonuino sketch!!
-                long rfid = getLong(textLines[0]);
+                long rfid = getLong(textLines[0]); 
                 int cookie = getInt(textLines[1]);
-                byte folder = getByte(textLines[2]);
-                if (folder == 0)
+                if (cookie == 0)
                 {
-                    EModiType modiType = ModiType.FromNumber(getByte(textLines[3]));
-                    TimeSpan sleepTime = TimeSpan.FromMinutes(getByte(textLines[4]));
-                    data = new ModiCardData(rfid, cookie, modiType, sleepTime);
+                    data = new CardData(rfid, cookie);
                 }
                 else
                 {
-                    EMusicMode mode = MusicMode.FromNumber(getByte(textLines[3]));
-                    byte start = getByte(textLines[4]);
-                    byte end = getByte(textLines[5]);
-                    data = new MusicCardData(rfid, cookie, mode, folder, start, end);
+                    byte folder = getByte(textLines[2]);
+                    if (folder == 0)
+                    {
+                        EModiType modiType = ModiType.FromNumber(getByte(textLines[3]));
+                        TimeSpan sleepTime = TimeSpan.FromMinutes(getByte(textLines[4]));
+                        data = new ModiCardData(rfid, cookie, modiType, sleepTime);
+                    }
+                    else
+                    {
+                        EMusicMode mode = MusicMode.FromNumber(getByte(textLines[3]));
+                        byte start = getByte(textLines[4]);
+                        byte end = getByte(textLines[5]);
+                        data = new MusicCardData(rfid, cookie, mode, folder, start, end);
+                    }
                 }
             }
             return data;

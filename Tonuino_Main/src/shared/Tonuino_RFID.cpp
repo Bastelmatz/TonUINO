@@ -2,7 +2,7 @@
 #include "Tonuino_RFID.h"
 
 // Card detection
-static bool Tonuino_RFID_Reader::hasAnyCard() { return hasMusicCard || hasModifierCard; }
+bool Tonuino_RFID_Reader::hasAnyCard() { return hasMusicCard || hasModifierCard; }
 
 void Tonuino_RFID_Reader::setupRFID() 
 {
@@ -53,6 +53,8 @@ byte Tonuino_RFID_Reader::pollCard()
 	if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial() && readCard())
 	{
 	  retries = maxRetries;
+	  // store info about current card
+	  memcpy(currentCardUid, mfrc522.uid.uidByte, 4);
 	  bool currentCardIsUL = mfrc522.PICC_GetType(mfrc522.uid.sak) == MFRC522::PICC_TYPE_MIFARE_UL;
 	  bool isModifierCard = readCardData.cookie == cardCookie && readCardData.nfcFolderSettings.folder == 0;
 	  if (isModifierCard)

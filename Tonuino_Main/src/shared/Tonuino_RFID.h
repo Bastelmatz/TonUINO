@@ -36,8 +36,8 @@ static MFRC522::StatusCode status;
 const byte MUSICCARD_NO_CHANGE = 0; // no change detected since last pollCard() call
 const byte MUSICCARD_NEW       = 1; // music card with new UID detected (had no card or other card before)
 const byte MODIFIERCARD_NEW    = 2; // modifier card is detected
-const byte ALLCARDS_GONE       = 2; // no card is reachable anymore
-const byte MUSICCARD_IS_BACK   = 3; // music card was gone, and is now back again
+const byte ALLCARDS_GONE       = 3; // no card is reachable anymore
+const byte MUSICCARD_IS_BACK   = 4; // music card was gone, and is now back again
 	
 void dump_byte_array(byte * buffer, byte bufferSize); 
 	
@@ -53,6 +53,7 @@ public:
 	// Card detection
 	bool hasAnyCard();
 	byte lastMusicCardUid[4];
+	byte currentCardUid[4];
 	byte retries;
 	const byte maxRetries = 2;
 	bool lastMusicCardWasUL;
