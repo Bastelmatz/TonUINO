@@ -87,7 +87,6 @@ void writeCard(nfcTagObject nfcTag);
 void dump_byte_array(byte * buffer, byte bufferSize);
 void adminMenu(bool fromCard = false);
 bool knownCard = false;
-bool anyFolderStarted = false;
 
 #define buttonPause A1
 #define buttonNext A3
@@ -152,7 +151,7 @@ void loadFolder()
 void playTrack(uint8_t track)
 {
 	if (track > 0)
-	{
+	{ 
 		Serial.print(F("Spiele Titel:"));
 		Serial.println(track);
 		mp3.playFolderTrack(myFolder->folder, track);
@@ -162,13 +161,12 @@ void playTrack(uint8_t track)
 			writeLastTrackToFlash(track);
 		}
 		tonuinoPlayer.playTitle();
+		delay(1000);
 	}
-	delay(1000);
 }
 
-void playFolder()
-{
-	anyFolderStarted = true;     
+void playCurrentTrack()
+{  
     uint8_t track = tonuinoPlayer.currentTrack();
 	playTrack(track);
 }
@@ -176,13 +174,24 @@ void playFolder()
 void loadAndPlayFolder()
 {
 	loadFolder();
-	playFolder();
+	playCurrentTrack();
 }
 
 void continueTitle()
 {
-	mp3.start();
-	tonuinoPlayer.playTitle();
+	if (!knownCard)
+	{
+		return;
+	}
+	if (tonuinoPlayer.currentTrackStarted)
+	{
+		mp3.start(); // Continue
+		tonuinoPlayer.playTitle();
+	}
+	else
+	{
+		playCurrentTrack();
+	}
 }
 
 void pauseAndStandBy()
@@ -197,16 +206,9 @@ void togglePlay()
 	{
 		pauseAndStandBy();
 	}
-	else if (knownCard) 
+	else 
 	{
-		if (anyFolderStarted) 
-		{
-			continueTitle();
-		}
-		else
-		{
-			playFolder();
-		}
+		continueTitle();
 	}
 }
 
@@ -505,14 +507,18 @@ void nextTrack()
 		return;
 	}
 
-	uint8_t track = tonuinoPlayer.getNextTrack();
-	playTrack(track);
+	if (tonuinoPlayer.goToNextTrack())
+	{
+		playCurrentTrack();
+	}
 }
 
 void previousTrack()
 {
-	uint8_t track = tonuinoPlayer.getPreviousTrack();
-	playTrack(track);
+	if (tonuinoPlayer.goToPreviousTrack())
+	{
+		playCurrentTrack();
+	}
 }
 
 void trackFinished()

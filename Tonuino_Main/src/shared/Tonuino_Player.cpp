@@ -2,6 +2,7 @@
 #include "Tonuino_Player.h"
 
 bool TonuinoPlayer::isPlaying = false;
+bool TonuinoPlayer::currentTrackStarted = false;
 bool TonuinoPlayer::currentTrackFinished = false;
 
 uint8_t TonuinoPlayer::mode = 0;
@@ -11,8 +12,14 @@ uint8_t TonuinoPlayer::firstTrack = 0;
 uint8_t TonuinoPlayer::endTrack = 0;
 uint8_t TonuinoPlayer::queue[255];
 
+uint8_t TonuinoPlayer::allTracksCount()
+{
+	return endTrack - firstTrack + 1;
+}
+
 // *********************************
 // Timer Class
+// *********************************
 unsigned long TonuinoTimer::activeTime = 0;
 static long TonuinoTimer::timeInMin = 0;
 
@@ -39,11 +46,9 @@ void TonuinoTimer::disable()
 TonuinoTimer TonuinoPlayer::standbyTimer;
 TonuinoTimer TonuinoPlayer::sleepTimer;
 
-uint8_t TonuinoPlayer::allTracksCount()
-{
-	return endTrack - firstTrack + 1;
-}
-
+// *********************************
+// Settings
+// *********************************
 bool TonuinoPlayer::useSection()
 {
 	return mode == Section_AudioDrama || mode == Section_Party || Section_Album;
@@ -64,20 +69,12 @@ bool TonuinoPlayer::useRandomQueue()
 	return mode == Party || mode == Section_Party;
 } 
 
-bool TonuinoPlayer::reShuffleOnEnd()
-{
-	return true;
-}
+bool TonuinoPlayer::reShuffleOnEnd = true;
+bool TonuinoPlayer::useAllRepetition = false;
+bool TonuinoPlayer::useSingleRepetition = false;
+bool TonuinoPlayer::goToTrackOnPause = false;
 
-bool TonuinoPlayer::useAllRepetition()
-{
-	return false;
-}
-
-bool TonuinoPlayer::useSingleRepetition()
-{
-	return false;
-}
+// *********************************
 
 uint8_t TonuinoPlayer::currentTrack()
 {
@@ -123,6 +120,7 @@ void TonuinoPlayer::shuffleQueue()
 void TonuinoPlayer::playTitle()
 {
 	isPlaying = true;
+	currentTrackStarted = true;
 	currentTrackFinished = false;
 	standbyTimer.disable();
 	sleepTimer.activate();
@@ -149,7 +147,7 @@ void TonuinoPlayer::trackFinished()
 	currentTrackFinished = true;
 	
 	// repeat current track
-	if (useSingleRepetition())
+	if (useSingleRepetition)
 	{
 		return;
 	}
@@ -161,22 +159,30 @@ void TonuinoPlayer::trackFinished()
 	}
 }
 
-uint8_t TonuinoPlayer::getNextTrack() 
+bool TonuinoPlayer::goToNextTrack() 
 {
-	return getTrack(true);
+	return goToTrack(true);
 }
 
-uint8_t TonuinoPlayer::getPreviousTrack() 
+bool TonuinoPlayer::goToPreviousTrack() 
 {
-	return getTrack(false);
+	return goToTrack(false);
 }
 
-uint8_t TonuinoPlayer::getTrack(bool next) 
+bool TonuinoPlayer::goToTrack(bool next) 
 {
+	currentTrackStarted = false;
+	
 	// repeat current track
-	if (useSingleRepetition())
+	if (useSingleRepetition)
 	{
-		return currentTrack();
+		return true;
+	}
+	
+	// go to next only while playing
+	if (!goToTrackOnPause && isPlaying)
+	{
+		return false;
 	}
 	
 	if (useSingleTrack()) 
@@ -202,7 +208,7 @@ uint8_t TonuinoPlayer::getTrack(bool next)
 				{
 					Serial.println(F("Ende der Queue -> beginne von vorne"));
 					currentTrackIndex = 1;
-					if (reShuffleOnEnd())
+					if (reShuffleOnEnd)
 					{
 						Serial.println(F("Ende der Queue -> mische neu"));
 						shuffleQueue();
@@ -250,7 +256,7 @@ uint8_t TonuinoPlayer::getTrack(bool next)
 		}
 	}
 	
-	return isPlaying ? currentTrack() : 0;
+	return true;
 }
 
 void TonuinoPlayer::loadFolder(uint8_t numTracksInFolder, uint8_t folderMode, uint8_t startTrack, uint8_t finalTrack, uint8_t lastTrack) 

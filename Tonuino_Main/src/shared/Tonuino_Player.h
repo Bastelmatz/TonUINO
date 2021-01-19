@@ -39,14 +39,15 @@ class TonuinoPlayer
 		
 	uint8_t currentTrack();
 	uint8_t currentTrackInRange();
-	
+	static bool currentTrackStarted;
+		
 	void playTitle();
 	void pauseNoStandBy();
 	void pauseAndStandBy();
 	void trackFinished();
 	
-	uint8_t getNextTrack();
-	uint8_t getPreviousTrack();
+	bool goToNextTrack();
+	bool goToPreviousTrack();
 	
 	void loadFolder(uint8_t numTracks, uint8_t folderMode, uint8_t startTrack, uint8_t endTrack, uint8_t lastTrack);
 	
@@ -66,12 +67,13 @@ class TonuinoPlayer
 	bool useRandomSingle();
 	bool useRandomQueue();
 	bool useSingleTrack();
-	bool useAllRepetition();
-	bool useSingleRepetition();
-	bool reShuffleOnEnd();
-		
+	static bool useAllRepetition;
+	static bool useSingleRepetition;
+	static bool reShuffleOnEnd;
+	static bool goToTrackOnPause;
+	
 	void shuffleQueue();
-	uint8_t getTrack(bool next);
+	bool goToTrack(bool next);
 };
 
 #endif
