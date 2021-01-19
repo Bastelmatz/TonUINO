@@ -45,19 +45,19 @@ void dump_byte_array(byte * buffer, byte bufferSize);
 class Tonuino_RFID_Reader
 {
 public:
-	bool hasMusicCard = false;
-	bool hasModifierCard = false;
+	static bool hasMusicCard;
+	static bool hasModifierCard;
 
 	nfcTagObject readCardData;
 
 	// Card detection
 	bool hasAnyCard();
-	byte lastMusicCardUid[4];
-	byte currentCardUid[4];
-	byte retries;
-	const byte maxRetries = 2;
-	bool lastMusicCardWasUL;
-	bool lastModifierCardWasUL;
+	static byte lastMusicCardUid[4];
+	static byte currentCardUid[4];
+	static byte retries;
+	static const byte maxRetries = 2;
+	static bool lastMusicCardWasUL;
+	static bool lastModifierCardWasUL;
 
 	void setupRFID();
 

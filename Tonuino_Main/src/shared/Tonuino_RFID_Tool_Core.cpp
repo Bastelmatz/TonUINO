@@ -1,0 +1,127 @@
+
+#include "Tonuino_RFID_Tool_Core.h"
+#include <SPI.h>
+#include <avr/sleep.h>
+
+char Tonuino_RFID_Tool_Core::readSerialString[20];
+
+void Tonuino_RFID_Tool_Core::transmitTrigger(bool startTrigger)
+{
+  // this information is required for Tonuino RFID Tool
+  if (startTrigger)
+  {
+	Serial.println("Tonuino_RFID_Tool_BEGIN");
+  }
+  else
+  {
+	Serial.println("Tonuino_RFID_Tool_END");
+  }
+}
+
+void Tonuino_RFID_Tool_Core::transmitCardData(nfcTagObject nfcTag)
+{
+  // this information is required for Tonuino RFID Tool
+  // the formatting and order of the transmitted data is defined and must be in sync with the tool
+  transmitTrigger(true);
+  Serial.println("CardData");
+  Serial.print("RFID:");
+  //dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size); // doesn't work anymore for some reason
+  dump_byte_array(tonuinoRFID.currentCardUid, sizeof(tonuinoRFID.currentCardUid));
+  Serial.println();
+  Serial.print("Cookie:");
+  Serial.println(nfcTag.cookie);
+  Serial.print("Folder:");
+  Serial.println(nfcTag.nfcFolderSettings.folder);
+  Serial.print("Mode:");
+  Serial.println(nfcTag.nfcFolderSettings.mode);
+  Serial.print("Special:");
+  Serial.println(nfcTag.nfcFolderSettings.special);
+  Serial.print("Special2:");
+  Serial.println(nfcTag.nfcFolderSettings.special2);
+  transmitTrigger(false);
+}
+
+void Tonuino_RFID_Tool_Core::transmitCardRemoval()
+{
+	transmitTrigger(true);
+	Serial.println("CardData");
+	transmitTrigger(false);
+}
+
+void Tonuino_RFID_Tool_Core::writeCard(nfcTagObject nfcTag)
+{
+  tonuinoRFID.writeCard(nfcTag);
+  tonuinoRFID.haltAndStop();
+  
+  // force new card detection
+  transmitCardData(nfcTag);
+  tonuinoRFID.hasMusicCard = false;
+  tonuinoRFID.hasModifierCard = false;
+}
+
+void Tonuino_RFID_Tool_Core::handleCommand()
+{
+  Serial.println("RFID_Tool_Command_Received");
+  Serial.println(readSerialString);
+
+  folderSettings receivedFS;
+  int index = 0;
+  char* command = strtok(readSerialString, ";");
+  while(command != NULL) 
+  {
+	int charToInt = atoi(command);
+	byte parsedByte = (byte)charToInt;
+	switch (index)
+	{
+	  case 0: receivedFS.folder = parsedByte; break;
+	  case 1: receivedFS.mode = parsedByte; break;
+	  case 2: receivedFS.special = parsedByte; break;
+	  case 3: receivedFS.special2 = parsedByte; break;
+	}
+	index++;
+	// create next part
+	command = strtok(NULL, ";");
+  }
+
+  Serial.println(receivedFS.folder);
+  Serial.println(receivedFS.mode);
+  Serial.println(receivedFS.special);
+  Serial.println(receivedFS.special2);
+
+  nfcTagObject tempCard;
+  tempCard.cookie = cardCookie;
+  tempCard.version = 1;
+  tempCard.nfcFolderSettings.folder = receivedFS.folder;
+  tempCard.nfcFolderSettings.special = receivedFS.special;
+  tempCard.nfcFolderSettings.special2 = receivedFS.special2;
+  tempCard.nfcFolderSettings.mode = receivedFS.mode;
+
+  writeCard(tempCard);
+}
+
+void Tonuino_RFID_Tool_Core::listen()
+{
+	byte index = 0;
+	while (Serial.available()) 
+	{
+		if (index > sizeof(readSerialString))
+		{
+			break;
+		}
+		delay(3);  
+		char c = Serial.read();
+		readSerialString[index] = c; 
+		index++;
+	}
+	if (index > 0)
+	{
+		handleCommand();
+		for(int i = 0; i < sizeof(readSerialString); ++i)
+		{
+		  readSerialString[i] = (char)0;
+		}
+	}
+}
+
+
+
