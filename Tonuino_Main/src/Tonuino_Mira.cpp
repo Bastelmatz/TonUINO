@@ -41,7 +41,6 @@ bool usePowerOff = false;
 
 uint8_t voiceMenu(int numberOfOptions, int startMessage, int messageOffset,
                   bool preview = false, int previewFromFolder = 0, int defaultValue = 0, bool exitWithLongPress = false);
-bool checkTwo ( uint8_t a[], uint8_t b[] );
 void writeCard(nfcTagStruct nfcTag);
 void adminMenu(bool fromCard = false);
 
@@ -697,45 +696,9 @@ void adminMenu(bool fromCard = false)
   dfPlayer.folderLoaded = false;
   if (fromCard == false) {
     // Admin menu has been locked - it still can be trigged via admin card
-    if (tonuinoEEPROM.settings.adminMenuLocked == 1) {
+    if (tonuinoEEPROM.settings.adminMenuLocked) 
+	{
       return;
-    }
-    // Pin check
-    else if (tonuinoEEPROM.settings.adminMenuLocked == 2) {
-      uint8_t pin[4];
-      dfPlayer.playMp3Track(991);
-      if (askCode(pin) == true) {
-        if (checkTwo(pin, tonuinoEEPROM.settings.adminMenuPin) == false) {
-          return;
-        }
-      } else {
-        return;
-      }
-    }
-    // Match check
-    else if (tonuinoEEPROM.settings.adminMenuLocked == 3) {
-      uint8_t a = random(10, 20);
-      uint8_t b = random(1, 10);
-      uint8_t c;
-      dfPlayer.playMP3AndWait(992);
-      dfPlayer.playMP3AndWait(a);
-
-      if (random(1, 3) == 2) {
-        // a + b
-        c = a + b;
-        dfPlayer.playMP3AndWait(993);
-      } else {
-        // a - b
-        b = random(1, a);
-        c = a - b;
-        dfPlayer.playMP3AndWait(994);
-      }
-      dfPlayer.playMp3Track(b);
-      Serial.println(c);
-      uint8_t temp = voiceMenu(255, 0, 0, false);
-      if (temp != c) {
-        return;
-      }
     }
   }
   int subMenu = voiceMenu(12, 900, 900, false, false, 0, true);
@@ -830,46 +793,14 @@ void adminMenu(bool fromCard = false)
     dfPlayer.playMp3Track(999);
   }
   // lock admin menu
-  else if (subMenu == 12) {
-    int temp = voiceMenu(4, 980, 980, false);
-    if (temp == 1) {
-      tonuinoEEPROM.settings.adminMenuLocked = 0;
-    }
-    else if (temp == 2) {
-      tonuinoEEPROM.settings.adminMenuLocked = 1;
-    }
-    else if (temp == 3) {
-      int8_t pin[4];
-      dfPlayer.playMp3Track(991);
-      if (askCode(pin)) {
-        memcpy(tonuinoEEPROM.settings.adminMenuPin, pin, 4);
-        tonuinoEEPROM.settings.adminMenuLocked = 2;
-      }
-    }
-    else if (temp == 4) {
-      tonuinoEEPROM.settings.adminMenuLocked = 3;
-    }
-
+  else if (subMenu == 12) 
+  {
+    int temp = voiceMenu(2, 980, 980, false);
+    tonuinoEEPROM.settings.adminMenuLocked = temp == 2;
   }
   tonuinoEEPROM.writeSettingsToFlash();
   setStandbyTimerValue();
   dfPlayer.pauseAndStandBy();
-}
-
-bool askCode(uint8_t *code) {
-  uint8_t x = 0;
-  while (x < 4) {
-    readButtons();
-    if (pauseButton.pressedFor(LONG_PRESS))
-      break;
-    if (pauseButton.wasReleased())
-      code[x++] = 1;
-    if (nextButton.wasReleased())
-      code[x++] = 2;
-    if (previousButton.wasReleased())
-      code[x++] = 3;
-  }
-  return true;
 }
 
 uint8_t voiceMenu(int numberOfOptions, int startMessage, int messageOffset,
@@ -1088,17 +1019,6 @@ void writeCard(nfcTagStruct nfcTag)
 {
 	bool statusOK = tonuinoRFID.writeCard(nfcTag);
 	dfPlayer.playMp3Track(statusOK ? 400 : 401);
-}
-
-
-///////////////////////////////////////// Check Bytes   ///////////////////////////////////
-bool checkTwo ( uint8_t a[], uint8_t b[] ) {
-  for ( uint8_t k = 0; k < 4; k++ ) {   // Loop 4 times
-    if ( a[k] != b[k] ) {     // IF a != b then false, because: one fails, all fail
-      return false;
-    }
-  }
-  return true;
 }
 
 #endif

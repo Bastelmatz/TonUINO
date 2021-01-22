@@ -16,8 +16,7 @@ struct adminSettings {
   bool locked;
   long standbyTimer;
   musicDataset shortCuts[4];
-  uint8_t adminMenuLocked;
-  uint8_t adminMenuPin[4];
+  bool adminMenuLocked;
 };
 
 class TonuinoEEPROM

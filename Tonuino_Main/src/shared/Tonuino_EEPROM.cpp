@@ -90,10 +90,6 @@ void TonuinoEEPROM::resetSettings()
   settings.shortCuts[2].folder = 0;
   settings.shortCuts[3].folder = 0;
   settings.adminMenuLocked = 0;
-  settings.adminMenuPin[0] = 1;
-  settings.adminMenuPin[1] = 1;
-  settings.adminMenuPin[2] = 1;
-  settings.adminMenuPin[3] = 1;
 
   writeSettingsToFlash();
 }
@@ -105,10 +101,6 @@ void TonuinoEEPROM::migrateSettings(int oldVersion)
     Serial.println(F("1 -> 2"));
     settings.version = 2;
     settings.adminMenuLocked = 0;
-    settings.adminMenuPin[0] = 1;
-    settings.adminMenuPin[1] = 1;
-    settings.adminMenuPin[2] = 1;
-    settings.adminMenuPin[3] = 1;
     writeSettingsToFlash();
   }
 }
@@ -147,12 +139,6 @@ void TonuinoEEPROM::loadSettingsFromFlash()
 
   Serial.print(F("Admin Menu locked: "));
   Serial.println(settings.adminMenuLocked);
-
-  Serial.print(F("Admin Menu Pin: "));
-  Serial.print(settings.adminMenuPin[0]);
-  Serial.print(settings.adminMenuPin[1]);
-  Serial.print(settings.adminMenuPin[2]);
-  Serial.println(settings.adminMenuPin[3]);
 }
 
 
