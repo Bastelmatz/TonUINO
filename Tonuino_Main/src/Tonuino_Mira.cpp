@@ -119,45 +119,6 @@ class Modifier {
 
 Modifier *activeModifier = NULL;
 
-class FreezeDance: public Modifier {
-  private:
-    unsigned long nextStopAtMillis = 0;
-    const uint8_t minSecondsBetweenStops = 5;
-    const uint8_t maxSecondsBetweenStops = 30;
-
-    void setNextStopAtMillis() {
-      uint16_t seconds = random(this->minSecondsBetweenStops, this->maxSecondsBetweenStops + 1);
-      Serial.println(F("=== FreezeDance::setNextStopAtMillis()"));
-      Serial.println(seconds);
-      this->nextStopAtMillis = millis() + seconds * 1000;
-    }
-
-  public:
-    void loop() {
-      if (this->nextStopAtMillis != 0 && millis() > this->nextStopAtMillis) {
-        Serial.println(F("== FreezeDance::loop() -> FREEZE!"));
-        if (dfPlayer.isPlaying()) {
-          dfPlayer.playAdvertisement(301);
-          delay(500);
-        }
-        setNextStopAtMillis();
-      }
-    }
-    FreezeDance(void) {
-      Serial.println(F("=== FreezeDance()"));
-      if (dfPlayer.isPlaying()) {
-        delay(1000);
-        dfPlayer.playAdvertisement(300);
-        delay(500);
-      }
-      setNextStopAtMillis();
-    }
-    uint8_t getActive() {
-      Serial.println(F("== FreezeDance::getActive()"));
-      return 2;
-    }
-};
-
 class Locked: public Modifier {
   public:
     virtual bool handlePause()     {
@@ -278,6 +239,17 @@ class KindergardenMode: public Modifier {
       return 5;
     }
 };
+
+void activateFreezeDance(bool active)
+{
+	if (dfPlayer.isPlaying()) 
+	{
+		delay(1000);
+		dfPlayer.playAdvertisement(300);
+		delay(500);
+	}
+	dfPlayer.setFreezeDance(active);
+}
 
 void turnOff()
 {
@@ -995,7 +967,6 @@ bool evaluateCardData(nfcTagStruct tempCard, nfcTagStruct nfcTag)
         case 0:
         case 255:
           tonuinoRFID.haltAndStop(); adminMenu(true);  break;
-        case 2: activeModifier = new FreezeDance(); break;
         case 3: activeModifier = new Locked(); break;
         case 4: activeModifier = new ToddlerMode(); break;
         case 5: activeModifier = new KindergardenMode(); break;

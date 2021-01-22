@@ -14,6 +14,9 @@ musicDataset TonuinoDFPlayer::musicDS;
 bool TonuinoDFPlayer::folderLoaded = false;
 bool TonuinoDFPlayer::feedbackOnVolumeChange = false;
 
+bool TonuinoDFPlayer::freezeDance_active = false;
+unsigned long TonuinoDFPlayer::freezeDance_nextStopAtMillis = 0;
+
 void TonuinoDFPlayer::trackFinished();
 
 // implement a notification class,
@@ -244,8 +247,35 @@ void TonuinoDFPlayer::start()
 	mp3.start();
 }
 
+void TonuinoDFPlayer::setNextStopAtMillis() 
+{
+	uint16_t seconds = random(5, 30 + 1);
+	Serial.print("Freeze dance - next stop in seconds: ");
+	Serial.println(seconds);
+	freezeDance_nextStopAtMillis = millis() + seconds * 1000;
+}
+	
+void TonuinoDFPlayer::setFreezeDance(bool active)
+{
+	freezeDance_active = active;
+	if (active)
+	{
+		setNextStopAtMillis();
+	}
+}
+
 void TonuinoDFPlayer::loop()
 {
+	if (freezeDance_active)
+	{
+		if (millis() > freezeDance_nextStopAtMillis) 
+		{
+			Serial.println("Freeze - pause playing ...");
+			setNextStopAtMillis();
+			togglePlay();
+		}
+	}
+
 	mp3.loop();
 }
 
@@ -273,7 +303,6 @@ uint16_t TonuinoDFPlayer::getFolderTrackCount(uint16_t folder)
 {
 	return mp3.getFolderTrackCount(folder);
 }
-
 
 
 

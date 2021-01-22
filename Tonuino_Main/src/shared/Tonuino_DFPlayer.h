@@ -45,11 +45,16 @@ class TonuinoDFPlayer
 	void playMp3Track(uint16_t track);
 	uint16_t getFolderTrackCount(uint16_t folder);
 	
+	void setFreezeDance(bool active);
+	
 	private:
 	static bool feedbackOnVolumeChange;
-	
+	static bool freezeDance_active;
+	static unsigned long freezeDance_nextStopAtMillis;
+
 	void playCurrentTrack();
 	void playTrack(uint8_t track);
+	void setNextStopAtMillis();
 };
 
 #endif
