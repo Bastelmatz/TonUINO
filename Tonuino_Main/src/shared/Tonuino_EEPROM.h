@@ -29,7 +29,7 @@ class TonuinoEEPROM
 	
 	void writeLastFolderToFlash(folderSettings folder);
 	void writeLastTrackToFlash(uint8_t track, uint8_t folder);
-	uint16_t loadLastTrackFromFlash(uint8_t folder);
+	uint8_t loadLastTrackFromFlash(uint8_t folder);
 	
 	void writeSettingsToFlash();
 	void resetSettings();

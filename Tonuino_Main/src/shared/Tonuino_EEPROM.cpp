@@ -57,10 +57,10 @@ void TonuinoEEPROM::writeLastTrackToFlash(uint8_t track, uint8_t folder)
   EEPROM.update(flashAddress_Track(folder), track);
 }
 
-uint16_t TonuinoEEPROM::loadLastTrackFromFlash(uint8_t folder) 
+uint8_t TonuinoEEPROM::loadLastTrackFromFlash(uint8_t folder) 
 {
   Serial.println(F("=== loadLastTrackFromFlash()"));
-  uint16_t track = EEPROM.read(flashAddress_Track(folder));
+  uint8_t track = EEPROM.read(flashAddress_Track(folder));
   
   Serial.print(F("Last track: "));
   Serial.println(track);

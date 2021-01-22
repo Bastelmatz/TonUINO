@@ -261,7 +261,8 @@ bool TonuinoPlayer::goToTrack(bool next)
 
 void TonuinoPlayer::loadFolder(uint8_t numTracksInFolder, uint8_t folderMode, uint8_t startTrack, uint8_t finalTrack, uint8_t lastTrack) 
 {
-	Serial.println(F("== loadFolder()")) ;
+	Serial.print("Load folder with mode ");
+	Serial.println(folderMode);
 	mode = folderMode;
 	endTrack = numTracksInFolder;
 	firstTrack = 1;
