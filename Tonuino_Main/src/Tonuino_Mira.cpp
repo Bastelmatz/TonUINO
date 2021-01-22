@@ -34,15 +34,15 @@ TonuinoDFPlayer dfPlayer;
 TonuinoEEPROM tonuinoEEPROM;
 
 uint8_t trackInEEPROM = 0;
-nfcTagObject myCard;
-folderSettings lastFolder;
+nfcTagStruct myCard;
+musicDataset lastMusicDS;
 
 bool usePowerOff = false;
 
 uint8_t voiceMenu(int numberOfOptions, int startMessage, int messageOffset,
                   bool preview = false, int previewFromFolder = 0, int defaultValue = 0, bool exitWithLongPress = false);
 bool checkTwo ( uint8_t a[], uint8_t b[] );
-void writeCard(nfcTagObject nfcTag);
+void writeCard(nfcTagStruct nfcTag);
 void adminMenu(bool fromCard = false);
 
 #define buttonPause A1
@@ -77,10 +77,10 @@ TonuinoPlayer tonuinoPlayer()
 void loadDataFromFlash()
 {
 	tonuinoEEPROM.loadSettingsFromFlash();
-	lastFolder = tonuinoEEPROM.loadLastFolderFromFlash();
+	lastMusicDS = tonuinoEEPROM.loadLastDatasetFromFlash();
 	
-	dfPlayer.volumeMin = tonuinoEEPROM.mySettings.minVolume;
-	dfPlayer.volumeMax = tonuinoEEPROM.mySettings.maxVolume;
+	dfPlayer.volumeMin = tonuinoEEPROM.settings.minVolume;
+	dfPlayer.volumeMax = tonuinoEEPROM.settings.maxVolume;
 }
 
 class Modifier {
@@ -107,7 +107,7 @@ class Modifier {
     virtual bool handleVolumeDown() {
       return false;
     }
-    virtual bool handleRFID(nfcTagObject *newCard) {
+    virtual bool handleRFID(nfcTagStruct *newCard) {
       return false;
     }
     virtual uint8_t getActive() {
@@ -181,7 +181,7 @@ class Locked: public Modifier {
       Serial.println(F("== Locked::handleVolumeDown() -> LOCKED!"));
       return true;
     }
-    virtual bool handleRFID(nfcTagObject *newCard) {
+    virtual bool handleRFID(nfcTagStruct *newCard) {
       Serial.println(F("== Locked::handleRFID() -> LOCKED!"));
       return true;
     }
@@ -230,19 +230,19 @@ class ToddlerMode: public Modifier {
 
 class KindergardenMode: public Modifier {
   private:
-    nfcTagObject nextCard;
+    nfcTagStruct nextCard;
     bool cardQueued = false;
 
   public:
     virtual bool handleNext() {
       Serial.println(F("== KindergardenMode::handleNext() -> NEXT"));
-      //if (this->nextCard.cookie == cardCookie && this->nextCard.nfcFolderSettings.folder != 0 && this->nextCard.nfcFolderSettings.mode != 0) {
-      //myFolder = &this->nextCard.nfcFolderSettings;
+      //if (this->nextCard.cookie == cardCookie && this->nextCard.musicDS.folder != 0 && this->nextCard.musicDS.mode != 0) {
+      //myFolder = &this->nextCard.musicDS;
       if (this->cardQueued == true) {
         this->cardQueued = false;
 
         myCard = nextCard;
-        loadAndPlayFolder(myCard.nfcFolderSettings);
+        loadAndPlayFolder(myCard.musicDS);
         return true;
       }
       return false;
@@ -259,7 +259,7 @@ class KindergardenMode: public Modifier {
       Serial.println(F("== KindergardenMode::handlePreviousButton() -> LOCKED!"));
       return true;
     }
-    virtual bool handleRFID(nfcTagObject * newCard) { // lot of work to do!
+    virtual bool handleRFID(nfcTagStruct * newCard) { // lot of work to do!
       Serial.println(F("== KindergardenMode::handleRFID() -> queued!"));
       this->nextCard = *newCard;
       this->cardQueued = true;
@@ -324,14 +324,14 @@ void checkStandbyAtMillis()
 
 void checkCurrentTrack()
 {
-	if (dfPlayer.folderDataset.mode == AudioBook)
+	if (dfPlayer.musicDS.mode == AudioBook)
 	{
 		uint8_t currentTrack = tonuinoPlayer().currentTrack();
 		if (currentTrack > 0 && trackInEEPROM != currentTrack)
 		{
 			Serial.print("Save current track to EEPROM: ");
 			Serial.print(currentTrack);
-			tonuinoEEPROM.writeLastTrackToFlash(currentTrack, dfPlayer.folderDataset.folder);
+			tonuinoEEPROM.writeLastTrackToFlash(currentTrack, dfPlayer.musicDS.folder);
 		}
 	}
 }
@@ -340,7 +340,7 @@ void playShortCut(uint8_t shortCut)
 {
 	Serial.println(F("=== playShortCut()"));
 	Serial.println(shortCut);
-	folderSettings shortCutData = tonuinoEEPROM.mySettings.shortCuts[shortCut];
+	musicDataset shortCutData = tonuinoEEPROM.settings.shortCuts[shortCut];
 	if (shortCutData.folder != 0) 
 	{
 		loadAndPlayFolder(shortCutData);
@@ -353,7 +353,7 @@ void playShortCut(uint8_t shortCut)
 
 void setStandbyTimerValue()
 {
-	tonuinoPlayer().standbyTimer.timeInMin = tonuinoEEPROM.mySettings.standbyTimer;
+	tonuinoPlayer().standbyTimer.timeInMin = tonuinoEEPROM.settings.standbyTimer;
 }
 
 void setSleepTimerValue()
@@ -361,23 +361,23 @@ void setSleepTimerValue()
 	tonuinoPlayer().sleepTimer.timeInMin = 0;
 }
 
-uint8_t getLastTrack(folderSettings folderDataset)
+uint8_t getLastTrack(musicDataset musicDS)
 {
-	if (folderDataset.mode == AudioBook) 
+	if (musicDS.mode == AudioBook) 
 	{
-		trackInEEPROM = tonuinoEEPROM.loadLastTrackFromFlash(folderDataset.folder);
+		trackInEEPROM = tonuinoEEPROM.loadLastTrackFromFlash(musicDS.folder);
 		return trackInEEPROM;
 	}
 	return 0;
 }
 
-void loadFolder(folderSettings folder)
+void loadFolder(musicDataset folder)
 {
     uint8_t lastTrack = getLastTrack(folder);
 	dfPlayer.loadFolder(folder, lastTrack);
 }
 
-void loadAndPlayFolder(folderSettings folder)
+void loadAndPlayFolder(musicDataset folder)
 {
 	uint8_t lastTrack = getLastTrack(folder);
 	dfPlayer.loadAndPlayFolder(folder, lastTrack);
@@ -414,9 +414,9 @@ void setupTonuino() {
   
   // DFPlayer Mini initialisieren
   dfPlayer.setup();
-  dfPlayer.setVolume(tonuinoEEPROM.mySettings.initVolume);
+  dfPlayer.setVolume(tonuinoEEPROM.settings.initVolume);
   oldPotiValue = dfPlayer.volume;
-  dfPlayer.setEqualizer(tonuinoEEPROM.mySettings.eq - 1);
+  dfPlayer.setEqualizer(tonuinoEEPROM.settings.eq - 1);
 
   // NFC Leser initialisieren
   tonuinoRFID.setupRFID();
@@ -445,7 +445,7 @@ void setupTonuino() {
   delay(1000);
   
   // load last folder 
-  loadFolder(lastFolder);
+  loadFolder(lastMusicDS);
 }
 
 void readButtons() {
@@ -644,12 +644,12 @@ void loopTonuino()
 
 void onNewCard()
 {
-	if (myCard.cookie == cardCookie && myCard.nfcFolderSettings.folder != 0 && myCard.nfcFolderSettings.mode != 0) 
+	if (myCard.cookie == cardCookie && myCard.musicDS.folder != 0 && myCard.musicDS.mode != 0) 
 	{
-		dfPlayer.folderDataset = myCard.nfcFolderSettings;
-		loadAndPlayFolder(dfPlayer.folderDataset);
+		dfPlayer.musicDS = myCard.musicDS;
+		loadAndPlayFolder(dfPlayer.musicDS);
 		// Save last folder for next power up
-		tonuinoEEPROM.writeLastFolderToFlash(dfPlayer.folderDataset);
+		tonuinoEEPROM.writeLastDatasetToFlash(dfPlayer.musicDS);
 	}
 	// Neue Karte konfigurieren
 	else if (myCard.cookie != cardCookie) 
@@ -673,7 +673,7 @@ void waitForNewCard()
   } while (!tonuinoRFID.cardDetected());
 }
 
-void waitForCardAndWrite(nfcTagObject card)
+void waitForCardAndWrite(nfcTagStruct card)
 {
 	Serial.println(F(" Karte auflegen"));
 	waitForNewCard();
@@ -697,15 +697,15 @@ void adminMenu(bool fromCard = false)
   dfPlayer.folderLoaded = false;
   if (fromCard == false) {
     // Admin menu has been locked - it still can be trigged via admin card
-    if (tonuinoEEPROM.mySettings.adminMenuLocked == 1) {
+    if (tonuinoEEPROM.settings.adminMenuLocked == 1) {
       return;
     }
     // Pin check
-    else if (tonuinoEEPROM.mySettings.adminMenuLocked == 2) {
+    else if (tonuinoEEPROM.settings.adminMenuLocked == 2) {
       uint8_t pin[4];
       dfPlayer.playMp3Track(991);
       if (askCode(pin) == true) {
-        if (checkTwo(pin, tonuinoEEPROM.mySettings.adminMenuPin) == false) {
+        if (checkTwo(pin, tonuinoEEPROM.settings.adminMenuPin) == false) {
           return;
         }
       } else {
@@ -713,7 +713,7 @@ void adminMenu(bool fromCard = false)
       }
     }
     // Match check
-    else if (tonuinoEEPROM.mySettings.adminMenuLocked == 3) {
+    else if (tonuinoEEPROM.settings.adminMenuLocked == 3) {
       uint8_t a = random(10, 20);
       uint8_t b = random(1, 10);
       uint8_t c;
@@ -748,38 +748,38 @@ void adminMenu(bool fromCard = false)
   }
   else if (subMenu == 2) {
     // Maximum Volume
-    tonuinoEEPROM.mySettings.maxVolume = voiceMenu(30 - tonuinoEEPROM.mySettings.minVolume, 930, tonuinoEEPROM.mySettings.minVolume, false, false, tonuinoEEPROM.mySettings.maxVolume - tonuinoEEPROM.mySettings.minVolume) + tonuinoEEPROM.mySettings.minVolume;
+    tonuinoEEPROM.settings.maxVolume = voiceMenu(30 - tonuinoEEPROM.settings.minVolume, 930, tonuinoEEPROM.settings.minVolume, false, false, tonuinoEEPROM.settings.maxVolume - tonuinoEEPROM.settings.minVolume) + tonuinoEEPROM.settings.minVolume;
   }
   else if (subMenu == 3) {
     // Minimum Volume
-    tonuinoEEPROM.mySettings.minVolume = voiceMenu(tonuinoEEPROM.mySettings.maxVolume - 1, 931, 0, false, false, tonuinoEEPROM.mySettings.minVolume);
+    tonuinoEEPROM.settings.minVolume = voiceMenu(tonuinoEEPROM.settings.maxVolume - 1, 931, 0, false, false, tonuinoEEPROM.settings.minVolume);
   }
   else if (subMenu == 4) {
     // Initial Volume
-    tonuinoEEPROM.mySettings.initVolume = voiceMenu(tonuinoEEPROM.mySettings.maxVolume - tonuinoEEPROM.mySettings.minVolume + 1, 932, tonuinoEEPROM.mySettings.minVolume - 1, false, false, tonuinoEEPROM.mySettings.initVolume - tonuinoEEPROM.mySettings.minVolume + 1) + tonuinoEEPROM.mySettings.minVolume - 1;
+    tonuinoEEPROM.settings.initVolume = voiceMenu(tonuinoEEPROM.settings.maxVolume - tonuinoEEPROM.settings.minVolume + 1, 932, tonuinoEEPROM.settings.minVolume - 1, false, false, tonuinoEEPROM.settings.initVolume - tonuinoEEPROM.settings.minVolume + 1) + tonuinoEEPROM.settings.minVolume - 1;
   }
   else if (subMenu == 5) {
     // EQ
-    tonuinoEEPROM.mySettings.eq = voiceMenu(6, 920, 920, false, false, tonuinoEEPROM.mySettings.eq);
-    dfPlayer.setEqualizer(tonuinoEEPROM.mySettings.eq - 1);
+    tonuinoEEPROM.settings.eq = voiceMenu(6, 920, 920, false, false, tonuinoEEPROM.settings.eq);
+    dfPlayer.setEqualizer(tonuinoEEPROM.settings.eq - 1);
   }
   else if (subMenu == 6) {
     // create modifier card
-    nfcTagObject tempCard;
+    nfcTagStruct tempCard;
     tempCard.cookie = cardCookie;
     tempCard.version = 1;
-    tempCard.nfcFolderSettings.folder = 0;
-    tempCard.nfcFolderSettings.special = 0;
-    tempCard.nfcFolderSettings.special2 = 0;
-    tempCard.nfcFolderSettings.mode = voiceMenu(6, 970, 970, false, false, 0, true);
+    tempCard.musicDS.folder = 0;
+    tempCard.musicDS.special = 0;
+    tempCard.musicDS.special2 = 0;
+    tempCard.musicDS.mode = voiceMenu(6, 970, 970, false, false, 0, true);
 
-    if (tempCard.nfcFolderSettings.mode != 0) {
-      if (tempCard.nfcFolderSettings.mode == 1) {
+    if (tempCard.musicDS.mode != 0) {
+      if (tempCard.musicDS.mode == 1) {
         switch (voiceMenu(4, 960, 960)) {
-          case 1: tempCard.nfcFolderSettings.special = 5; break;
-          case 2: tempCard.nfcFolderSettings.special = 15; break;
-          case 3: tempCard.nfcFolderSettings.special = 30; break;
-          case 4: tempCard.nfcFolderSettings.special = 60; break;
+          case 1: tempCard.musicDS.special = 5; break;
+          case 2: tempCard.musicDS.special = 15; break;
+          case 3: tempCard.musicDS.special = 30; break;
+          case 4: tempCard.musicDS.special = 60; break;
         }
       }
       dfPlayer.playMp3Track(800);
@@ -789,35 +789,35 @@ void adminMenu(bool fromCard = false)
   }
   else if (subMenu == 7) {
     uint8_t shortcut = voiceMenu(4, 940, 940);
-    setupFolder(&tonuinoEEPROM.mySettings.shortCuts[shortcut - 1]);
+    setupFolder(&tonuinoEEPROM.settings.shortCuts[shortcut - 1]);
     dfPlayer.playMp3Track(400);
   }
   else if (subMenu == 8) {
     switch (voiceMenu(5, 960, 960)) {
-      case 1: tonuinoEEPROM.mySettings.standbyTimer = 5; break;
-      case 2: tonuinoEEPROM.mySettings.standbyTimer = 15; break;
-      case 3: tonuinoEEPROM.mySettings.standbyTimer = 30; break;
-      case 4: tonuinoEEPROM.mySettings.standbyTimer = 60; break;
-      case 5: tonuinoEEPROM.mySettings.standbyTimer = 0; break;
+      case 1: tonuinoEEPROM.settings.standbyTimer = 5; break;
+      case 2: tonuinoEEPROM.settings.standbyTimer = 15; break;
+      case 3: tonuinoEEPROM.settings.standbyTimer = 30; break;
+      case 4: tonuinoEEPROM.settings.standbyTimer = 60; break;
+      case 5: tonuinoEEPROM.settings.standbyTimer = 0; break;
     }
   }
   else if (subMenu == 9) {
     // Create Cards for Folder
     // Ordner abfragen
-    nfcTagObject tempCard;
+    nfcTagStruct tempCard;
     tempCard.cookie = cardCookie;
     tempCard.version = 1;
-    tempCard.nfcFolderSettings.mode = 4;
-    tempCard.nfcFolderSettings.folder = voiceMenu(99, 301, 0, true);
-    uint8_t special = voiceMenu(dfPlayer.getFolderTrackCount(tempCard.nfcFolderSettings.folder), 321, 0,
-                                true, tempCard.nfcFolderSettings.folder);
-    uint8_t special2 = voiceMenu(dfPlayer.getFolderTrackCount(tempCard.nfcFolderSettings.folder), 322, 0,
-                                 true, tempCard.nfcFolderSettings.folder, special);
+    tempCard.musicDS.mode = 4;
+    tempCard.musicDS.folder = voiceMenu(99, 301, 0, true);
+    uint8_t special = voiceMenu(dfPlayer.getFolderTrackCount(tempCard.musicDS.folder), 321, 0,
+                                true, tempCard.musicDS.folder);
+    uint8_t special2 = voiceMenu(dfPlayer.getFolderTrackCount(tempCard.musicDS.folder), 322, 0,
+                                 true, tempCard.musicDS.folder, special);
 
     dfPlayer.playMP3AndWait(936);
     for (uint8_t x = special; x <= special2; x++) {
       dfPlayer.playMp3Track(x);
-      tempCard.nfcFolderSettings.special = x;
+      tempCard.musicDS.special = x;
       Serial.print(x);
       
 	  waitForCardAndWrite(tempCard);
@@ -833,21 +833,21 @@ void adminMenu(bool fromCard = false)
   else if (subMenu == 12) {
     int temp = voiceMenu(4, 980, 980, false);
     if (temp == 1) {
-      tonuinoEEPROM.mySettings.adminMenuLocked = 0;
+      tonuinoEEPROM.settings.adminMenuLocked = 0;
     }
     else if (temp == 2) {
-      tonuinoEEPROM.mySettings.adminMenuLocked = 1;
+      tonuinoEEPROM.settings.adminMenuLocked = 1;
     }
     else if (temp == 3) {
       int8_t pin[4];
       dfPlayer.playMp3Track(991);
       if (askCode(pin)) {
-        memcpy(tonuinoEEPROM.mySettings.adminMenuPin, pin, 4);
-        tonuinoEEPROM.mySettings.adminMenuLocked = 2;
+        memcpy(tonuinoEEPROM.settings.adminMenuPin, pin, 4);
+        tonuinoEEPROM.settings.adminMenuLocked = 2;
       }
     }
     else if (temp == 4) {
-      tonuinoEEPROM.mySettings.adminMenuLocked = 3;
+      tonuinoEEPROM.settings.adminMenuLocked = 3;
     }
 
   }
@@ -986,31 +986,31 @@ void resetCard() {
   setupCard();
 }
 
-bool setupFolder(folderSettings * theFolder) {
+bool setupFolder(musicDataset * musicDS) {
   // Ordner abfragen
-  theFolder->folder = voiceMenu(99, 301, 0, true, 0, 0, true);
-  if (theFolder->folder == 0) return false;
+  musicDS->folder = voiceMenu(99, 301, 0, true, 0, 0, true);
+  if (musicDS->folder == 0) return false;
 
   // Wiedergabemodus abfragen
-  theFolder->mode = voiceMenu(9, 310, 310, false, 0, 0, true);
-  if (theFolder->mode == 0) return false;
+  musicDS->mode = voiceMenu(9, 310, 310, false, 0, 0, true);
+  if (musicDS->mode == 0) return false;
 
   // Einzelmodus -> Datei abfragen
-  if (theFolder->mode == 4)
-    theFolder->special = voiceMenu(dfPlayer.getFolderTrackCount(theFolder->folder), 320, 0,
-                                   true, theFolder->folder);
+  if (musicDS->mode == 4)
+    musicDS->special = voiceMenu(dfPlayer.getFolderTrackCount(musicDS->folder), 320, 0,
+                                   true, musicDS->folder);
   // Admin Funktionen
-  if (theFolder->mode == 6) {
-    //theFolder->special = voiceMenu(3, 320, 320);
-    theFolder->folder = 0;
-    theFolder->mode = 255;
+  if (musicDS->mode == 6) {
+    //musicDS->special = voiceMenu(3, 320, 320);
+    musicDS->folder = 0;
+    musicDS->mode = 255;
   }
   // Spezialmodus Von-Bis
-  if (theFolder->mode == 7 || theFolder->mode == 8 || theFolder->mode == 9) {
-    theFolder->special = voiceMenu(dfPlayer.getFolderTrackCount(theFolder->folder), 321, 0,
-                                   true, theFolder->folder);
-    theFolder->special2 = voiceMenu(dfPlayer.getFolderTrackCount(theFolder->folder), 322, 0,
-                                    true, theFolder->folder, theFolder->special);
+  if (musicDS->mode == 7 || musicDS->mode == 8 || musicDS->mode == 9) {
+    musicDS->special = voiceMenu(dfPlayer.getFolderTrackCount(musicDS->folder), 321, 0,
+                                   true, musicDS->folder);
+    musicDS->special2 = voiceMenu(dfPlayer.getFolderTrackCount(musicDS->folder), 322, 0,
+                                    true, musicDS->folder, musicDS->special);
   }
   return true;
 }
@@ -1018,8 +1018,8 @@ bool setupFolder(folderSettings * theFolder) {
 void setupCard() {
   dfPlayer.pause();
   Serial.println(F("=== setupCard()"));
-  nfcTagObject newCard;
-  if (setupFolder(&newCard.nfcFolderSettings) == true)
+  nfcTagStruct newCard;
+  if (setupFolder(&newCard.musicDS) == true)
   {
     // Karte ist konfiguriert -> speichern
     dfPlayer.pause();
@@ -1030,21 +1030,22 @@ void setupCard() {
   delay(1000);
 }
 
-bool evaluateCardData(nfcTagObject tempCard, nfcTagObject nfcTag)
+bool evaluateCardData(nfcTagStruct tempCard, nfcTagStruct nfcTag)
 {
   if (tempCard.cookie == cardCookie) 
   {
-    if (activeModifier != NULL && tempCard.nfcFolderSettings.folder != 0) {
+    if (activeModifier != NULL && tempCard.musicDS.folder != 0) {
       if (activeModifier->handleRFID(&tempCard) == true) {
         return false;
       }
     }
 
-    if (tempCard.nfcFolderSettings.folder == 0) 
+	musicDataset musicDS = tempCard.musicDS;
+    if (musicDS.folder == 0) 
     {
       if (activeModifier != NULL) 
       {
-        if (activeModifier->getActive() == tempCard.nfcFolderSettings.mode) 
+        if (activeModifier->getActive() == musicDS.mode) 
         {
           delete activeModifier;
           activeModifier = NULL;
@@ -1054,11 +1055,11 @@ bool evaluateCardData(nfcTagObject tempCard, nfcTagObject nfcTag)
           return false;
         }
       }
-      if (tempCard.nfcFolderSettings.mode != 0 && tempCard.nfcFolderSettings.mode != 255) 
+      if (musicDS.mode != 0 && musicDS.mode != 255) 
       {
         dfPlayer.playAdvertisement(260);
       }
-      switch (tempCard.nfcFolderSettings.mode ) 
+      switch (musicDS.mode ) 
 	  {
         case 0:
         case 255:
@@ -1072,18 +1073,18 @@ bool evaluateCardData(nfcTagObject tempCard, nfcTagObject nfcTag)
       return false;
     }
     else {
-      memcpy(&nfcTag, &tempCard, sizeof(nfcTagObject));
-      loadFolder(nfcTag.nfcFolderSettings);
+      memcpy(&nfcTag, &tempCard, sizeof(nfcTagStruct));
+      loadFolder(musicDS);
     }
     return true;
   }
   else {
-    memcpy(&nfcTag, &tempCard, sizeof(nfcTagObject));
+    memcpy(&nfcTag, &tempCard, sizeof(nfcTagStruct));
     return true;
   }
 }
 
-void writeCard(nfcTagObject nfcTag) 
+void writeCard(nfcTagStruct nfcTag) 
 {
 	bool statusOK = tonuinoRFID.writeCard(nfcTag);
 	dfPlayer.playMp3Track(statusOK ? 400 : 401);

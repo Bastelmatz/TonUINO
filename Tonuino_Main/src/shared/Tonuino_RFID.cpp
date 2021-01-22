@@ -63,7 +63,7 @@ byte Tonuino_RFID_Reader::pollCard()
 	{
 	  retries = maxRetries;
 	  bool currentCardIsUL = mfrc522.PICC_GetType(mfrc522.uid.sak) == MFRC522::PICC_TYPE_MIFARE_UL;
-	  bool isModifierCard = readCardData.cookie == cardCookie && readCardData.nfcFolderSettings.folder == 0;
+	  bool isModifierCard = readCardData.cookie == cardCookie && readCardData.musicDS.folder == 0;
 	  if (isModifierCard)
 	  {
 		hasModifierCard = true;
@@ -211,10 +211,10 @@ bool Tonuino_RFID_Reader::readCard()
 
   readCardData.cookie = tempCookie;
   readCardData.version = buffer[4];
-  readCardData.nfcFolderSettings.folder = buffer[5];
-  readCardData.nfcFolderSettings.mode = buffer[6];
-  readCardData.nfcFolderSettings.special = buffer[7];
-  readCardData.nfcFolderSettings.special2 = buffer[8];
+  readCardData.musicDS.folder = buffer[5];
+  readCardData.musicDS.mode = buffer[6];
+  readCardData.musicDS.special = buffer[7];
+  readCardData.musicDS.special2 = buffer[8];
  
   // store info about current card
   memcpy(currentCardUid, mfrc522.uid.uidByte, 4);
@@ -222,14 +222,14 @@ bool Tonuino_RFID_Reader::readCard()
   return true;
 }
 
-bool Tonuino_RFID_Reader::writeCard(nfcTagObject nfcTag) 
+bool Tonuino_RFID_Reader::writeCard(nfcTagStruct cardData) 
 {
   byte buffer[16] = {0x13, 0x37, 0xb3, 0x47, // 0x1337 0xb347 magic cookie to identify our nfc tags
 					 0x02,                   // version 1
-					 nfcTag.nfcFolderSettings.folder,  // the folder picked by the user
-					 nfcTag.nfcFolderSettings.mode,    // the playback mode picked by the user
-					 nfcTag.nfcFolderSettings.special, // track or function for admin cards
-					 nfcTag.nfcFolderSettings.special2,
+					 cardData.musicDS.folder,  // the folder picked by the user
+					 cardData.musicDS.mode,    // the playback mode picked by the user
+					 cardData.musicDS.special, // track or function for admin cards
+					 cardData.musicDS.special2,
 					 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 					};
 

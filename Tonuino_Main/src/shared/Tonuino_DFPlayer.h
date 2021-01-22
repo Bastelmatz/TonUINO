@@ -3,7 +3,7 @@
 #ifndef TONUINO_DFPLAYER_INCLUDED
 #define TONUINO_DFPLAYER_INCLUDED
 
-#include "Tonuino_RFID.h"
+#include "Tonuino_Structs.h"
 #include "Tonuino_Player.h"
 
 #include <DFMiniMp3.h>
@@ -12,7 +12,7 @@
 class TonuinoDFPlayer
 {
 	public:
-	static folderSettings folderDataset;
+	static musicDataset musicDS;
 	static TonuinoPlayer tonuinoPlayer;
 	static uint8_t volume;
 	static uint8_t volumeMin;
@@ -21,8 +21,8 @@ class TonuinoDFPlayer
 			
 	void setup();
 	bool isPlaying();
-	void loadFolder(folderSettings newFolder, uint8_t lastTrack);
-	void loadAndPlayFolder(folderSettings folder, uint8_t lastTrack);
+	void loadFolder(musicDataset dataset, uint8_t lastTrack);
+	void loadAndPlayFolder(musicDataset dataset, uint8_t lastTrack);
 	void continueTitle();
 	void pauseAndStandBy();
 	void togglePlay();

@@ -8,13 +8,13 @@ class Tonuino_RFID_Tool_Core
 	public:
 	static char readSerialString[20];
 	
-	void transmitCardData(nfcTagObject nfcTag);
+	void transmitCardData(nfcTagStruct nfcTag);
 	void transmitCardRemoval();
 	void listen();
 	
 	private:
 	void transmitTrigger(bool startTrigger);
-	void writeCard(nfcTagObject nfcTag);
+	void writeCard(nfcTagStruct nfcTag);
 	void handleCommand();
 };
 

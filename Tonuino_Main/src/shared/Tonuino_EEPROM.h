@@ -1,5 +1,5 @@
 
-#include "Tonuino_RFID.h"
+#include "Tonuino_Structs.h"
 
 // prevent multiple definitions
 #ifndef TONUINO_EEPROM_INCLUDED
@@ -15,7 +15,7 @@ struct adminSettings {
   uint8_t eq;
   bool locked;
   long standbyTimer;
-  folderSettings shortCuts[4];
+  musicDataset shortCuts[4];
   uint8_t adminMenuLocked;
   uint8_t adminMenuPin[4];
 };
@@ -23,11 +23,11 @@ struct adminSettings {
 class TonuinoEEPROM
 {
 	public:
-	static adminSettings mySettings;
+	static adminSettings settings;
 	
 	void resetEEPROM();
 	
-	void writeLastFolderToFlash(folderSettings folder);
+	void writeLastDatasetToFlash(musicDataset dataset);
 	void writeLastTrackToFlash(uint8_t track, uint8_t folder);
 	uint8_t loadLastTrackFromFlash(uint8_t folder);
 	
@@ -36,7 +36,7 @@ class TonuinoEEPROM
 	void migrateSettings(int oldVersion);
 	
 	void loadSettingsFromFlash();
-	folderSettings loadLastFolderFromFlash();
+	musicDataset loadLastDatasetFromFlash();
 	
 	private:
 	int flashAddress_Settings();

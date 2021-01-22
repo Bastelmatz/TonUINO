@@ -2,25 +2,11 @@
 #include <SPI.h>
 #include <avr/sleep.h>
 
+#include "Tonuino_Structs.h"
+
 // prevent multiple definitions
 #ifndef TONUINO_RFID_INCLUDED
 #define TONUINO_RFID_INCLUDED
-
-static const uint32_t cardCookie = 322417479;
-
-struct folderSettings {
-  uint8_t folder;
-  uint8_t mode;
-  uint8_t special;
-  uint8_t special2;
-};
-
-// this object stores nfc tag data
-struct nfcTagObject {
-  uint32_t cookie;
-  uint8_t version;
-  folderSettings nfcFolderSettings;
-};
 
 // MFRC522
 #define RST_PIN 9
@@ -48,7 +34,7 @@ public:
 	static bool hasMusicCard;
 	static bool hasModifierCard;
 
-	nfcTagObject readCardData;
+	nfcTagStruct readCardData;
 
 	// Card detection
 	bool hasAnyCard();
@@ -67,7 +53,7 @@ public:
 	
 	byte tryPollCard();
 
-	bool writeCard(nfcTagObject nfcTag);
+	bool writeCard(nfcTagStruct nfcTag);
 
 private:
 	byte pollCard();

@@ -18,7 +18,7 @@ void Tonuino_RFID_Tool_Core::transmitTrigger(bool startTrigger)
   }
 }
 
-void Tonuino_RFID_Tool_Core::transmitCardData(nfcTagObject nfcTag)
+void Tonuino_RFID_Tool_Core::transmitCardData(nfcTagStruct nfcTag)
 {
   // this information is required for Tonuino RFID Tool
   // the formatting and order of the transmitted data is defined and must be in sync with the tool
@@ -31,13 +31,13 @@ void Tonuino_RFID_Tool_Core::transmitCardData(nfcTagObject nfcTag)
   Serial.print("Cookie:");
   Serial.println(nfcTag.cookie);
   Serial.print("Folder:");
-  Serial.println(nfcTag.nfcFolderSettings.folder);
+  Serial.println(nfcTag.musicDS.folder);
   Serial.print("Mode:");
-  Serial.println(nfcTag.nfcFolderSettings.mode);
+  Serial.println(nfcTag.musicDS.mode);
   Serial.print("Special:");
-  Serial.println(nfcTag.nfcFolderSettings.special);
+  Serial.println(nfcTag.musicDS.special);
   Serial.print("Special2:");
-  Serial.println(nfcTag.nfcFolderSettings.special2);
+  Serial.println(nfcTag.musicDS.special2);
   transmitTrigger(false);
 }
 
@@ -48,7 +48,7 @@ void Tonuino_RFID_Tool_Core::transmitCardRemoval()
 	transmitTrigger(false);
 }
 
-void Tonuino_RFID_Tool_Core::writeCard(nfcTagObject nfcTag)
+void Tonuino_RFID_Tool_Core::writeCard(nfcTagStruct nfcTag)
 {
   tonuinoRFID.writeCard(nfcTag);
   tonuinoRFID.haltAndStop();
@@ -64,7 +64,7 @@ void Tonuino_RFID_Tool_Core::handleCommand()
   Serial.println("RFID_Tool_Command_Received");
   Serial.println(readSerialString);
 
-  folderSettings receivedFS;
+  musicDataset receivedDS;
   int index = 0;
   char* command = strtok(readSerialString, ";");
   while(command != NULL) 
@@ -73,28 +73,28 @@ void Tonuino_RFID_Tool_Core::handleCommand()
 	byte parsedByte = (byte)charToInt;
 	switch (index)
 	{
-	  case 0: receivedFS.folder = parsedByte; break;
-	  case 1: receivedFS.mode = parsedByte; break;
-	  case 2: receivedFS.special = parsedByte; break;
-	  case 3: receivedFS.special2 = parsedByte; break;
+	  case 0: receivedDS.folder = parsedByte; break;
+	  case 1: receivedDS.mode = parsedByte; break;
+	  case 2: receivedDS.special = parsedByte; break;
+	  case 3: receivedDS.special2 = parsedByte; break;
 	}
 	index++;
 	// create next part
 	command = strtok(NULL, ";");
   }
 
-  Serial.println(receivedFS.folder);
-  Serial.println(receivedFS.mode);
-  Serial.println(receivedFS.special);
-  Serial.println(receivedFS.special2);
+  Serial.println(receivedDS.folder);
+  Serial.println(receivedDS.mode);
+  Serial.println(receivedDS.special);
+  Serial.println(receivedDS.special2);
 
-  nfcTagObject tempCard;
+  nfcTagStruct tempCard;
   tempCard.cookie = cardCookie;
   tempCard.version = 1;
-  tempCard.nfcFolderSettings.folder = receivedFS.folder;
-  tempCard.nfcFolderSettings.special = receivedFS.special;
-  tempCard.nfcFolderSettings.special2 = receivedFS.special2;
-  tempCard.nfcFolderSettings.mode = receivedFS.mode;
+  tempCard.musicDS.folder = receivedDS.folder;
+  tempCard.musicDS.special = receivedDS.special;
+  tempCard.musicDS.special2 = receivedDS.special2;
+  tempCard.musicDS.mode = receivedDS.mode;
 
   writeCard(tempCard);
 }

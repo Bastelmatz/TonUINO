@@ -9,15 +9,15 @@
 void loopTonuino();
 void setupTonuino();
 
-uint8_t getLastTrack(folderSettings folder);
-void loadAndPlayFolder(folderSettings theFolder);
-void loadFolder(folderSettings theFolder);
-bool setupFolder(folderSettings * theFolder);
+uint8_t getLastTrack(musicDataset folder);
+void loadAndPlayFolder(musicDataset theFolder);
+void loadFolder(musicDataset theFolder);
+bool setupFolder(musicDataset * theFolder);
 
 void onNewCard();
 void setupCard();
 void resetCard();
 
-bool evaluateCardData(nfcTagObject tempCard, nfcTagObject nfcTag);
+bool evaluateCardData(nfcTagStruct tempCard, nfcTagStruct nfcTag);
 
 bool askCode(uint8_t *code);

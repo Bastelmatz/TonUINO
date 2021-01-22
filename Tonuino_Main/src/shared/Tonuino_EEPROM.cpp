@@ -5,7 +5,7 @@
 
 static const int lastFolderSize = 4;
 
-adminSettings TonuinoEEPROM::mySettings;
+adminSettings TonuinoEEPROM::settings;
 
 void TonuinoEEPROM::resetEEPROM()
 {
@@ -23,32 +23,32 @@ int TonuinoEEPROM::flashAddress_Track(uint8_t folder)
 
 int TonuinoEEPROM::flashAddress_Settings() 
 {
-  folderSettings folderSet;
-  return lastFolderSize + sizeof(folderSet.folder) * 100;
+  musicDataset musicDS;
+  return lastFolderSize + sizeof(musicDS.folder) * 100;
 }
 
-void TonuinoEEPROM::writeLastFolderToFlash(folderSettings folder) 
+void TonuinoEEPROM::writeLastDatasetToFlash(musicDataset musicDS) 
 {
-  Serial.println(F("=== writeLastFolderToFlash()"));
-  EEPROM.put(0, folder);
+  Serial.println("Write last dataset to flash");
+  EEPROM.put(0, musicDS);
 }
 
-folderSettings TonuinoEEPROM::loadLastFolderFromFlash() 
+musicDataset TonuinoEEPROM::loadLastDatasetFromFlash() 
 {
-  folderSettings folder;
-  Serial.println(F("=== loadLastFolderFromFlash()"));
-  EEPROM.get(0, folder);
+  musicDataset musicDS;
+  Serial.println("Load last dataset from flash");
+  EEPROM.get(0, musicDS);
   
   Serial.print(F("Last folder: "));
-  Serial.println(folder.folder);
+  Serial.println(musicDS.folder);
   Serial.print(F("Last mode: "));
-  Serial.println(folder.mode);
+  Serial.println(musicDS.mode);
   Serial.print(F("Last special: "));
-  Serial.println(folder.special);
+  Serial.println(musicDS.special);
   Serial.print(F("Last special2: "));
-  Serial.println(folder.special2);
+  Serial.println(musicDS.special2);
   
-  return folder;
+  return musicDS;
 }
 
 void TonuinoEEPROM::writeLastTrackToFlash(uint8_t track, uint8_t folder) 
@@ -71,29 +71,29 @@ void TonuinoEEPROM::writeSettingsToFlash()
 {
   Serial.println(F("=== writeSettingsToFlash()"));
   int address = flashAddress_Settings();
-  EEPROM.put(address, mySettings);
+  EEPROM.put(address, settings);
 }
 
 void TonuinoEEPROM::resetSettings() 
 {
   Serial.println(F("=== resetSettings()"));
-  mySettings.cookie = cardCookie;
-  mySettings.version = 2;
-  mySettings.maxVolume = 10;
-  mySettings.minVolume = 1;
-  mySettings.initVolume = 5;
-  mySettings.eq = 1;
-  mySettings.locked = false;
-  mySettings.standbyTimer = 0;
-  mySettings.shortCuts[0].folder = 0;
-  mySettings.shortCuts[1].folder = 0;
-  mySettings.shortCuts[2].folder = 0;
-  mySettings.shortCuts[3].folder = 0;
-  mySettings.adminMenuLocked = 0;
-  mySettings.adminMenuPin[0] = 1;
-  mySettings.adminMenuPin[1] = 1;
-  mySettings.adminMenuPin[2] = 1;
-  mySettings.adminMenuPin[3] = 1;
+  settings.cookie = cardCookie;
+  settings.version = 2;
+  settings.maxVolume = 10;
+  settings.minVolume = 1;
+  settings.initVolume = 5;
+  settings.eq = 1;
+  settings.locked = false;
+  settings.standbyTimer = 0;
+  settings.shortCuts[0].folder = 0;
+  settings.shortCuts[1].folder = 0;
+  settings.shortCuts[2].folder = 0;
+  settings.shortCuts[3].folder = 0;
+  settings.adminMenuLocked = 0;
+  settings.adminMenuPin[0] = 1;
+  settings.adminMenuPin[1] = 1;
+  settings.adminMenuPin[2] = 1;
+  settings.adminMenuPin[3] = 1;
 
   writeSettingsToFlash();
 }
@@ -103,12 +103,12 @@ void TonuinoEEPROM::migrateSettings(int oldVersion)
   if (oldVersion == 1) {
     Serial.println(F("=== resetSettings()"));
     Serial.println(F("1 -> 2"));
-    mySettings.version = 2;
-    mySettings.adminMenuLocked = 0;
-    mySettings.adminMenuPin[0] = 1;
-    mySettings.adminMenuPin[1] = 1;
-    mySettings.adminMenuPin[2] = 1;
-    mySettings.adminMenuPin[3] = 1;
+    settings.version = 2;
+    settings.adminMenuLocked = 0;
+    settings.adminMenuPin[0] = 1;
+    settings.adminMenuPin[1] = 1;
+    settings.adminMenuPin[2] = 1;
+    settings.adminMenuPin[3] = 1;
     writeSettingsToFlash();
   }
 }
@@ -117,42 +117,42 @@ void TonuinoEEPROM::loadSettingsFromFlash()
 {
   Serial.println(F("=== loadSettingsFromFlash()"));
   int address = flashAddress_Settings();
-  EEPROM.get(address, mySettings);
-  if (mySettings.cookie != cardCookie)
+  EEPROM.get(address, settings);
+  if (settings.cookie != cardCookie)
   {
     resetSettings();
   }
-  migrateSettings(mySettings.version);
+  migrateSettings(settings.version);
 
   Serial.print(F("Version: "));
-  Serial.println(mySettings.version);
+  Serial.println(settings.version);
 
   Serial.print(F("Maximal Volume: "));
-  Serial.println(mySettings.maxVolume);
+  Serial.println(settings.maxVolume);
 
   Serial.print(F("Minimal Volume: "));
-  Serial.println(mySettings.minVolume);
+  Serial.println(settings.minVolume);
 
   Serial.print(F("Initial Volume: "));
-  Serial.println(mySettings.initVolume);
+  Serial.println(settings.initVolume);
 
   Serial.print(F("EQ: "));
-  Serial.println(mySettings.eq);
+  Serial.println(settings.eq);
 
   Serial.print(F("Locked: "));
-  Serial.println(mySettings.locked);
+  Serial.println(settings.locked);
 
   Serial.print(F("Sleep Timer: "));
-  Serial.println(mySettings.standbyTimer);
+  Serial.println(settings.standbyTimer);
 
   Serial.print(F("Admin Menu locked: "));
-  Serial.println(mySettings.adminMenuLocked);
+  Serial.println(settings.adminMenuLocked);
 
   Serial.print(F("Admin Menu Pin: "));
-  Serial.print(mySettings.adminMenuPin[0]);
-  Serial.print(mySettings.adminMenuPin[1]);
-  Serial.print(mySettings.adminMenuPin[2]);
-  Serial.println(mySettings.adminMenuPin[3]);
+  Serial.print(settings.adminMenuPin[0]);
+  Serial.print(settings.adminMenuPin[1]);
+  Serial.print(settings.adminMenuPin[2]);
+  Serial.println(settings.adminMenuPin[3]);
 }
 
 
