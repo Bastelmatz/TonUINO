@@ -11,8 +11,10 @@ uint8_t TonuinoDFPlayer::volumeMin = 0;
 uint8_t TonuinoDFPlayer::volumeMax = 30;
 
 musicDataset TonuinoDFPlayer::musicDS;
-bool TonuinoDFPlayer::folderLoaded = false;
+bool TonuinoDFPlayer::musicDSLoaded = false;
+bool TonuinoDFPlayer::newMusisDS = false;
 bool TonuinoDFPlayer::feedbackOnVolumeChange = false;
+bool TonuinoDFPlayer::listenUntilTrackEnds = false;
 
 bool TonuinoDFPlayer::freezeDance_active = false;
 unsigned long TonuinoDFPlayer::freezeDance_nextStopAtMillis = 0;
@@ -85,9 +87,8 @@ void TonuinoDFPlayer::playTrack(uint8_t track)
 		mp3.playFolderTrack(musicDS.folder, track);
 		tonuinoPlayer.playTitle();
 		delay(1000);
-		return true;
+		newMusisDS = false;
 	}
-	return false;
 }
 
 void TonuinoDFPlayer::playCurrentTrack()
@@ -106,7 +107,8 @@ void TonuinoDFPlayer::loadFolder(musicDataset dataset, uint8_t lastTrack)
 	}
 	Serial.println(musicDS.folder);
 	tonuinoPlayer.loadFolder(numTracks, musicDS.mode, musicDS.special, musicDS.special2, lastTrack);
-	folderLoaded = true;
+	musicDSLoaded = true;
+	newMusisDS = true;
 }
 
 void TonuinoDFPlayer::loadAndPlayFolder(musicDataset dataset, uint8_t lastTrack)
@@ -117,7 +119,7 @@ void TonuinoDFPlayer::loadAndPlayFolder(musicDataset dataset, uint8_t lastTrack)
 
 void TonuinoDFPlayer::continueTitle()
 {
-	if (!folderLoaded)
+	if (!musicDSLoaded)
 	{
 		return;
 	}
@@ -152,9 +154,16 @@ void TonuinoDFPlayer::togglePlay()
 
 void TonuinoDFPlayer::nextTrack() 
 {
-	if (tonuinoPlayer.goToNextTrack())
+	if (newMusisDS)
 	{
 		playCurrentTrack();
+	}
+	else
+	{
+		if (tonuinoPlayer.goToNextTrack())
+		{
+			playCurrentTrack();
+		}
 	}
 }
 
@@ -169,12 +178,10 @@ void TonuinoDFPlayer::previousTrack()
 void TonuinoDFPlayer::trackFinished()
 {
 	tonuinoPlayer.trackFinished();
-	if (tonuinoPlayer.isPlaying)
+
+	if (tonuinoPlayer.isPlaying && musicDSLoaded)
 	{
-		if (folderLoaded) // Wenn eine neue Karte angelernt wird, soll das Ende eines Tracks nicht verarbeitet werden
-		{
-			nextTrack();
-		}
+		nextTrack();
 	}
 }
 

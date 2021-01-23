@@ -17,7 +17,8 @@ class TonuinoDFPlayer
 	static uint8_t volume;
 	static uint8_t volumeMin;
 	static uint8_t volumeMax;
-	static bool folderLoaded;
+	static bool musicDSLoaded;
+	static bool listenUntilTrackEnds;
 			
 	void setup();
 	bool isPlaying();
@@ -48,6 +49,7 @@ class TonuinoDFPlayer
 	void setFreezeDance(bool active);
 	
 	private:
+	static 	bool newMusisDS;
 	static bool feedbackOnVolumeChange;
 	static bool freezeDance_active;
 	static unsigned long freezeDance_nextStopAtMillis;

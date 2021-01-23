@@ -33,12 +33,6 @@ TonuinoDFPlayer dfPlayer;
 
 TonuinoEEPROM tonuinoEEPROM;
 
-uint8_t trackInEEPROM = 0;
-nfcTagStruct myCard;
-musicDataset lastMusicDS;
-
-bool usePowerOff = false;
-
 uint8_t voiceMenu(int numberOfOptions, int startMessage, int messageOffset,
                   bool preview = false, int previewFromFolder = 0, int defaultValue = 0, bool exitWithLongPress = false);
 void writeCard(nfcTagStruct nfcTag);
@@ -67,6 +61,12 @@ Button previousButton(buttonPrevious);
 bool ignorePauseButton = false;
 bool ignoreNextButton = false;
 bool ignorePreviousButton = false;
+
+uint8_t trackInEEPROM = 0;
+nfcTagStruct nextMC;
+musicDataset lastMusicDS;
+
+bool usePowerOff = false;
 
 bool allLocked = false;
 bool buttonsLocked = false;
@@ -122,57 +122,38 @@ class Modifier {
 
 Modifier *activeModifier = NULL;
 
-class KindergardenMode: public Modifier {
-  private:
-    nfcTagStruct nextCard;
-    bool cardQueued = false;
 
-  public:
-    virtual bool handleNext() {
-      Serial.println(F("== KindergardenMode::handleNext() -> NEXT"));
-      //if (this->nextCard.cookie == cardCookie && this->nextCard.musicDS.folder != 0 && this->nextCard.musicDS.mode != 0) {
-      //myFolder = &this->nextCard.musicDS;
-      if (this->cardQueued == true) {
-        this->cardQueued = false;
+void setStandbyTimerValue()
+{
+	tonuinoPlayer().standbyTimer.timeInMin = tonuinoEEPROM.settings.standbyTimer;
+}
 
-        myCard = nextCard;
-        loadAndPlayFolder(myCard.musicDS);
-        return true;
-      }
-      return false;
-    }
-    //    virtual bool handlePause()     {
-    //      Serial.println(F("== KindergardenMode::handlePause() -> LOCKED!"));
-    //      return true;
-    //    }
-    virtual bool handleNextButton()       {
-      Serial.println(F("== KindergardenMode::handleNextButton() -> LOCKED!"));
-      return true;
-    }
-    virtual bool handlePreviousButton() {
-      Serial.println(F("== KindergardenMode::handlePreviousButton() -> LOCKED!"));
-      return true;
-    }
-    virtual bool handleRFID(nfcTagStruct * newCard) { // lot of work to do!
-      Serial.println(F("== KindergardenMode::handleRFID() -> queued!"));
-      this->nextCard = *newCard;
-      this->cardQueued = true;
-      if (!dfPlayer.isPlaying()) {
-        handleNext();
-      }
-      return true;
-    }
-    KindergardenMode() {
-      Serial.println(F("=== KindergardenMode()"));
-      //      if (isPlaying())
-      //        mp3.playAdvertisement(305);
-      //      delay(500);
-    }
-    uint8_t getActive() {
-      Serial.println(F("== KindergardenMode::getActive()"));
-      return 5;
-    }
-};
+void setSleepTimerValue()
+{
+	tonuinoPlayer().sleepTimer.timeInMin = 0;
+}
+
+uint8_t getLastTrack(musicDataset musicDS)
+{
+	if (musicDS.mode == AudioBook) 
+	{
+		trackInEEPROM = tonuinoEEPROM.loadLastTrackFromFlash(musicDS.folder);
+		return trackInEEPROM;
+	}
+	return 0;
+}
+
+void loadFolder(musicDataset musicDS)
+{
+    uint8_t lastTrack = getLastTrack(musicDS);
+	dfPlayer.loadFolder(musicDS, lastTrack);
+}
+
+void loadAndPlayFolder(musicDataset musicDS)
+{
+	uint8_t lastTrack = getLastTrack(musicDS);
+	dfPlayer.loadAndPlayFolder(musicDS, lastTrack);
+}
 
 void activateFreezeDance(bool active)
 {
@@ -254,38 +235,6 @@ void playShortCut(uint8_t shortCut)
 	{
 		Serial.println(F("Shortcut not configured!"));
 	}
-}
-
-void setStandbyTimerValue()
-{
-	tonuinoPlayer().standbyTimer.timeInMin = tonuinoEEPROM.settings.standbyTimer;
-}
-
-void setSleepTimerValue()
-{
-	tonuinoPlayer().sleepTimer.timeInMin = 0;
-}
-
-uint8_t getLastTrack(musicDataset musicDS)
-{
-	if (musicDS.mode == AudioBook) 
-	{
-		trackInEEPROM = tonuinoEEPROM.loadLastTrackFromFlash(musicDS.folder);
-		return trackInEEPROM;
-	}
-	return 0;
-}
-
-void loadFolder(musicDataset folder)
-{
-    uint8_t lastTrack = getLastTrack(folder);
-	dfPlayer.loadFolder(folder, lastTrack);
-}
-
-void loadAndPlayFolder(musicDataset folder)
-{
-	uint8_t lastTrack = getLastTrack(folder);
-	dfPlayer.loadAndPlayFolder(folder, lastTrack);
 }
 
 void setupTonuino() {
@@ -486,26 +435,29 @@ void loopTonuino()
 			}
 			ignorePauseButton = true;
 		}
-		if (nextButton.wasReleased()) 
+		if (!dfPlayer.listenUntilTrackEnds)
 		{
-			if (isCurrentlyPlaying) 
+			if (nextButton.wasReleased()) 
 			{
-				dfPlayer.nextTrack();
+				if (isCurrentlyPlaying) 
+				{
+					dfPlayer.nextTrack();
+				}
+				else 
+				{
+					playShortCut(1);
+				}
 			}
-			else 
+			if (previousButton.wasReleased()) 
 			{
-				playShortCut(1);
-			}
-		}
-		if (previousButton.wasReleased()) 
-		{
-			if (isCurrentlyPlaying) 
-			{
-				dfPlayer.previousTrack();
-			}
-			else 
-			{
-				playShortCut(2);
+				if (isCurrentlyPlaying) 
+				{
+					dfPlayer.previousTrack();
+				}
+				else 
+				{
+					playShortCut(2);
+				}
 			}
 		}
 	}
@@ -517,17 +469,16 @@ void loopTonuino()
 
 void onNewCard()
 {
-	if (myCard.cookie == cardCookie && myCard.musicDS.folder != 0 && myCard.musicDS.mode != 0) 
+	if (nextMC.cookie == cardCookie && nextMC.musicDS.folder > 0 && nextMC.musicDS.mode > 0) 
 	{
-		dfPlayer.musicDS = myCard.musicDS;
-		loadAndPlayFolder(dfPlayer.musicDS);
+		loadAndPlayFolder(nextMC.musicDS);
 		// Save last folder for next power up
-		tonuinoEEPROM.writeLastDatasetToFlash(dfPlayer.musicDS);
+		tonuinoEEPROM.writeLastDatasetToFlash(nextMC.musicDS);
 	}
 	// Neue Karte konfigurieren
-	else if (myCard.cookie != cardCookie) 
+	else if (nextMC.cookie != cardCookie) 
 	{
-		dfPlayer.folderLoaded = false;
+		dfPlayer.musicDSLoaded = false;
 		dfPlayer.playMP3AndWait(300);
 		setupCard();
 	}
@@ -580,7 +531,7 @@ void adminMenu(bool fromCard = false)
   tonuinoPlayer().pauseNoStandBy();
   dfPlayer.pause();
   Serial.println(F("=== adminMenu()"));
-  dfPlayer.folderLoaded = false;
+  dfPlayer.musicDSLoaded = false;
   if (fromCard == false) {
     // Admin menu has been locked - it still can be trigged via admin card
     if (tonuinoEEPROM.settings.adminMenuLocked) 
@@ -877,24 +828,23 @@ bool evaluateCardData(nfcTagStruct tempCard)
       {
         dfPlayer.playAdvertisement(260);
       }
-      switch (musicDS.mode ) 
+      switch (musicDS.mode) 
 	  {
         case 0:
         case 255:
           tonuinoRFID.haltAndStop(); adminMenu(true);  break;
-        case 5: activeModifier = new KindergardenMode(); break;
       }
       delay(2000);
       return false;
     }
     else {
-      memcpy(&myCard, &tempCard, sizeof(nfcTagStruct));
+      memcpy(&nextMC, &tempCard, sizeof(nfcTagStruct));
       loadFolder(musicDS);
     }
     return true;
   }
   else {
-    memcpy(&myCard, &tempCard, sizeof(nfcTagStruct));
+    memcpy(&nextMC, &tempCard, sizeof(nfcTagStruct));
     return true;
   }
 }
