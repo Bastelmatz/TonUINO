@@ -85,44 +85,6 @@ void loadDataFromFlash()
 	dfPlayer.volumeMax = tonuinoEEPROM.settings.maxVolume;
 }
 
-class Modifier {
-  public:
-    virtual void loop() {}
-    virtual bool handlePause() {
-      return false;
-    }
-    virtual bool handleNext() {
-      return false;
-    }
-    virtual bool handlePrevious() {
-      return false;
-    }
-    virtual bool handleNextButton() {
-      return false;
-    }
-    virtual bool handlePreviousButton() {
-      return false;
-    }
-    virtual bool handleVolumeUp() {
-      return false;
-    }
-    virtual bool handleVolumeDown() {
-      return false;
-    }
-    virtual bool handleRFID(nfcTagStruct *newCard) {
-      return false;
-    }
-    virtual uint8_t getActive() {
-      return 0;
-    }
-    Modifier() {
-
-    }
-};
-
-Modifier *activeModifier = NULL;
-
-
 void setStandbyTimerValue()
 {
 	tonuinoPlayer().standbyTimer.timeInMin = tonuinoEEPROM.settings.standbyTimer;
@@ -388,12 +350,7 @@ void loopTonuino()
       setStopLight();
       m_lastPlayState = isCurrentlyPlaying;
     }
-
-    // Modifier : WIP!
-    if (activeModifier != NULL) {
-      activeModifier->loop();
-    }
-      
+     
     // Buttons werden nun über JS_Button gehandelt, dadurch kann jede Taste doppelt belegt werden
     readButtons();
     
@@ -803,27 +760,9 @@ bool evaluateCardData(nfcTagStruct tempCard)
 {
   if (tempCard.cookie == cardCookie) 
   {
-    if (activeModifier != NULL && tempCard.musicDS.folder != 0) {
-      if (activeModifier->handleRFID(&tempCard) == true) {
-        return false;
-      }
-    }
-
 	musicDataset musicDS = tempCard.musicDS;
     if (musicDS.folder == 0) 
     {
-      if (activeModifier != NULL) 
-      {
-        if (activeModifier->getActive() == musicDS.mode) 
-        {
-          delete activeModifier;
-          activeModifier = NULL;
-          Serial.println(F("modifier removed"));
-          dfPlayer.playAdvertisement(261);
-          delay(2000);
-          return false;
-        }
-      }
       if (musicDS.mode != 0 && musicDS.mode != 255) 
       {
         dfPlayer.playAdvertisement(260);
