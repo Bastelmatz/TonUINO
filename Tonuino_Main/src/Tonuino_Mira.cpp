@@ -359,7 +359,7 @@ void handleCardReader()
 
 		if (pollCardResult == MODIFIERCARD_NEW)
 		{
-			evaluateModifierData(tonuinoRFID.readCardData);
+			evaluateModifierData(tonuinoRFID.readCardData.musicDS);
 		}
 		if (allLocked)
 		{
@@ -629,11 +629,8 @@ void setupCard()
   delay(1000);
 }
 
-void evaluateModifierData(nfcTagStruct tempCard)
+void handleModifier(EModifier modifier, uint8_t special)
 {
-	EModifier modifier = static_cast<EModifier>(tempCard.musicDS.mode);
-	uint8_t special = tempCard.musicDS.special;
-	
 	bool settingChanged = false;
 	switch (modifier)
 	{
@@ -665,6 +662,19 @@ void evaluateModifierData(nfcTagStruct tempCard)
 	{
 		tonuinoEEPROM.writeSettingsToFlash();
 	}
+}
+
+void handleModifier(EModifier modifier)
+{
+	handleModifier(modifier, 0);
+}
+
+void evaluateModifierData(musicDataset musicDS)
+{
+	EModifier modifier = static_cast<EModifier>(musicDS.mode);
+	uint8_t special = musicDS.special;
+	
+	handleModifier(modifier, special);
 }
 
 void writeCard(nfcTagStruct nfcTag) 

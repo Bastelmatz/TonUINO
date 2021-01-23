@@ -3,8 +3,6 @@
 #ifndef TONUINO_MODIFIERS_INCLUDED
 #define TONUINO_MODIFIERS_INCLUDED
 
-//#include <SPI.h>
-
 typedef enum EModifier
 {
 	TrackPlay = 1,

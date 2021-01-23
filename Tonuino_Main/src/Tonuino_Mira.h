@@ -1,5 +1,4 @@
 
-#include <avr/sleep.h> // for byte type
 #include "shared/Tonuino_RFID.h"
 #include "shared/Tonuino_EEPROM.h"
 #include "shared/Tonuino_Player.h"
@@ -22,5 +21,5 @@ void onCardReturn();
 void setupCard();
 void resetCard();
 
-void evaluateModifierData(nfcTagStruct tempCard);
+void evaluateModifierData(musicDataset musicDS);
 
