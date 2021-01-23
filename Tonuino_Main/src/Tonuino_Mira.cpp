@@ -68,6 +68,8 @@ bool ignorePauseButton = false;
 bool ignoreNextButton = false;
 bool ignorePreviousButton = false;
 
+bool allLocked = false;
+
 TonuinoPlayer tonuinoPlayer()
 {
 	return dfPlayer.tonuinoPlayer;
@@ -118,42 +120,6 @@ class Modifier {
 };
 
 Modifier *activeModifier = NULL;
-
-class Locked: public Modifier {
-  public:
-    virtual bool handlePause()     {
-      Serial.println(F("== Locked::handlePause() -> LOCKED!"));
-      return true;
-    }
-    virtual bool handleNextButton()       {
-      Serial.println(F("== Locked::handleNextButton() -> LOCKED!"));
-      return true;
-    }
-    virtual bool handlePreviousButton() {
-      Serial.println(F("== Locked::handlePreviousButton() -> LOCKED!"));
-      return true;
-    }
-    virtual bool handleVolumeUp()   {
-      Serial.println(F("== Locked::handleVolumeUp() -> LOCKED!"));
-      return true;
-    }
-    virtual bool handleVolumeDown() {
-      Serial.println(F("== Locked::handleVolumeDown() -> LOCKED!"));
-      return true;
-    }
-    virtual bool handleRFID(nfcTagStruct *newCard) {
-      Serial.println(F("== Locked::handleRFID() -> LOCKED!"));
-      return true;
-    }
-    Locked(void) {
-      Serial.println(F("=== Locked()"));
-      //      if (isPlaying())
-      //        mp3.playAdvertisement(303);
-    }
-    uint8_t getActive() {
-      return 3;
-    }
-};
 
 class ToddlerMode: public Modifier {
   public:
@@ -445,24 +411,6 @@ void readPotentiometer()
     }
 }
 
-void doNextButton() 
-{
-	if (activeModifier != NULL)
-		if (activeModifier->handleNextButton() == true)
-			return;
-
-	dfPlayer.nextTrack();
-}
-
-void doPreviousButton() 
-{
-	if (activeModifier != NULL)
-		if (activeModifier->handlePreviousButton() == true)
-			return;
-
-	dfPlayer.previousTrack();
-}
-
 void handleCardReader()
 {
 	// poll card only every 100ms
@@ -475,43 +423,37 @@ void handleCardReader()
 
 		byte pollCardResult = tonuinoRFID.tryPollCard();
 
-		if (pollCardResult == MUSICCARD_NEW || 
-			pollCardResult == MUSICCARD_IS_BACK ||
-			pollCardResult == MODIFIERCARD_NEW)
+		if (pollCardResult == MODIFIERCARD_NEW)
 		{
-			evaluateCardData(tonuinoRFID.readCardData, myCard);
+			evaluateModifierData(tonuinoRFID.readCardData);
 		}
-
+		if (allLocked)
+		{
+			return;
+		}
+		if (pollCardResult == MUSICCARD_NEW || pollCardResult == MUSICCARD_IS_BACK)
+		{
+			evaluateCardData(tonuinoRFID.readCardData);
+		}
 		switch (pollCardResult)
 		{
-		case MUSICCARD_NEW:
-			onNewCard();
-			break;
-
-		case ALLCARDS_GONE:
-			if (StopPlayOnCardRemoval)
-			{
-				dfPlayer.pauseAndStandBy();
-			}
-			break;
-
-		case MUSICCARD_IS_BACK:
-			dfPlayer.continueTitle();
-			break;
+			case MUSICCARD_NEW: onNewCard(); break;
+			case ALLCARDS_GONE: onCardGone(); break;
+			case MUSICCARD_IS_BACK:	onCardReturn(); break;
 		}    
 	}
 }
 
 void setStopLight()
 {
-  if (dfPlayer.isPlaying())
-  {
-    digitalWrite(stopLED, LOW);
-  }
-  else
-  {
-    digitalWrite(stopLED, HIGH);
-  }
+	if (dfPlayer.isPlaying())
+	{
+		digitalWrite(stopLED, LOW);
+	}
+	else
+	{
+		digitalWrite(stopLED, HIGH);
+	}
 }
 
 bool m_lastPlayState = true;
@@ -535,11 +477,8 @@ void loopTonuino()
       activeModifier->loop();
     }
       
-    // Buttons werden nun über JS_Button gehandelt, dadurch kann jede Taste
-    // doppelt belegt werden
+    // Buttons werden nun über JS_Button gehandelt, dadurch kann jede Taste doppelt belegt werden
     readButtons();
-
-    readPotentiometer(); 
     
     // admin menu
     if ((pauseButton.pressedFor(LONG_PRESS) || nextButton.pressedFor(LONG_PRESS) || previousButton.pressedFor(LONG_PRESS)) 
@@ -554,59 +493,54 @@ void loopTonuino()
       return;
     }
 
-    if (pauseButton.wasReleased()) 
-    {
-      if (activeModifier != NULL)
-      {
-        if (activeModifier->handlePause() == true)
-          return;
-      }
-      if (ignorePauseButton == false)
-      {
-		dfPlayer.togglePlay();
-      }
-      ignorePauseButton = false;
-    } else if (pauseButton.pressedFor(LONG_PRESS) && ignorePauseButton == false) 
-    {
-      if (activeModifier != NULL)
-      {
-        if (activeModifier->handlePause() == true)
-          return;
-      }
-      if (isCurrentlyPlaying) 
-      {
-        uint8_t advertTrack = tonuinoPlayer().currentTrackInRange();
-        dfPlayer.playAdvertisement(advertTrack);
-      }
-      else 
-      {
-        playShortCut(0);
-      }
-      ignorePauseButton = true;
-    }
-
-    if (nextButton.wasReleased()) 
-    {
-      if (isCurrentlyPlaying) 
-      {
-        doNextButton();
-      }
-      else 
-      {
-        playShortCut(1);
-      }
-    }
-    if (previousButton.wasReleased()) 
-    {
-      if (isCurrentlyPlaying) 
-      {
-        doPreviousButton();
-      }
-      else 
-      {
-        playShortCut(2);
-      }
-    }
+	if (!allLocked)
+	{
+		readPotentiometer();
+		
+		if (pauseButton.wasReleased()) 
+		{
+			if (ignorePauseButton == false)
+			{
+				dfPlayer.togglePlay();
+			}
+			ignorePauseButton = false;
+		} 
+		else if (pauseButton.pressedFor(LONG_PRESS) && ignorePauseButton == false) 
+		{
+			if (isCurrentlyPlaying) 
+			{
+				uint8_t advertTrack = tonuinoPlayer().currentTrackInRange();
+				dfPlayer.playAdvertisement(advertTrack);
+			}
+			else 
+			{
+				playShortCut(0);
+			}
+			ignorePauseButton = true;
+		}
+		if (nextButton.wasReleased()) 
+		{
+			if (isCurrentlyPlaying) 
+			{
+				dfPlayer.nextTrack();
+			}
+			else 
+			{
+				playShortCut(1);
+			}
+		}
+		if (previousButton.wasReleased()) 
+		{
+			if (isCurrentlyPlaying) 
+			{
+				dfPlayer.previousTrack();
+			}
+			else 
+			{
+				playShortCut(2);
+			}
+		}
+	}
 
     // Ende der Buttons
 
@@ -629,6 +563,19 @@ void onNewCard()
 		dfPlayer.playMP3AndWait(300);
 		setupCard();
 	}
+}
+
+void onCardGone()
+{
+	if (StopPlayOnCardRemoval)
+	{
+		dfPlayer.pauseAndStandBy();
+	}
+}
+
+void onCardReturn()
+{
+	dfPlayer.continueTitle();
 }
 
 void waitForNewCard()
@@ -933,7 +880,7 @@ void setupCard() {
   delay(1000);
 }
 
-bool evaluateCardData(nfcTagStruct tempCard, nfcTagStruct nfcTag)
+bool evaluateCardData(nfcTagStruct tempCard)
 {
   if (tempCard.cookie == cardCookie) 
   {
@@ -967,7 +914,6 @@ bool evaluateCardData(nfcTagStruct tempCard, nfcTagStruct nfcTag)
         case 0:
         case 255:
           tonuinoRFID.haltAndStop(); adminMenu(true);  break;
-        case 3: activeModifier = new Locked(); break;
         case 4: activeModifier = new ToddlerMode(); break;
         case 5: activeModifier = new KindergardenMode(); break;
       }
@@ -975,15 +921,20 @@ bool evaluateCardData(nfcTagStruct tempCard, nfcTagStruct nfcTag)
       return false;
     }
     else {
-      memcpy(&nfcTag, &tempCard, sizeof(nfcTagStruct));
+      memcpy(&myCard, &tempCard, sizeof(nfcTagStruct));
       loadFolder(musicDS);
     }
     return true;
   }
   else {
-    memcpy(&nfcTag, &tempCard, sizeof(nfcTagStruct));
+    memcpy(&myCard, &tempCard, sizeof(nfcTagStruct));
     return true;
   }
+}
+
+bool evaluateModifierData(nfcTagStruct tempCard)
+{
+	return true;
 }
 
 void writeCard(nfcTagStruct nfcTag) 

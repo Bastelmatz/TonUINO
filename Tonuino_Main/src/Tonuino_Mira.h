@@ -15,9 +15,11 @@ void loadFolder(musicDataset theFolder);
 bool setupFolder(musicDataset * theFolder);
 
 void onNewCard();
+void onCardGone();
+void onCardReturn();
 void setupCard();
 void resetCard();
 
-bool evaluateCardData(nfcTagStruct tempCard, nfcTagStruct nfcTag);
-
+bool evaluateCardData(nfcTagStruct tempCard);
+bool evaluateModifierData(nfcTagStruct tempCard);
 
