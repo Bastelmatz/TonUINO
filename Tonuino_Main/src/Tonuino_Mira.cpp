@@ -290,6 +290,76 @@ void readPotentiometer()
     }
 }
 
+void handleButtons()
+{
+	// Buttons werden nun über JS_Button gehandelt, dadurch kann jede Taste doppelt belegt werden
+    readButtons();
+    
+    // admin menu
+    if ((pauseButton.pressedFor(LONG_PRESS) || nextButton.pressedFor(LONG_PRESS) || previousButton.pressedFor(LONG_PRESS)) 
+        && pauseButton.isPressed() && nextButton.isPressed() && previousButton.isPressed()) 
+    {
+      dfPlayer.pause();
+      do {
+        readButtons();
+      } while (pauseButton.isPressed() || nextButton.isPressed() || previousButton.isPressed());
+      readButtons();
+      adminMenu();
+      return;
+    }
+	
+	readPotentiometer();
+		
+	bool isCurrentlyPlaying = dfPlayer.isPlaying();
+	
+	if (pauseButton.wasReleased()) 
+	{
+		if (ignorePauseButton == false)
+		{
+			dfPlayer.togglePlay();
+		}
+		ignorePauseButton = false;
+	} 
+	else if (pauseButton.pressedFor(LONG_PRESS) && ignorePauseButton == false) 
+	{
+		if (isCurrentlyPlaying) 
+		{
+			uint8_t advertTrack = tonuinoPlayer().currentTrackInRange();
+			dfPlayer.playAdvertisement(advertTrack);
+		}
+		else 
+		{
+			playShortCut(0);
+		}
+		ignorePauseButton = true;
+	}
+	if (!dfPlayer.listenUntilTrackEnds)
+	{
+		if (nextButton.wasReleased()) 
+		{
+			if (isCurrentlyPlaying) 
+			{
+				dfPlayer.nextTrack();
+			}
+			else 
+			{
+				playShortCut(1);
+			}
+		}
+		if (previousButton.wasReleased()) 
+		{
+			if (isCurrentlyPlaying) 
+			{
+				dfPlayer.previousTrack();
+			}
+			else 
+			{
+				playShortCut(2);
+			}
+		}
+	}
+}
+
 void handleCardReader()
 {
 	// poll card only every 100ms
@@ -323,19 +393,16 @@ void handleCardReader()
 	}
 }
 
-void setStopLight()
-{
-	if (dfPlayer.isPlaying())
-	{
-		digitalWrite(stopLED, LOW);
-	}
-	else
-	{
-		digitalWrite(stopLED, HIGH);
-	}
-}
-
 bool m_lastPlayState = true;
+void checkPlayState()
+{
+	bool isCurrentlyPlaying = dfPlayer.isPlaying();
+    if (m_lastPlayState != isCurrentlyPlaying)
+    {
+      digitalWrite(stopLED, isCurrentlyPlaying ? LOW : HIGH);
+      m_lastPlayState = isCurrentlyPlaying;
+    }
+}
 
 void loopTonuino() 
 {
@@ -343,80 +410,11 @@ void loopTonuino()
     checkStandbyAtMillis();
 	checkCurrentTrack();
     dfPlayer.loop();
-
-    bool isCurrentlyPlaying = dfPlayer.isPlaying();
-    if (m_lastPlayState != isCurrentlyPlaying)
-    {
-      setStopLight();
-      m_lastPlayState = isCurrentlyPlaying;
-    }
-     
-    // Buttons werden nun über JS_Button gehandelt, dadurch kann jede Taste doppelt belegt werden
-    readButtons();
-    
-    // admin menu
-    if ((pauseButton.pressedFor(LONG_PRESS) || nextButton.pressedFor(LONG_PRESS) || previousButton.pressedFor(LONG_PRESS)) 
-        && pauseButton.isPressed() && nextButton.isPressed() && previousButton.isPressed()) 
-    {
-      dfPlayer.pause();
-      do {
-        readButtons();
-      } while (pauseButton.isPressed() || nextButton.isPressed() || previousButton.isPressed());
-      readButtons();
-      adminMenu();
-      return;
-    }
+	checkPlayState();
 
 	if (!allLocked && !buttonsLocked)
 	{
-		readPotentiometer();
-		
-		if (pauseButton.wasReleased()) 
-		{
-			if (ignorePauseButton == false)
-			{
-				dfPlayer.togglePlay();
-			}
-			ignorePauseButton = false;
-		} 
-		else if (pauseButton.pressedFor(LONG_PRESS) && ignorePauseButton == false) 
-		{
-			if (isCurrentlyPlaying) 
-			{
-				uint8_t advertTrack = tonuinoPlayer().currentTrackInRange();
-				dfPlayer.playAdvertisement(advertTrack);
-			}
-			else 
-			{
-				playShortCut(0);
-			}
-			ignorePauseButton = true;
-		}
-		if (!dfPlayer.listenUntilTrackEnds)
-		{
-			if (nextButton.wasReleased()) 
-			{
-				if (isCurrentlyPlaying) 
-				{
-					dfPlayer.nextTrack();
-				}
-				else 
-				{
-					playShortCut(1);
-				}
-			}
-			if (previousButton.wasReleased()) 
-			{
-				if (isCurrentlyPlaying) 
-				{
-					dfPlayer.previousTrack();
-				}
-				else 
-				{
-					playShortCut(2);
-				}
-			}
-		}
+		handleButtons();
 	}
 
     // Ende der Buttons
