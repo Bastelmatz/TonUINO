@@ -51,7 +51,7 @@ TonuinoTimer TonuinoPlayer::sleepTimer;
 // *********************************
 bool TonuinoPlayer::useSection()
 {
-	return mode == Section_AudioDrama || mode == Section_Party || Section_Album;
+	return mode == Section_AudioDrama || mode == Section_Party || mode == Section_Album;
 }
 
 bool TonuinoPlayer::useSingleTrack()
@@ -70,7 +70,6 @@ bool TonuinoPlayer::useRandomQueue()
 } 
 
 bool TonuinoPlayer::reShuffleOnEnd = true;
-bool TonuinoPlayer::useAllRepetition = false;
 bool TonuinoPlayer::useSingleRepetition = false;
 bool TonuinoPlayer::goToTrackOnPause = false;
 
@@ -96,25 +95,25 @@ uint8_t TonuinoPlayer::currentTrackInRange()
 
 void TonuinoPlayer::shuffleQueue() 
 {
-  uint8_t allTracks = allTracksCount();
-  // Queue für die Zufallswiedergabe erstellen
-  for (uint8_t x = 0; x < allTracks; x++)
-  {
-    queue[x] = x + firstTrack;
-  }
-  // Rest mit 0 auffüllen
-  for (uint8_t x = allTracks; x < sizeof(queue); x++)
-  {
-    queue[x] = 0;
-  }
-  // Queue mischen
-  for (uint8_t i = 0; i < allTracks; i++)
-  {
-    uint8_t j = random (0, allTracks);
-    uint8_t t = queue[i];
-    queue[i] = queue[j];
-    queue[j] = t;
-  }
+	uint8_t allTracks = allTracksCount();
+	// Queue für die Zufallswiedergabe erstellen
+	for (uint8_t x = 0; x < allTracks; x++)
+	{
+		queue[x] = x + firstTrack;
+	}
+	// Rest mit 0 auffüllen
+	for (uint8_t x = allTracks; x < sizeof(queue); x++)
+	{
+		queue[x] = 0;
+	}
+	// Queue mischen
+	for (uint8_t i = 0; i < allTracks; i++)
+	{
+		uint8_t j = random (0, allTracks);
+		uint8_t t = queue[i];
+		queue[i] = queue[j];
+		queue[j] = t;
+	}
 }
 
 void TonuinoPlayer::playTitle()

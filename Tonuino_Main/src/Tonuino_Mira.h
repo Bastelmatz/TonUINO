@@ -20,4 +20,4 @@ void resetCard();
 
 bool evaluateCardData(nfcTagStruct tempCard, nfcTagStruct nfcTag);
 
-bool askCode(uint8_t *code);
+

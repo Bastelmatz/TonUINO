@@ -67,7 +67,6 @@ class TonuinoPlayer
 	bool useRandomSingle();
 	bool useRandomQueue();
 	bool useSingleTrack();
-	static bool useAllRepetition;
 	static bool useSingleRepetition;
 	static bool reShuffleOnEnd;
 	static bool goToTrackOnPause;
