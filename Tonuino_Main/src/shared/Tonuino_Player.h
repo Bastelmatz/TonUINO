@@ -23,7 +23,7 @@ class TonuinoTimer
 {
 	public:
 	static unsigned long activeTime;
-	static long timeInMin;
+	static uint8_t timeInMin;
 	
 	void activate();
 	void disable();

@@ -4,6 +4,8 @@
 #include "shared/Tonuino_EEPROM.h"
 #include "shared/Tonuino_Player.h"
 #include "shared/Tonuino_DFPlayer.h"
+#include "shared/Tonuino_Modifiers.h"
+
 #include <SPI.h>
 
 void loopTonuino();
@@ -20,6 +22,5 @@ void onCardReturn();
 void setupCard();
 void resetCard();
 
-bool evaluateCardData(nfcTagStruct tempCard);
-bool evaluateModifierData(nfcTagStruct tempCard);
+void evaluateModifierData(nfcTagStruct tempCard);
 

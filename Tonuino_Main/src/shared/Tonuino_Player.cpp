@@ -21,7 +21,7 @@ uint8_t TonuinoPlayer::allTracksCount()
 // Timer Class
 // *********************************
 unsigned long TonuinoTimer::activeTime = 0;
-static long TonuinoTimer::timeInMin = 0;
+uint8_t TonuinoTimer::timeInMin = 0;
 
 void TonuinoTimer::activate()
 {

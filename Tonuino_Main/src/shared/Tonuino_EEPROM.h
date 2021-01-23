@@ -9,14 +9,8 @@
 struct adminSettings {
   uint32_t cookie;
   byte version;
-  uint8_t maxVolume;
-  uint8_t minVolume;
-  uint8_t initVolume;
-  uint8_t eq;
-  bool locked;
   long standbyTimer;
   musicDataset shortCuts[4];
-  bool adminMenuLocked;
 };
 
 class TonuinoEEPROM
@@ -32,7 +26,6 @@ class TonuinoEEPROM
 	
 	void writeSettingsToFlash();
 	void resetSettings();
-	void migrateSettings(int oldVersion);
 	
 	void loadSettingsFromFlash();
 	musicDataset loadLastDatasetFromFlash();

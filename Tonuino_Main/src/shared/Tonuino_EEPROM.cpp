@@ -78,67 +78,27 @@ void TonuinoEEPROM::resetSettings()
 {
   Serial.println(F("=== resetSettings()"));
   settings.cookie = cardCookie;
-  settings.version = 2;
-  settings.maxVolume = 10;
-  settings.minVolume = 1;
-  settings.initVolume = 5;
-  settings.eq = 1;
-  settings.locked = false;
   settings.standbyTimer = 0;
   settings.shortCuts[0].folder = 0;
   settings.shortCuts[1].folder = 0;
   settings.shortCuts[2].folder = 0;
   settings.shortCuts[3].folder = 0;
-  settings.adminMenuLocked = 0;
 
   writeSettingsToFlash();
 }
 
-void TonuinoEEPROM::migrateSettings(int oldVersion) 
-{
-  if (oldVersion == 1) {
-    Serial.println(F("=== resetSettings()"));
-    Serial.println(F("1 -> 2"));
-    settings.version = 2;
-    settings.adminMenuLocked = 0;
-    writeSettingsToFlash();
-  }
-}
-
 void TonuinoEEPROM::loadSettingsFromFlash() 
 {
-  Serial.println(F("=== loadSettingsFromFlash()"));
-  int address = flashAddress_Settings();
-  EEPROM.get(address, settings);
-  if (settings.cookie != cardCookie)
-  {
-    resetSettings();
-  }
-  migrateSettings(settings.version);
+	Serial.println(F("=== loadSettingsFromFlash()"));
+	int address = flashAddress_Settings();
+	EEPROM.get(address, settings);
+	if (settings.cookie != cardCookie)
+	{
+		resetSettings();
+	}
 
-  Serial.print(F("Version: "));
-  Serial.println(settings.version);
-
-  Serial.print(F("Maximal Volume: "));
-  Serial.println(settings.maxVolume);
-
-  Serial.print(F("Minimal Volume: "));
-  Serial.println(settings.minVolume);
-
-  Serial.print(F("Initial Volume: "));
-  Serial.println(settings.initVolume);
-
-  Serial.print(F("EQ: "));
-  Serial.println(settings.eq);
-
-  Serial.print(F("Locked: "));
-  Serial.println(settings.locked);
-
-  Serial.print(F("Sleep Timer: "));
-  Serial.println(settings.standbyTimer);
-
-  Serial.print(F("Admin Menu locked: "));
-  Serial.println(settings.adminMenuLocked);
+	Serial.print(F("Sleep Timer: "));
+	Serial.println(settings.standbyTimer);
 }
 
 

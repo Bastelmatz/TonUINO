@@ -19,8 +19,6 @@ bool TonuinoDFPlayer::listenUntilTrackEnds = false;
 bool TonuinoDFPlayer::freezeDance_active = false;
 unsigned long TonuinoDFPlayer::freezeDance_nextStopAtMillis = 0;
 
-void TonuinoDFPlayer::trackFinished();
-
 // implement a notification class,
 // its member methods will get called
 //
