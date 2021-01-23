@@ -69,6 +69,7 @@ bool ignoreNextButton = false;
 bool ignorePreviousButton = false;
 
 bool allLocked = false;
+bool buttonsLocked = false;
 
 TonuinoPlayer tonuinoPlayer()
 {
@@ -120,39 +121,6 @@ class Modifier {
 };
 
 Modifier *activeModifier = NULL;
-
-class ToddlerMode: public Modifier {
-  public:
-    virtual bool handlePause()     {
-      Serial.println(F("== ToddlerMode::handlePause() -> LOCKED!"));
-      return true;
-    }
-    virtual bool handleNextButton()       {
-      Serial.println(F("== ToddlerMode::handleNextButton() -> LOCKED!"));
-      return true;
-    }
-    virtual bool handlePreviousButton() {
-      Serial.println(F("== ToddlerMode::handlePreviousButton() -> LOCKED!"));
-      return true;
-    }
-    virtual bool handleVolumeUp()   {
-      Serial.println(F("== ToddlerMode::handleVolumeUp() -> LOCKED!"));
-      return true;
-    }
-    virtual bool handleVolumeDown() {
-      Serial.println(F("== ToddlerMode::handleVolumeDown() -> LOCKED!"));
-      return true;
-    }
-    ToddlerMode(void) {
-      Serial.println(F("=== ToddlerMode()"));
-      //      if (isPlaying())
-      //        mp3.playAdvertisement(304);
-    }
-    uint8_t getActive() {
-      Serial.println(F("== ToddlerMode::getActive()"));
-      return 4;
-    }
-};
 
 class KindergardenMode: public Modifier {
   private:
@@ -493,7 +461,7 @@ void loopTonuino()
       return;
     }
 
-	if (!allLocked)
+	if (!allLocked && !buttonsLocked)
 	{
 		readPotentiometer();
 		
@@ -914,7 +882,6 @@ bool evaluateCardData(nfcTagStruct tempCard)
         case 0:
         case 255:
           tonuinoRFID.haltAndStop(); adminMenu(true);  break;
-        case 4: activeModifier = new ToddlerMode(); break;
         case 5: activeModifier = new KindergardenMode(); break;
       }
       delay(2000);
