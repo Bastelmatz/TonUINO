@@ -15,11 +15,13 @@ typedef enum EModifier
 	
 	MODI_Player_StandbyTime = 10,
 	MODI_Player_SleepTime = 11,
+	
 	MODI_Player_Random = 20,
 	MODI_Player_RepeatSingle = 21,
 	MODI_Player_RepeatAll = 22,
 	MODI_Player_ListenToEnd = 23,
 	MODI_Player_StopOnCardRemoval = 24,
+	MODI_Player_FreezeDance = 25,
 	
 	MODI_LockAll = 30,
 	MODI_LockButtons = 31,

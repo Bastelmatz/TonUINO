@@ -612,6 +612,18 @@ void handleModifier(EModifier modifier, uint8_t special)
 		{
 			setSleepTimerValue(special);
 		}
+		case MODI_Player_RepeatSingle:
+		{
+			tonuinoPlayer().useSingleRepetition = !tonuinoPlayer().useSingleRepetition;
+		}
+		case MODI_Player_ListenToEnd:
+		{
+			dfPlayer.listenUntilTrackEnds = !dfPlayer.listenUntilTrackEnds;
+		}
+		case MODI_Player_FreezeDance:
+		{
+			dfPlayer.freezeDance_active = !dfPlayer.freezeDance_active;
+		}
 	}
 }
 

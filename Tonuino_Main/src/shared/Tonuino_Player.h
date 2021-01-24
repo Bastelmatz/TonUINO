@@ -36,6 +36,7 @@ class TonuinoPlayer
 	static TonuinoTimer standbyTimer;
 	
 	static bool isPlaying;
+	static bool useSingleRepetition;
 		
 	uint8_t currentTrack();
 	uint8_t currentTrackInRange();
@@ -67,7 +68,6 @@ class TonuinoPlayer
 	bool useRandomSingle();
 	bool useRandomQueue();
 	bool useSingleTrack();
-	static bool useSingleRepetition;
 	static bool reShuffleOnEnd;
 	static bool goToTrackOnPause;
 	
