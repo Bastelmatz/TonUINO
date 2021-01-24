@@ -12,7 +12,7 @@
 class TonuinoDFPlayer
 {
 	public:
-	static musicDataset musicDS;
+	static MusicDataset musicDS;
 	static TonuinoPlayer tonuinoPlayer;
 	static uint8_t volume;
 	static uint8_t volumeMin;
@@ -22,8 +22,8 @@ class TonuinoDFPlayer
 			
 	void setup();
 	bool isPlaying();
-	void loadFolder(musicDataset dataset, uint8_t lastTrack);
-	void loadAndPlayFolder(musicDataset dataset, uint8_t lastTrack);
+	void loadFolder(MusicDataset dataset, uint8_t lastTrack);
+	void loadAndPlayFolder(MusicDataset dataset, uint8_t lastTrack);
 	void continueTitle();
 	void pauseAndStandBy();
 	void togglePlay();

@@ -64,7 +64,7 @@ void Tonuino_RFID_Tool_Core::handleCommand()
   Serial.println("RFID_Tool_Command_Received");
   Serial.println(readSerialString);
 
-  musicDataset receivedDS;
+  MusicDataset receivedDS;
   int index = 0;
   char* command = strtok(readSerialString, ";");
   while(command != NULL) 

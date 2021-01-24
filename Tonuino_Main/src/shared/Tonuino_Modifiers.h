@@ -5,26 +5,27 @@
 
 typedef enum EModifier
 {
-	TrackPlay = 1,
-	TrackPause = 2,
-	TrackToggle = 3,
-	TrackNext = 4,
-	TrackPrevious = 5,
-	TrackFirst = 6,
-	TrackLast = 7,
+	MODI_TrackPlay = 1,
+	MODI_TrackPause = 2,
+	MODI_TrackToggle = 3,
+	MODI_TrackNext = 4,
+	MODI_TrackPrevious = 5,
+	MODI_TrackFirst = 6,
+	MODI_TrackLast = 7,
 	
-	Player_StandbyTime = 10,
-	Player_SleepTime = 11,
-	Player_Random = 20,
-	Player_RepeatSingle = 21,
-	Player_RepeatAll = 22,
-	Player_ListenToEnd = 23,
+	MODI_Player_StandbyTime = 10,
+	MODI_Player_SleepTime = 11,
+	MODI_Player_Random = 20,
+	MODI_Player_RepeatSingle = 21,
+	MODI_Player_RepeatAll = 22,
+	MODI_Player_ListenToEnd = 23,
+	MODI_Player_StopOnCardRemoval = 24,
 	
-	LockAll = 30,
-	LockButtons = 31,
+	MODI_LockAll = 30,
+	MODI_LockButtons = 31,
 	
-	ResetCard = 40,
-	ResetEEPROM = 41,
+	MODI_ResetCard = 40,
+	MODI_ResetEEPROM = 41,
 };
 
 #endif

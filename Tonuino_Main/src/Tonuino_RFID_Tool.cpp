@@ -24,7 +24,7 @@ void setupTool()
   tonuinoRFID.setupRFID();
 }
 
-void handleCardReader()
+void checkCardReader()
 {
   byte pollCardResult = tonuinoRFID.tryPollCard();
 
@@ -55,7 +55,7 @@ void loopTool()
 {
 	tonuinoRFIDTool.listen();
 	
-	handleCardReader();
+	checkCardReader();
 }
 
 #endif

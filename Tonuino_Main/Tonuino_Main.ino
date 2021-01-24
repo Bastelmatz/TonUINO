@@ -34,12 +34,12 @@ void loop()
 
 void setup()
 {
-  setupTonuino();
+  setupMira();
 }
 
 void loop()
 {
-  loopTonuino();
+  loopMira();
 }
 
 #endif

@@ -10,7 +10,7 @@ uint8_t TonuinoDFPlayer::volume = 0;
 uint8_t TonuinoDFPlayer::volumeMin = 0;
 uint8_t TonuinoDFPlayer::volumeMax = 30;
 
-musicDataset TonuinoDFPlayer::musicDS;
+MusicDataset TonuinoDFPlayer::musicDS;
 bool TonuinoDFPlayer::musicDSLoaded = false;
 bool TonuinoDFPlayer::newMusisDS = false;
 bool TonuinoDFPlayer::feedbackOnVolumeChange = false;
@@ -95,7 +95,7 @@ void TonuinoDFPlayer::playCurrentTrack()
 	playTrack(track);
 }
 
-void TonuinoDFPlayer::loadFolder(musicDataset dataset, uint8_t lastTrack)
+void TonuinoDFPlayer::loadFolder(MusicDataset dataset, uint8_t lastTrack)
 {
 	musicDS = dataset;
 	uint16_t numTracks = mp3.getFolderTrackCount(musicDS.folder);
@@ -109,7 +109,7 @@ void TonuinoDFPlayer::loadFolder(musicDataset dataset, uint8_t lastTrack)
 	newMusisDS = true;
 }
 
-void TonuinoDFPlayer::loadAndPlayFolder(musicDataset dataset, uint8_t lastTrack)
+void TonuinoDFPlayer::loadAndPlayFolder(MusicDataset dataset, uint8_t lastTrack)
 {
 	loadFolder(dataset, lastTrack);
 	playCurrentTrack();
