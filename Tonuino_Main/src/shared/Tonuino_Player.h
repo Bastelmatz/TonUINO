@@ -71,6 +71,7 @@ class TonuinoPlayer
 	static bool reShuffleOnEnd;
 	static bool goToTrackOnPause;
 	
+	void showTimerInfo();
 	void shuffleQueue();
 	bool goToTrack(bool next);
 };

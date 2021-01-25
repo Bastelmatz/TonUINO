@@ -80,7 +80,7 @@ void TonuinoDFPlayer::playTrack(uint8_t track)
 {
 	if (track > 0)
 	{ 
-		Serial.print(F("Spiele Titel:"));
+		Serial.print(F("Play track: "));
 		Serial.println(track);
 		mp3.playFolderTrack(musicDS.folder, track);
 		tonuinoPlayer.playTitle();

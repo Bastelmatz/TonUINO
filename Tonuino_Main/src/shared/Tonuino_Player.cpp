@@ -25,7 +25,6 @@ uint8_t TonuinoTimer::timeInMin = 0;
 
 void TonuinoTimer::activate()
 {
-	Serial.println(F("Activate timer"));
 	if (timeInMin > 0)
 	{
 		activeTime = millis() + (timeInMin * 60 * 1000);
@@ -34,7 +33,6 @@ void TonuinoTimer::activate()
 	{
 		activeTime = 0;
 	}
-	Serial.println(activeTime);
 }
 
 void TonuinoTimer::disable()
@@ -116,6 +114,23 @@ void TonuinoPlayer::shuffleQueue()
 	}
 }
 
+void TonuinoPlayer::showTimerInfo()
+{
+	// Show debug info if timers are used
+	if (sleepTimer.timeInMin > 0)
+	{
+		Serial.print("Sleep timer: ");
+		Serial.print(sleepTimer.activeTime);
+		Serial.println(sleepTimer.activeTime > 0 ? "" : " = disabled");
+	}
+	if (standbyTimer.timeInMin > 0)
+	{
+		Serial.print("Standby timer: ");
+		Serial.print(standbyTimer.activeTime);
+		Serial.println(standbyTimer.activeTime > 0 ? "" : " = disabled");
+	}
+}
+
 void TonuinoPlayer::playTitle()
 {
 	isPlaying = true;
@@ -123,6 +138,7 @@ void TonuinoPlayer::playTitle()
 	currentTrackFinished = false;
 	standbyTimer.disable();
 	sleepTimer.activate();
+	showTimerInfo();
 }
 
 void TonuinoPlayer::pauseNoStandBy()
@@ -130,6 +146,7 @@ void TonuinoPlayer::pauseNoStandBy()
 	isPlaying = false;
 	standbyTimer.disable();
 	sleepTimer.disable();
+	showTimerInfo();
 }
 
 void TonuinoPlayer::pauseAndStandBy()
@@ -137,6 +154,7 @@ void TonuinoPlayer::pauseAndStandBy()
 	isPlaying = false;
 	standbyTimer.activate();
 	sleepTimer.disable();
+	showTimerInfo();
 }
 
 void TonuinoPlayer::trackFinished()
@@ -266,7 +284,7 @@ void TonuinoPlayer::loadFolder(uint8_t numTracksInFolder, uint8_t folderMode, ui
 	endTrack = numTracksInFolder;
 	firstTrack = 1;
 	Serial.print(numTracksInFolder);
-	Serial.println(F(" Dateien in Ordner "));
+	Serial.println(F(" files in folder "));
 
 	if (useSection())
 	{
