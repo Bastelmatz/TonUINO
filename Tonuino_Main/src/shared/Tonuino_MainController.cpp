@@ -203,7 +203,7 @@ void setupTonuino() {
   // NFC Leser initialisieren
   tonuinoRFID.setupRFID();
 
-  tonuinoPoti.setup();
+  tonuinoPoti.setup(PIN_Poti);
   
   pinMode(PIN_ButtonPause, INPUT_PULLUP);
   pinMode(PIN_ButtonNext, INPUT_PULLUP);
@@ -246,9 +246,9 @@ void handleButtons()
 	// Buttons werden nun über JS_Button gehandelt, dadurch kann jede Taste doppelt belegt werden
     readButtons();
 	
-	int potiValue = tonuinoPoti.read();
-	if (potiValue > 0)
+	if (CONFIG_HasPotentiometer)
 	{
+		int potiValue = tonuinoPoti.read();
 		dfPlayer.setVolume(potiValue);
 	}
 	
