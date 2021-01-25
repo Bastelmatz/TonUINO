@@ -179,7 +179,7 @@ bool TonuinoPlayer::goToTrack(bool next)
 	}
 	
 	// go to next only while playing
-	if (!goToTrackOnPause && isPlaying)
+	if (!goToTrackOnPause && !isPlaying)
 	{
 		return false;
 	}

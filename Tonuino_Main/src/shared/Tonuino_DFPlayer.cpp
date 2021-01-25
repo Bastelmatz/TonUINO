@@ -175,6 +175,7 @@ void TonuinoDFPlayer::previousTrack()
 
 void TonuinoDFPlayer::trackFinished()
 {
+	mp3.pause();
 	tonuinoPlayer.trackFinished();
 
 	if (tonuinoPlayer.isPlaying && musicDSLoaded)
