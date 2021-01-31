@@ -5,10 +5,11 @@ class TonuinoPotentiometer
 {
 	public:
 	void setup(int pin);
-	int read();
+	bool read();
+	static int appliedValue; 
 	
 	private:
 	static int pin;
-	static int hysterese; 
 	static int lastValue; 
+	static int hysterese;
 };

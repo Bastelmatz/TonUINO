@@ -12,11 +12,11 @@ static uint8_t CONFIG_StandbyTime = 0;
 static uint8_t CONFIG_SleepTime = 0;
 static uint8_t CONFIG_VolumeInit = 10;
 static uint8_t CONFIG_VolumeMin = 1;
-static uint8_t CONFIG_VolumeMax = 30;
+static uint8_t CONFIG_VolumeMax = 25;
 static DfMp3_Eq CONFIG_Equalizer = DfMp3_Eq_Normal;
 
 static bool CONFIG_UsePowerOff = false;
-static bool CONFIG_HasPotentiometer = false;
+static bool CONFIG_HasPotentiometer = true;
 
 static bool CONFIG_StopPlayOnCardRemoval = false;
 

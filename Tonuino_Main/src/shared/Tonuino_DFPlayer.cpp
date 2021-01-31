@@ -8,7 +8,7 @@ TonuinoPlayer TonuinoDFPlayer::tonuinoPlayer;
 
 uint8_t TonuinoDFPlayer::volume = 0;
 uint8_t TonuinoDFPlayer::volumeMin = 0;
-uint8_t TonuinoDFPlayer::volumeMax = 30;
+uint8_t TonuinoDFPlayer::volumeMax = 25;
 
 MusicDataset TonuinoDFPlayer::musicDS;
 bool TonuinoDFPlayer::musicDSLoaded = false;

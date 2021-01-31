@@ -248,8 +248,10 @@ void handleButtons()
 	
 	if (CONFIG_HasPotentiometer)
 	{
-		int potiValue = tonuinoPoti.read();
-		dfPlayer.setVolume(potiValue);
+		if (tonuinoPoti.read())
+		{
+			dfPlayer.setVolume(tonuinoPoti.appliedValue);
+		}
 	}
 	
 	bool isCurrentlyPlaying = dfPlayer.isPlaying();
