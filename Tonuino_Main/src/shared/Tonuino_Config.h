@@ -15,8 +15,10 @@ static uint8_t CONFIG_VolumeMin = 1;
 static uint8_t CONFIG_VolumeMax = 25;
 static DfMp3_Eq CONFIG_Equalizer = DfMp3_Eq_Normal;
 
+static bool CONFIG_UseCardReader = false;
 static bool CONFIG_UsePowerOff = false;
 static bool CONFIG_HasPotentiometer = true;
+static bool CONFIG_HasUltraSonic = true;
 
 static bool CONFIG_StopPlayOnCardRemoval = false;
 
@@ -29,6 +31,8 @@ static MusicDataset CONFIG_ShortCuts[4];
 #define PIN_ButtonPrevious A4
 #define PIN_StopLED 6
 #define PIN_Shutdown 7
+#define PIN_SonicTrigger 5 
+#define PIN_SonicEcho 8 
 #define PIN_OpenAnalog A6
 
 #define PIN_Poti A2  // 10kOhm Poti

@@ -11,7 +11,9 @@ void setConfigMira()
 {
 	CONFIG_StandbyTime = 0;
 	
+	CONFIG_UseCardReader = false;
 	CONFIG_HasPotentiometer = true;
+	CONFIG_HasUltraSonic = true;
 	
 	CONFIG_StopPlayOnCardRemoval = false;
 }

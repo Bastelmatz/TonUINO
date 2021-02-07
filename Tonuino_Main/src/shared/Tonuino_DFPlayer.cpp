@@ -204,6 +204,7 @@ void TonuinoDFPlayer::playAdvertisement(int advertisement)
 	if (isPlaying()) 
 	{
 		mp3.playAdvertisement(advertisement);
+		delay(1500);
 	}
 	else 
 	{

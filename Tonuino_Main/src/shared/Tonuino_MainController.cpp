@@ -33,6 +33,10 @@ bool ignorePauseButton = false;
 bool ignoreNextButton = false;
 bool ignorePreviousButton = false;
 
+long sonic_duration = 0; 
+long sonic_distance = 0; 
+bool handle_sonic = false;
+
 uint8_t trackInEEPROM = 0;
 nfcTagStruct nextMC;
 MusicDataset lastMusicDS;
@@ -209,7 +213,10 @@ void setupTonuino() {
   pinMode(PIN_ButtonNext, INPUT_PULLUP);
   pinMode(PIN_ButtonPrevious, INPUT_PULLUP);
 
-
+  pinMode(PIN_SonicTrigger, OUTPUT); 
+  pinMode(PIN_SonicEcho, INPUT); 
+  digitalWrite(PIN_SonicTrigger, LOW); 
+  
   pinMode(PIN_StopLED, OUTPUT);
   
   pinMode(PIN_Shutdown, OUTPUT);
@@ -344,6 +351,41 @@ void checkPlayState()
     }
 }
 
+void checkUltraSonic()
+{
+	if (!CONFIG_HasUltraSonic)
+	{
+		return;
+	}
+	
+	//delay(5); 
+	digitalWrite(PIN_SonicTrigger, HIGH); 
+	//delay(10);
+	digitalWrite(PIN_SonicTrigger, LOW);
+	sonic_duration = pulseIn(PIN_SonicEcho, HIGH); 
+	sonic_distance = (sonic_duration/2) * 0.3432; //mm
+
+	Serial.println(millis());
+	Serial.print("Duration: ");
+	Serial.println(sonic_duration);
+	Serial.print("Distance: ");
+	Serial.println(sonic_distance);
+	
+	if (sonic_distance > 10 && sonic_distance < 70)
+	{
+		handle_sonic = true;
+	}
+	if (sonic_distance > 70)
+	{
+		if (handle_sonic)
+		{
+			dfPlayer.playAdvertisement(262);
+			dfPlayer.nextTrack();
+		}
+		handle_sonic = false;
+	}
+}
+
 void loopTonuino() 
 {
 	checkSleepAtMillis();
@@ -351,15 +393,17 @@ void loopTonuino()
 	checkCurrentTrack();
     dfPlayer.loop();
 	checkPlayState();
-
+	checkUltraSonic();
+	
 	if (!allLocked && !buttonsLocked)
 	{
 		handleButtons();
 	}
 
-    // Ende der Buttons
-
-    handleCardReader();
+    if (CONFIG_UseCardReader)
+	{
+		handleCardReader();
+	}
 }
 
 void onNewCard()
