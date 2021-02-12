@@ -15,6 +15,8 @@
     created by Bastelmatz.
 */
 
+TonuinoConfig mainConfig;
+
 // RFID reader
 Tonuino_RFID_Reader tonuinoRFID;
 
@@ -51,7 +53,14 @@ TonuinoPlayer tonuinoPlayer()
 
 void loadDataFromFlash()
 {
-	lastMusicDS = tonuinoEEPROM.loadLastDatasetFromFlash();
+	if (mainConfig.StartMusicDS.folder == 0)
+	{
+		lastMusicDS = tonuinoEEPROM.loadLastDatasetFromFlash();
+	}
+	else
+	{
+		lastMusicDS = mainConfig.StartMusicDS;
+	}
 }
 
 void setStandbyTimerValue(uint8_t timeInMin)
@@ -99,7 +108,7 @@ void activateFreezeDance(bool active)
 
 void turnOff()
 {
-	if (!CONFIG_UsePowerOff)
+	if (!mainConfig.UsePowerOff)
 	{
 		return;
 	}
@@ -157,7 +166,7 @@ void playShortCut(uint8_t shortCut)
 {
 	Serial.println(F("=== playShortCut()"));
 	Serial.println(shortCut);
-	MusicDataset shortCutData = CONFIG_ShortCuts[shortCut];
+	MusicDataset shortCutData = mainConfig.ShortCuts[shortCut];
 	if (shortCutData.folder > 0) 
 	{
 		loadAndPlayFolder(shortCutData);
@@ -168,8 +177,9 @@ void playShortCut(uint8_t shortCut)
 	}
 }
 
-void setupTonuino() {
-
+void setupTonuino(TonuinoConfig config) 
+{
+  mainConfig = config;
   Serial.begin(115200); // Es gibt ein paar Debug Ausgaben über die serielle Schnittstelle
 
   // Wert für randomSeed() erzeugen durch das mehrfache Sammeln von rauschenden LSBs eines offenen Analogeingangs
@@ -197,30 +207,39 @@ void setupTonuino() {
   dfPlayer.setup();
   
   // set settings
-  dfPlayer.volumeMin = CONFIG_VolumeMin;
-  dfPlayer.volumeMax = CONFIG_VolumeMax;
-  dfPlayer.setVolume(CONFIG_VolumeInit);
-  dfPlayer.setEqualizer(CONFIG_Equalizer);
+  dfPlayer.volumeMin = mainConfig.VolumeMin;
+  dfPlayer.volumeMax = mainConfig.VolumeMax;
+  dfPlayer.setVolume(mainConfig.VolumeInit);
+  dfPlayer.setEqualizer(mainConfig.Equalizer);
   setStandbyTimerValue(0);
   setSleepTimerValue(0);
 
   // NFC Leser initialisieren
-  tonuinoRFID.setupRFID();
+  if (mainConfig.UseCardReader)
+  {
+	tonuinoRFID.setupRFID();
+  }
 
-  tonuinoPoti.setup(PIN_Poti);
-  
+  if (mainConfig.HasPotentiometer)
+  {
+	tonuinoPoti.setup(PIN_Poti, mainConfig.VolumeMin, mainConfig.VolumeMax); 
+	
+	pinMode(PIN_SonicTrigger, OUTPUT); 
+	pinMode(PIN_SonicEcho, INPUT); 
+	digitalWrite(PIN_SonicTrigger, LOW); 
+  }
+
   pinMode(PIN_ButtonPause, INPUT_PULLUP);
   pinMode(PIN_ButtonNext, INPUT_PULLUP);
   pinMode(PIN_ButtonPrevious, INPUT_PULLUP);
 
-  pinMode(PIN_SonicTrigger, OUTPUT); 
-  pinMode(PIN_SonicEcho, INPUT); 
-  digitalWrite(PIN_SonicTrigger, LOW); 
-  
   pinMode(PIN_StopLED, OUTPUT);
   
-  pinMode(PIN_Shutdown, OUTPUT);
-  digitalWrite(PIN_Shutdown, LOW);
+  if (mainConfig.UsePowerOff)
+  {
+	pinMode(PIN_Shutdown, OUTPUT);
+	digitalWrite(PIN_Shutdown, LOW);
+  }
 
   // RESET --- ALLE DREI KNÖPFE BEIM STARTEN GEDRÜCKT HALTEN -> alle EINSTELLUNGEN werden gelöscht
   if (digitalRead(PIN_ButtonPause) == LOW && 
@@ -232,11 +251,9 @@ void setupTonuino() {
   }
 
   // play startup sound
-  //dfPlayer.start();
   dfPlayer.playAdvertisement(261);
-  //dfPlayer.pause();
   delay(1000);
-  
+   
   // load last folder 
   loadFolder(lastMusicDS);
 }
@@ -253,7 +270,7 @@ void handleButtons()
 	// Buttons werden nun über JS_Button gehandelt, dadurch kann jede Taste doppelt belegt werden
     readButtons();
 	
-	if (CONFIG_HasPotentiometer)
+	if (mainConfig.HasPotentiometer)
 	{
 		if (tonuinoPoti.read())
 		{
@@ -353,7 +370,7 @@ void checkPlayState()
 
 void checkUltraSonic()
 {
-	if (!CONFIG_HasUltraSonic)
+	if (!mainConfig.HasUltraSonic)
 	{
 		return;
 	}
@@ -400,7 +417,7 @@ void loopTonuino()
 		handleButtons();
 	}
 
-    if (CONFIG_UseCardReader)
+    if (mainConfig.UseCardReader)
 	{
 		handleCardReader();
 	}
@@ -427,7 +444,7 @@ void onNewCard()
 
 void onCardGone()
 {
-	if (CONFIG_StopPlayOnCardRemoval)
+	if (mainConfig.StopPlayOnCardRemoval)
 	{
 		dfPlayer.pauseAndStandBy();
 	}

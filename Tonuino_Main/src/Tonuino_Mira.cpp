@@ -7,22 +7,27 @@
 #include "shared/Tonuino_Config.h"
 #include "shared/Tonuino_MainController.h"
 
-void setConfigMira()
+TonuinoConfig getConfigMira()
 {
-	CONFIG_StandbyTime = 0;
+	TonuinoConfig config;
 	
-	CONFIG_UseCardReader = false;
-	CONFIG_HasPotentiometer = true;
-	CONFIG_HasUltraSonic = true;
+	config.UseCardReader = false;
+	config.HasPotentiometer = true;
+	config.HasUltraSonic = true;
 	
-	CONFIG_StopPlayOnCardRemoval = false;
+	config.StopPlayOnCardRemoval = false;
+	
+	config.StartMusicDS.folder = 10;
+	config.StartMusicDS.mode = 1;
+	
+	return config;
 }
 
 void setupMira()
 {
-	setConfigMira();
+	TonuinoConfig config = getConfigMira();
 	
-	setupTonuino();
+	setupTonuino(config);
 }
 
 void loopMira()

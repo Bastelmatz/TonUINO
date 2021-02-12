@@ -8,21 +8,26 @@
 #ifndef TONUINO_CONFIG_INCLUDED
 #define TONUINO_CONFIG_INCLUDED
 
-static uint8_t CONFIG_StandbyTime = 0;
-static uint8_t CONFIG_SleepTime = 0;
-static uint8_t CONFIG_VolumeInit = 10;
-static uint8_t CONFIG_VolumeMin = 1;
-static uint8_t CONFIG_VolumeMax = 25;
-static DfMp3_Eq CONFIG_Equalizer = DfMp3_Eq_Normal;
+class TonuinoConfig
+{
+	public:
+	uint8_t StandbyTime = 0;
+	uint8_t SleepTime = 0;
+	uint8_t VolumeInit = 10;
+	uint8_t VolumeMin = 1;
+	uint8_t VolumeMax = 25;
+	DfMp3_Eq Equalizer = DfMp3_Eq_Normal;
 
-static bool CONFIG_UseCardReader = false;
-static bool CONFIG_UsePowerOff = false;
-static bool CONFIG_HasPotentiometer = true;
-static bool CONFIG_HasUltraSonic = true;
+	bool UseCardReader = true;
+	bool UsePowerOff = false;
+	bool HasPotentiometer = false;
+	bool HasUltraSonic = false;
 
-static bool CONFIG_StopPlayOnCardRemoval = false;
+	bool StopPlayOnCardRemoval = false;
 
-static MusicDataset CONFIG_ShortCuts[4];
+	MusicDataset StartMusicDS;
+	MusicDataset ShortCuts[4];
+};
   
 #define LONG_PRESS 1000
 

@@ -10,7 +10,7 @@
 #include <SPI.h>
 
 void loopTonuino();
-void setupTonuino();
+void setupTonuino(TonuinoConfig config);
 
 uint8_t getLastTrack(MusicDataset folder);
 void loadAndPlayFolder(MusicDataset theFolder);

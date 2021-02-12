@@ -186,6 +186,7 @@ void TonuinoDFPlayer::trackFinished()
 
 void TonuinoDFPlayer::waitForTrackToFinish() 
 {
+	// give the player some time to actually start the track
 	long currentTime = millis();
 	#define TIMEOUT 1000
 	do 
@@ -193,6 +194,7 @@ void TonuinoDFPlayer::waitForTrackToFinish()
 		mp3.loop();
 	} while (!isPlaying() && millis() < currentTime + TIMEOUT);
 	delay(1000);
+	// now wait until the player is not busy anymore
 	do 
 	{
 		mp3.loop();
