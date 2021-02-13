@@ -467,123 +467,109 @@ void waitForNewCard()
 	} while (!tonuinoRFID.cardDetected());
 }
 
-void waitForCardAndWrite(nfcTagStruct card)
-{
-	Serial.println(F(" Karte auflegen"));
-	waitForNewCard();
-
-	// RFID Karte wurde aufgelegt
-	if (tonuinoRFID.cardSerialFound()) 
-	{
-		Serial.println(F("schreibe Karte..."));
-		writeCard(card);
-		delay(100);
-		tonuinoRFID.haltAndStop();
-		dfPlayer.waitForTrackToFinish();
-	}
-}
-
 uint8_t voiceMenu(int numberOfOptions, int startMessage, int messageOffset,
-                  bool preview = false, int previewFromFolder = 0, int defaultValue = 0, bool exitWithLongPress = false) {
-  uint8_t returnValue = defaultValue;
-  if (startMessage != 0)
-  {
-    dfPlayer.playMp3Track(startMessage);
-  }
-  Serial.print(F("=== voiceMenu() ("));
-  Serial.print(numberOfOptions);
-  Serial.println(F(" Options)"));
-  do {
-    if (Serial.available() > 0) {
-      int optionSerial = Serial.parseInt();
-      if (optionSerial != 0 && optionSerial <= numberOfOptions)
-        return optionSerial;
-    }
-    readButtons();
-    dfPlayer.loop();
-    if (pauseButton.pressedFor(LONG_PRESS)) 
-    {
-      dfPlayer.playMp3Track(802);
-      ignorePauseButton = true;
-      checkStandbyAtMillis();
-      return defaultValue;
-    }
-    if (pauseButton.wasReleased()) 
-    {
-      if (returnValue != 0) {
-        Serial.print(F("=== "));
-        Serial.print(returnValue);
-        Serial.println(F(" ==="));
-        return returnValue;
-      }
-      delay(1000);
-    }
-
-    if (nextButton.pressedFor(LONG_PRESS)) 
-    {
-      returnValue = min(returnValue + 10, numberOfOptions);
-      Serial.println(returnValue);
-      dfPlayer.playMP3AndWait(messageOffset + returnValue);
-      ignoreNextButton = true;
-    } else if (nextButton.wasReleased()) 
-    {
-      if (ignoreNextButton) 
-      {
-        ignoreNextButton = false;
-      } 
-      else 
-      {
-        returnValue = min(returnValue + 1, numberOfOptions);
-        Serial.println(returnValue);
-        dfPlayer.playMP3AndWait(messageOffset + returnValue);
-        if (preview) 
-        {
-          if (previewFromFolder == 0) 
-		  {
-            dfPlayer.playTrack(returnValue, 1);
-          } 
-		  else 
-		  {
-            dfPlayer.playTrack(previewFromFolder, returnValue);
-          }
-          delay(1000);
-        }
-      }
-    }
-
-    if (previousButton.pressedFor(LONG_PRESS)) 
-    {
-      returnValue = max(returnValue - 10, 1);
-      Serial.println(returnValue);
-      dfPlayer.playMP3AndWait(messageOffset + returnValue);
-      ignorePreviousButton = true;
-    } 
-	else if (previousButton.wasReleased()) 
-    {
-      if (ignorePreviousButton) 
-      {
-        ignorePreviousButton = false; 
-      } 
-      else 
-      {
-        returnValue = max(returnValue - 1, 1);
-        Serial.println(returnValue);
-        dfPlayer.playMP3AndWait(messageOffset + returnValue);
-        if (preview) 
+                  bool preview = false, int previewFromFolder = 0, int defaultValue = 0, bool exitWithLongPress = false) 
+{
+	uint8_t returnValue = defaultValue;
+	if (startMessage != 0)
+	{
+		dfPlayer.playMp3Track(startMessage);
+	}
+	Serial.print(F("=== voiceMenu() ("));
+	Serial.print(numberOfOptions);
+	Serial.println(F(" Options)"));
+	bool valueChanged;
+	bool longPressed;
+	do 
+	{
+		valueChanged = false;
+		longPressed = false;
+		// Support for input via console
+		if (Serial.available() > 0) 
 		{
-          if (previewFromFolder == 0) 
-		  {
-            dfPlayer.playTrack(returnValue, 1);
-          }
-          else 
-		  {
-            dfPlayer.playTrack(previewFromFolder, returnValue);
-          }
-          delay(1000);
-        }
-      }
-    }
-  } while (true);
+			int optionSerial = Serial.parseInt();
+			if (optionSerial != 0 && optionSerial <= numberOfOptions)
+			{
+				return optionSerial;
+			}
+		}
+		
+		readButtons();
+		dfPlayer.loop();
+		if (pauseButton.pressedFor(LONG_PRESS)) 
+		{
+			dfPlayer.playMp3Track(802);
+			ignorePauseButton = true;
+			checkStandbyAtMillis();
+			return defaultValue;
+		}
+		if (pauseButton.wasReleased()) 
+		{
+			if (returnValue != 0) 
+			{
+				Serial.print(F("=== "));
+				Serial.print(returnValue);
+				Serial.println(F(" ==="));
+				return returnValue;
+			}
+			delay(1000);
+		}
+
+		if (nextButton.pressedFor(LONG_PRESS)) 
+		{
+			returnValue = min(returnValue + 10, numberOfOptions);
+			longPressed = true;
+			ignoreNextButton = true;
+		} 
+		else if (nextButton.wasReleased()) 
+		{
+			if (ignoreNextButton) 
+			{
+				ignoreNextButton = false;
+			} 
+			else 
+			{
+				returnValue = min(returnValue + 1, numberOfOptions);
+				valueChanged = true;
+			}
+		}
+
+		if (previousButton.pressedFor(LONG_PRESS)) 
+		{
+			returnValue = max(returnValue - 10, 1);
+			longPressed = true;
+			ignorePreviousButton = true;
+		} 
+		else if (previousButton.wasReleased()) 
+		{
+			if (ignorePreviousButton) 
+			{
+				ignorePreviousButton = false; 
+			} 
+			else 
+			{
+				returnValue = max(returnValue - 1, 1);
+				valueChanged = true;
+			}
+		}
+		if (valueChanged)
+		{
+			Serial.println(returnValue);
+			dfPlayer.playMP3AndWait(messageOffset + returnValue);
+			if (preview && !longPressed) 
+			{
+				if (previewFromFolder == 0) 
+				{
+					dfPlayer.playTrack(returnValue, 1);
+				}
+				else 
+				{
+					dfPlayer.playTrack(previewFromFolder, returnValue);
+				}
+				delay(1000);
+			}
+		}
+	} while (true);
 }
 
 void resetCard() {
@@ -615,13 +601,6 @@ bool setupFolder(MusicDataset * musicDS)
   if (mode == 4)
   {
     musicDS->special = voiceMenu(numberOptions, 320, 0, true, musicDS->folder);
-  }
-  // Admin Funktionen
-  if (mode == 6) 
-  {
-    //musicDS->special = voiceMenu(3, 320, 320);
-    musicDS->folder = 0;
-    mode = 255;
   }
   // Spezialmodus Von-Bis
   if (mode == 7 || mode == 8 || mode == 9) 
