@@ -14,7 +14,6 @@ void TonuinoPotentiometer::setup(int potiPin, int minScale, int maxScale)
 	pin = potiPin;
 	min = minScale;
 	max = maxScale;
-	appliedValue = min;
 	pinMode(pin, INPUT_PULLUP);
 }
 
@@ -25,7 +24,8 @@ bool TonuinoPotentiometer::read()
 	lastValue = value;
 	
     if (valueRaw < 1023 && // ignore highest raw value, as it might occur occasionally
-	   ((value > appliedValue + hysterese && value <= max) // Compare current value with last incl. hysterese
+	   (appliedValue == 0 // for first call
+	     || (value > appliedValue + hysterese && value <= max) // Compare current value with last incl. hysterese
          || (value < appliedValue - hysterese && value >= min)))  
     {
 		Serial.print("Potentiometer Value: ");

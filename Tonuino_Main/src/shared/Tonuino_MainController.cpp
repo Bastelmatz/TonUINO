@@ -374,9 +374,9 @@ void checkUltraSonic()
 		return;
 	}
 	
-	//delay(5); 
+	delay(5); // not necessary
 	digitalWrite(PIN_SonicTrigger, HIGH); 
-	//delay(10);
+	delay(10); // not necessary
 	digitalWrite(PIN_SonicTrigger, LOW);
 	sonic_duration = pulseIn(PIN_SonicEcho, HIGH); 
 	sonic_distance = (sonic_duration/2) * 0.3432; //mm
