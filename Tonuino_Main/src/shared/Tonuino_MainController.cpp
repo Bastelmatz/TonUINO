@@ -651,15 +651,17 @@ void setupCard()
 
 void handleModifier(EModifier modifier, uint8_t special)
 {
+	bool toggle = special == 2;
+	bool bValue = special == 1;
 	switch (modifier)
 	{
 		case MODI_LockAll:
 		{
-			allLocked = !allLocked;
+			allLocked = toggle ? !allLocked : bValue;
 		}
 		case MODI_LockButtons:
 		{
-			buttonsLocked = !buttonsLocked;
+			buttonsLocked = toggle ? !buttonsLocked : bValue;
 		}
 		case MODI_ResetCard:
 		{
@@ -675,17 +677,21 @@ void handleModifier(EModifier modifier, uint8_t special)
 		{
 			setSleepTimerValue(special);
 		}
+		case MODI_Player_Random:
+		{
+			tonuinoPlayer().playRandom = toggle ? !tonuinoPlayer().playRandom : bValue;
+		}
 		case MODI_Player_RepeatSingle:
 		{
-			tonuinoPlayer().useSingleRepetition = !tonuinoPlayer().useSingleRepetition;
+			tonuinoPlayer().singleRepetition = toggle ? !tonuinoPlayer().singleRepetition : bValue;
 		}
 		case MODI_Player_ListenToEnd:
 		{
-			dfPlayer.listenUntilTrackEnds = !dfPlayer.listenUntilTrackEnds;
+			dfPlayer.listenUntilTrackEnds = toggle ? !dfPlayer.listenUntilTrackEnds : bValue;
 		}
 		case MODI_Player_FreezeDance:
 		{
-			dfPlayer.freezeDance_active = !dfPlayer.freezeDance_active;
+			dfPlayer.freezeDance_active = toggle ? !dfPlayer.freezeDance_active : bValue;
 		}
 	}
 }

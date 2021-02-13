@@ -36,8 +36,11 @@ class TonuinoPlayer
 	static TonuinoTimer standbyTimer;
 	
 	static bool isPlaying;
-	static bool useSingleRepetition;
-		
+	static bool singleRepetition;
+	static bool playRandom;
+	static bool useQueue;
+	static bool singleTrack;
+	
 	uint8_t currentTrack();
 	uint8_t currentTrackInRange();
 	static bool currentTrackStarted;
@@ -64,10 +67,6 @@ class TonuinoPlayer
 	static long standbyTimeInMin;
 
 	uint8_t allTracksCount();
-	bool useSection();
-	bool useRandomSingle();
-	bool useRandomQueue();
-	bool useSingleTrack();
 	static bool reShuffleOnEnd;
 	static bool goToTrackOnPause;
 	
