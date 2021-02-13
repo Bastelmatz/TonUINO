@@ -193,7 +193,7 @@ void TonuinoDFPlayer::waitForTrackToFinish()
 	{
 		mp3.loop();
 	} while (!isPlaying() && millis() < currentTime + TIMEOUT);
-	delay(1000);
+	delay(500);
 	// now wait until the player is not busy anymore
 	do 
 	{
@@ -206,7 +206,7 @@ void TonuinoDFPlayer::playAdvertisement(int advertisement)
 	if (isPlaying()) 
 	{
 		mp3.playAdvertisement(advertisement);
-		delay(1500);
+		waitForTrackToFinish();
 	}
 	else 
 	{
@@ -215,6 +215,7 @@ void TonuinoDFPlayer::playAdvertisement(int advertisement)
 		mp3.playAdvertisement(advertisement);
 		delay(100);
 		mp3.pause();
+		delay(1000);
 	}
 }
 

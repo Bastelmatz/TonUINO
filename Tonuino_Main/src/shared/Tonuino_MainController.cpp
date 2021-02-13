@@ -252,7 +252,6 @@ void setupTonuino(TonuinoConfig config)
 
   // play startup sound
   dfPlayer.playAdvertisement(261);
-  delay(1000);
    
   // load last folder 
   loadFolder(lastMusicDS);
