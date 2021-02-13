@@ -177,7 +177,7 @@ void TonuinoDFPlayer::trackFinished()
 {
 	mp3.pause();
 	tonuinoPlayer.trackFinished();
-
+	delay(1000);
 	if (tonuinoPlayer.isPlaying && musicDSLoaded)
 	{
 		nextTrack();

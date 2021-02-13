@@ -68,7 +68,6 @@ class TonuinoPlayer
 
 	uint8_t allTracksCount();
 	static bool reShuffleOnEnd;
-	static bool goToTrackOnPause;
 	
 	void showTimerInfo();
 	void shuffleQueue();

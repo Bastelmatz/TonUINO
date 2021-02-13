@@ -54,7 +54,6 @@ bool TonuinoPlayer::singleTrack = false;
 
 bool TonuinoPlayer::reShuffleOnEnd = true;
 bool TonuinoPlayer::singleRepetition = false;
-bool TonuinoPlayer::goToTrackOnPause = false;
 
 // *********************************
 
@@ -175,12 +174,6 @@ bool TonuinoPlayer::goToTrack(bool next)
 	if (singleRepetition)
 	{
 		return true;
-	}
-	
-	// go to next only while playing
-	if (!goToTrackOnPause && !isPlaying)
-	{
-		return false;
 	}
 	
 	if (singleTrack) 
