@@ -19,6 +19,14 @@ typedef enum EPlayerMode
 	Section_Audiobook = 10
 };
 
+typedef enum ETRACKDIRECTION
+{
+	TRACKDIR_Next = 1, 	
+	TRACKDIR_Previous = 2,
+	TRACKDIR_First = 3,
+	TRACKDIR_Last = 4,
+};
+
 class TonuinoTimer
 {
 	public:
@@ -40,6 +48,7 @@ class TonuinoPlayer
 	static bool playRandom;
 	static bool useQueue;
 	static bool singleTrack;
+	static bool listenUntilTrackEnds;
 	
 	uint8_t currentTrack();
 	uint8_t currentTrackInRange();
@@ -50,8 +59,7 @@ class TonuinoPlayer
 	void pauseAndStandBy();
 	void trackFinished();
 	
-	bool goToNextTrack();
-	bool goToPreviousTrack();
+	bool goToTrack(int trackDir);
 	
 	void loadFolder(uint8_t numTracks, uint8_t folderMode, uint8_t startTrack, uint8_t endTrack, uint8_t lastTrack);
 	

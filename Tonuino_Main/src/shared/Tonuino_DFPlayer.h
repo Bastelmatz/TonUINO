@@ -18,7 +18,6 @@ class TonuinoDFPlayer
 	static uint8_t volumeMin;
 	static uint8_t volumeMax;
 	static bool musicDSLoaded;
-	static bool listenUntilTrackEnds;
 	static bool freezeDance_active;
 			
 	void setup();
@@ -28,8 +27,11 @@ class TonuinoDFPlayer
 	void continueTitle();
 	void pauseAndStandBy();
 	void togglePlay();
+	void goToTrack(int trackDir);
 	void nextTrack();
 	void previousTrack();
+	void firstTrack();
+	void lastTrack();
 	void waitForTrackToFinish();
 	void playAdvertisement(int advertisement);
 	void playMP3AndWait(uint16_t track);

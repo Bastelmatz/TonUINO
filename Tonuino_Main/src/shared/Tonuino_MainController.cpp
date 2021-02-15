@@ -260,55 +260,64 @@ void handleButtons()
 	// Buttons werden nun über JS_Button gehandelt, dadurch kann jede Taste doppelt belegt werden
 	int buttonState = tonuinoButtons.read();	
 	bool isCurrentlyPlaying = dfPlayer.isPlaying();
-	switch (buttonState)
+	if (buttonState == BUTTONCLICK_StartStop)
 	{
-		case BUTTONCLICK_StartStop: 
+		dfPlayer.togglePlay();
+	}
+	if (buttonState == BUTTONCLICK_LONG_StartStop)
+	{
+		if (isCurrentlyPlaying) 
 		{
-			dfPlayer.togglePlay();
-			break;
+			uint8_t advertTrack = tonuinoPlayer().currentTrackInRange();
+			dfPlayer.playAdvertisement(advertTrack);
 		}
-		case BUTTONCLICK_LONG_StartStop:
+		else 
 		{
-			if (isCurrentlyPlaying) 
-			{
-				uint8_t advertTrack = tonuinoPlayer().currentTrackInRange();
-				dfPlayer.playAdvertisement(advertTrack);
-			}
-			else 
-			{
-				playShortCut(0);
-			}
-			break;
+			playShortCut(0);
 		}
-		case BUTTONCLICK_Next:
+	}
+	if (buttonState == BUTTONCLICK_Next)
+	{
+		if (isCurrentlyPlaying) 
 		{
-			if (!dfPlayer.listenUntilTrackEnds)
-			{
-				if (isCurrentlyPlaying) 
-				{
-					dfPlayer.nextTrack();
-				}
-				else 
-				{
-					playShortCut(1);
-				}
-			}
-			break;
+			dfPlayer.nextTrack();
 		}
-		case BUTTONCLICK_Previous:
+		else 
 		{
-			if (!dfPlayer.listenUntilTrackEnds)
-			{
-				if (isCurrentlyPlaying) 
-				{
-					dfPlayer.previousTrack();
-				}
-				else 
-				{
-					playShortCut(2);
-				}
-			}
-			break;
+			playShortCut(1);
+		}
+	}
+	if (buttonState == BUTTONCLICK_LONG_Next)
+	{
+		if (isCurrentlyPlaying) 
+		{
+			dfPlayer.lastTrack();
+		}
+		else 
+		{
+			playShortCut(1);
+		}
+	}
+	if (buttonState == BUTTONCLICK_Previous)
+	{
+		if (isCurrentlyPlaying) 
+		{
+			dfPlayer.previousTrack();
+		}
+		else 
+		{
+			playShortCut(2);
+		}
+	}
+	if (buttonState == BUTTONCLICK_LONG_Previous)
+	{
+		if (isCurrentlyPlaying) 
+		{
+			dfPlayer.firstTrack();
+		}
+		else 
+		{
+			playShortCut(2);
 		}
 	}
 }
@@ -628,7 +637,7 @@ void handleModifier(EModifier modifier, uint8_t special)
 		}
 		case MODI_Player_ListenToEnd:
 		{
-			dfPlayer.listenUntilTrackEnds = toggle ? !dfPlayer.listenUntilTrackEnds : bValue;
+			tonuinoPlayer().listenUntilTrackEnds = toggle ? !tonuinoPlayer().listenUntilTrackEnds : bValue;
 		}
 		case MODI_Player_FreezeDance:
 		{

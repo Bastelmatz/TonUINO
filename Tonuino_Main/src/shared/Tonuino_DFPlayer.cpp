@@ -17,7 +17,6 @@ MusicDataset TonuinoDFPlayer::musicDS;
 bool TonuinoDFPlayer::musicDSLoaded = false;
 bool TonuinoDFPlayer::newMusisDS = false;
 bool TonuinoDFPlayer::feedbackOnVolumeChange = false;
-bool TonuinoDFPlayer::listenUntilTrackEnds = false;
 
 bool TonuinoDFPlayer::freezeDance_active = false;
 unsigned long TonuinoDFPlayer::freezeDance_nextStopAtMillis = 0;
@@ -174,6 +173,14 @@ void TonuinoDFPlayer::togglePlay()
 	}
 }
 
+void TonuinoDFPlayer::goToTrack(int trackDir)
+{
+	if (tonuinoPlayer.goToTrack(trackDir))
+	{
+		playCurrentTrack();
+	}
+}
+
 void TonuinoDFPlayer::nextTrack() 
 {
 	if (newMusisDS)
@@ -182,19 +189,23 @@ void TonuinoDFPlayer::nextTrack()
 	}
 	else
 	{
-		if (tonuinoPlayer.goToNextTrack())
-		{
-			playCurrentTrack();
-		}
+		goToTrack(TRACKDIR_Next);
 	}
 }
 
 void TonuinoDFPlayer::previousTrack()
 {
-	if (tonuinoPlayer.goToPreviousTrack())
-	{
-		playCurrentTrack();
-	}
+	goToTrack(TRACKDIR_Previous);
+}
+
+void TonuinoDFPlayer::firstTrack()
+{
+	goToTrack(TRACKDIR_First);
+}
+
+void TonuinoDFPlayer::lastTrack()
+{
+	goToTrack(TRACKDIR_Last);
 }
 
 void TonuinoDFPlayer::trackFinished()

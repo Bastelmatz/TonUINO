@@ -54,6 +54,7 @@ bool TonuinoPlayer::singleTrack = false;
 
 bool TonuinoPlayer::reShuffleOnEnd = true;
 bool TonuinoPlayer::singleRepetition = false;
+bool TonuinoPlayer::listenUntilTrackEnds = false;
 
 // *********************************
 
@@ -154,19 +155,19 @@ void TonuinoPlayer::trackFinished()
 	}
 }
 
-bool TonuinoPlayer::goToNextTrack() 
+bool TonuinoPlayer::goToTrack(int trackDirection) 
 {
-	return goToTrack(true);
-}
-
-bool TonuinoPlayer::goToPreviousTrack() 
-{
-	return goToTrack(false);
-}
-
-bool TonuinoPlayer::goToTrack(bool next) 
-{
+	if (currentTrackStarted && !currentTrackFinished && listenUntilTrackEnds)
+	{
+		return false;
+	}
+		
 	currentTrackStarted = false;
+	
+	bool next = trackDirection == TRACKDIR_Next;
+	bool previous = trackDirection == TRACKDIR_Previous;
+	bool first = trackDirection == TRACKDIR_First;
+	bool last = trackDirection == TRACKDIR_Last;
 	
 	// repeat current track
 	if (singleRepetition)
@@ -190,7 +191,6 @@ bool TonuinoPlayer::goToTrack(bool next)
 			{
 				if (currentTrackIndex < allTracksCount()) 
 				{
-					Serial.println(F("Weiter in der Queue"));
 					currentTrackIndex++;
 				} 
 				else 
@@ -204,11 +204,10 @@ bool TonuinoPlayer::goToTrack(bool next)
 					}
 				}
 			}
-			else
+			if (previous)
 			{
 				if (currentTrackIndex > 1) 
 				{
-					Serial.println(F("Zurück in der Queue"));
 					currentTrackIndex--;
 				}
 				else
@@ -216,6 +215,14 @@ bool TonuinoPlayer::goToTrack(bool next)
 					Serial.println(F("Anfang der Queue -> springe ans Ende"));
 					currentTrackIndex = allTracksCount();
 				}
+			}
+			if (first)
+			{
+				currentTrackIndex = 1;
+			}
+			if (last)
+			{
+				currentTrackIndex = allTracksCount();
 			}
 		}
 		else // fixed numerical order
@@ -231,7 +238,7 @@ bool TonuinoPlayer::goToTrack(bool next)
 					currentTrackIndex = firstTrack;
 				}
 			}
-			else
+			if (previous)
 			{
 				if (currentTrackIndex > firstTrack) 
 				{
@@ -241,6 +248,14 @@ bool TonuinoPlayer::goToTrack(bool next)
 				{
 					currentTrackIndex = endTrack;
 				}
+			}
+			if (first)
+			{
+				currentTrackIndex = firstTrack;
+			}
+			if (last)
+			{
+				currentTrackIndex = endTrack;
 			}
 		}
 	}
