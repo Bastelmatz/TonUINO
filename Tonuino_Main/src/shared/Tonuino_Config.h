@@ -25,7 +25,7 @@ class TonuinoConfig
 
 	bool StopPlayOnCardRemoval = false;
 
-	MusicDataset StartMusicDS;
+	MusicDataset StartMusicDS { 0, 0, 0, 0 };
 	MusicDataset ShortCuts[4];
 };
   
