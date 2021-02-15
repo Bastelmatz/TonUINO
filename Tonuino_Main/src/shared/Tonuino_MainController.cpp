@@ -172,78 +172,81 @@ void playShortCut(uint8_t shortCut)
 
 void setupTonuino(TonuinoConfig config) 
 {
-  mainConfig = config;
-  Serial.begin(115200); // Es gibt ein paar Debug Ausgaben über die serielle Schnittstelle
+	mainConfig = config;
+	Serial.begin(115200); // Es gibt ein paar Debug Ausgaben über die serielle Schnittstelle
 
-  // Wert für randomSeed() erzeugen durch das mehrfache Sammeln von rauschenden LSBs eines offenen Analogeingangs
-  uint32_t ADC_LSB;
-  uint32_t ADCSeed;
-  for (uint8_t i = 0; i < 128; i++) 
-  {
-    ADC_LSB = analogRead(PIN_OpenAnalog) & 0x1;
-    ADCSeed ^= ADC_LSB << (i % 32);
-  }
-  randomSeed(ADCSeed); // Zufallsgenerator initialisieren
+	// Wert für randomSeed() erzeugen durch das mehrfache Sammeln von rauschenden LSBs eines offenen Analogeingangs
+	uint32_t ADC_LSB;
+	uint32_t ADCSeed;
+	for (uint8_t i = 0; i < 128; i++) 
+	{
+		ADC_LSB = analogRead(PIN_OpenAnalog) & 0x1;
+		ADCSeed ^= ADC_LSB << (i % 32);
+	}
+	randomSeed(ADCSeed); // Zufallsgenerator initialisieren
 
-  // Dieser Hinweis darf nicht entfernt werden
-  Serial.println(F("\n _____         _____ _____ _____ _____"));
-  Serial.println(F("|_   _|___ ___|  |  |     |   | |     |"));
-  Serial.println(F("  | | | . |   |  |  |-   -| | | |  |  |"));
-  Serial.println(F("  |_| |___|_|_|_____|_____|_|___|_____|\n"));
-  Serial.println(F("TonUINO MIRA Version 1.0.0"));
-  Serial.println(F("created by Bastelmatz."));
+	// Dieser Hinweis darf nicht entfernt werden
+	Serial.println(F("\n _____         _____ _____ _____ _____"));
+	Serial.println(F("|_   _|___ ___|  |  |     |   | |     |"));
+	Serial.println(F("  | | | . |   |  |  |-   -| | | |  |  |"));
+	Serial.println(F("  |_| |___|_|_|_____|_____|_|___|_____|\n"));
+	Serial.println(F("TonUINO MIRA Version 1.0.0"));
+	Serial.println(F("created by Bastelmatz."));
 
-  // load data from EEPROM
-  loadDataFromFlash();
-  
-  // DFPlayer Mini initialisieren
-  dfPlayer.setup();
-  
-  // set settings
-  dfPlayer.volumeMin = mainConfig.VolumeMin;
-  dfPlayer.volumeMax = mainConfig.VolumeMax;
-  dfPlayer.setVolume(mainConfig.VolumeInit);
-  dfPlayer.setEqualizer(mainConfig.Equalizer);
-  setStandbyTimerValue(0);
-  setSleepTimerValue(0);
+	// load data from EEPROM
+	loadDataFromFlash();
 
-  // NFC Leser initialisieren
-  if (mainConfig.UseCardReader)
-  {
-	tonuinoRFID.setupRFID();
-  }
+	// DFPlayer Mini initialisieren
+	dfPlayer.setup();
 
-  if (mainConfig.HasPotentiometer)
-  {
-	tonuinoPoti.setup(PIN_Poti, mainConfig.VolumeMin, mainConfig.VolumeMax); 
+	// set settings
+	dfPlayer.volumeMin = mainConfig.VolumeMin;
+	dfPlayer.volumeMax = mainConfig.VolumeMax;
+	dfPlayer.setVolume(mainConfig.VolumeInit);
+	dfPlayer.setEqualizer(mainConfig.Equalizer);
+	setStandbyTimerValue(0);
+	setSleepTimerValue(0);
+
+	// NFC Leser initialisieren
+	if (mainConfig.UseCardReader)
+	{
+		tonuinoRFID.setupRFID();
+	}
+
+	if (mainConfig.HasPotentiometer)
+	{
+		tonuinoPoti.setup(PIN_Poti, mainConfig.VolumeMin, mainConfig.VolumeMax); 
+	}
 	
-	pinMode(PIN_SonicTrigger, OUTPUT); 
-	pinMode(PIN_SonicEcho, INPUT); 
-	digitalWrite(PIN_SonicTrigger, LOW); 
-  }
+	if (mainConfig.HasUltraSonic)
+	{
+		pinMode(PIN_SonicTrigger, OUTPUT); 
+		pinMode(PIN_SonicEcho, INPUT); 
+		digitalWrite(PIN_SonicTrigger, LOW); 
+	}
 
 	tonuinoButtons.setup(PIN_ButtonPause, PIN_ButtonNext, PIN_ButtonPrevious);
 
-  pinMode(PIN_StopLED, OUTPUT);
-  
-  if (mainConfig.UsePowerOff)
-  {
-	pinMode(PIN_Shutdown, OUTPUT);
-	digitalWrite(PIN_Shutdown, LOW);
-  }
+	pinMode(PIN_StopLED, OUTPUT);
 
-  // RESET --- ALLE DREI KNÖPFE BEIM STARTEN GEDRÜCKT HALTEN -> alle EINSTELLUNGEN werden gelöscht
-  if (tonuinoButtons.readRaw() == BUTTONDOWN_All) 
-  {
-    tonuinoEEPROM.resetEEPROM();
-    loadDataFromFlash();
-  }
+	if (mainConfig.UsePowerOff)
+	{
+		pinMode(PIN_Shutdown, OUTPUT);
+		digitalWrite(PIN_Shutdown, LOW);
+	}
 
-  // play startup sound
-  dfPlayer.playAdvertisement(261);
-   
-  // load last folder 
-  loadFolder(lastMusicDS);
+	// RESET --- ALLE DREI KNÖPFE BEIM STARTEN GEDRÜCKT HALTEN -> alle EINSTELLUNGEN werden gelöscht
+	if (tonuinoButtons.readRaw() == BUTTONDOWN_All) 
+	{
+		tonuinoEEPROM.resetEEPROM();
+		loadDataFromFlash();
+	}
+
+	// play startup sound
+	dfPlayer.playAdvertisement(261);
+
+	// load last folder 
+	loadFolder(lastMusicDS);
 }
 
 void handleButtons()
@@ -314,31 +317,22 @@ void handleButtons()
 
 void handleCardReader()
 {
-	// poll card only every 100ms
-	static uint8_t lastCardPoll = 0;
-	uint8_t now = millis();
+	byte pollCardResult = tonuinoRFID.tryPollCard();
 
-	if (static_cast<uint8_t>(now - lastCardPoll) > 100)
+	if (pollCardResult == MODIFIERCARD_NEW)
 	{
-		lastCardPoll = now;
-
-		byte pollCardResult = tonuinoRFID.tryPollCard();
-
-		if (pollCardResult == MODIFIERCARD_NEW)
-		{
-			evaluateModifierData(tonuinoRFID.readCardData.musicDS);
-		}
-		if (allLocked)
-		{
-			return;
-		}
-		switch (pollCardResult)
-		{
-			case MUSICCARD_NEW: onNewCard(); break;
-			case ALLCARDS_GONE: onCardGone(); break;
-			case MUSICCARD_IS_BACK:	onCardReturn(); break;
-		}    
+		evaluateModifierData(tonuinoRFID.readCardData.musicDS);
 	}
+	if (allLocked)
+	{
+		return;
+	}
+	switch (pollCardResult)
+	{
+		case MUSICCARD_NEW: onNewCard(); break;
+		case ALLCARDS_GONE: onCardGone(); break;
+		case MUSICCARD_IS_BACK:	onCardReturn(); break;
+	}    
 }
 
 bool m_lastPlayState = true;
