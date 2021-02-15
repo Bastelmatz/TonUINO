@@ -473,19 +473,18 @@ uint8_t voiceMenu(int numberOfOptions, int startMessage, int messageOffset,
 		longPressed = false;
 		int buttonState = tonuinoButtons.read();
 		dfPlayer.loop();
+		checkStandbyAtMillis();
 		if (buttonState == BUTTONCLICK_LONG_StartStop) 
 		{
 			dfPlayer.playMp3Track(802);
-			checkStandbyAtMillis();
 			return defaultValue;
 		}
 		if (buttonState == BUTTONCLICK_StartStop) 
 		{
 			if (returnValue != 0) 
 			{
-				Serial.print(F("=== "));
-				Serial.print(returnValue);
-				Serial.println(F(" ==="));
+				Serial.print("Use option ");
+				Serial.println(returnValue);
 				return returnValue;
 			}
 			delay(1000);
@@ -528,21 +527,23 @@ uint8_t voiceMenu(int numberOfOptions, int startMessage, int messageOffset,
 				{
 					dfPlayer.playTrack(previewFromFolder, returnValue);
 				}
-				delay(1000);
 			}
 		}
 	} while (true);
 }
 
-void resetCard() {
-  dfPlayer.playMp3Track(800);
-  waitForNewCard();
+void resetCard() 
+{
+	dfPlayer.playMp3Track(800);
+	waitForNewCard();
 
-  if (!tonuinoRFID.cardSerialFound())
-    return;
+	if (!tonuinoRFID.cardSerialFound())
+	{
+		return;
+	}
 
-  Serial.print(F("Karte wird neu konfiguriert!"));
-  setupCard();
+	Serial.print(F("Karte wird neu konfiguriert!"));
+	setupCard();
 }
 
 bool setupFolder(MusicDataset * musicDS) 

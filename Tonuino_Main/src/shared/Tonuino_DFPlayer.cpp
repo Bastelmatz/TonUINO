@@ -6,6 +6,9 @@ SoftwareSerial mySoftwareSerial(2, 3); // RX, TX
 
 TonuinoPlayer TonuinoDFPlayer::tonuinoPlayer;
 
+uint8_t TonuinoDFPlayer::activeFolder = 0;
+uint16_t TonuinoDFPlayer::activeTrack = 0;
+
 uint8_t TonuinoDFPlayer::volume = 0;
 uint8_t TonuinoDFPlayer::volumeMin = 0;
 uint8_t TonuinoDFPlayer::volumeMax = 25;
@@ -26,8 +29,7 @@ class Mp3Notify {
   public:
     static void OnError(uint16_t errorCode) {
       // see DfMp3_Error for code meaning
-      Serial.println();
-      Serial.print("Com Error ");
+      Serial.print("DFPlayer Com Error ");
       Serial.println(errorCode);
     }
     static void PrintlnSourceAction(DfMp3_PlaySources source, const char* action) {
@@ -70,21 +72,39 @@ bool TonuinoDFPlayer::isPlaying()
 	return !digitalRead(busyPin);
 }
 
+void TonuinoDFPlayer::playMp3Track(uint16_t track)
+{
+	Serial.print(F("Play MP3 "));
+	Serial.println(track);
+	activeFolder = 0;
+	activeTrack = track;
+	mp3.playMp3FolderTrack(track);
+}
+
 void TonuinoDFPlayer::playMP3AndWait(uint16_t track)
 {
-	mp3.playMp3FolderTrack(track);
+	playMp3Track(track);
 	waitForTrackToFinish();
+}
+
+void TonuinoDFPlayer::playTrack(uint8_t folder, uint8_t track)
+{
+	Serial.print(F("Play track "));
+	Serial.print(track);
+	Serial.print(F(" from folder "));
+	Serial.println(folder);
+	activeFolder = folder;
+	activeTrack = track;
+	mp3.playFolderTrack(folder, track);
+	delay(1000);
 }
 
 void TonuinoDFPlayer::playTrack(uint8_t track)
 {
 	if (track > 0)
 	{ 
-		Serial.print(F("Play track: "));
-		Serial.println(track);
-		mp3.playFolderTrack(musicDS.folder, track);
+		playTrack(musicDS.folder, track);
 		tonuinoPlayer.playTitle();
-		delay(1000);
 		newMusisDS = false;
 	}
 }
@@ -179,9 +199,25 @@ void TonuinoDFPlayer::previousTrack()
 
 void TonuinoDFPlayer::trackFinished()
 {
-	mp3.pause();
+	Serial.print("Finished track ");
+	Serial.print(activeTrack);
+	Serial.print(" in folder ");
+	if (activeFolder > 0)
+	{
+		Serial.println(activeFolder);
+	}
+	else
+	{
+		Serial.println("MP3");
+	}
+
+	if (isPlaying())
+	{
+		mp3.pause();
+		delay(1000);
+	}
 	tonuinoPlayer.trackFinished();
-	delay(1000);
+	
 	if (tonuinoPlayer.isPlaying && musicDSLoaded)
 	{
 		nextTrack();
@@ -197,7 +233,7 @@ void TonuinoDFPlayer::waitForTrackToFinish()
 	{
 		mp3.loop();
 	} while (!isPlaying() && millis() < currentTime + TIMEOUT);
-	delay(500);
+	delay(1000);
 	// now wait until the player is not busy anymore
 	do 
 	{
@@ -207,6 +243,8 @@ void TonuinoDFPlayer::waitForTrackToFinish()
 
 void TonuinoDFPlayer::playAdvertisement(int advertisement)
 {
+	Serial.print("Play advertisement ");
+	Serial.println(advertisement);
 	if (isPlaying()) 
 	{
 		mp3.playAdvertisement(advertisement);
@@ -215,7 +253,6 @@ void TonuinoDFPlayer::playAdvertisement(int advertisement)
 	else 
 	{
 		mp3.start();
-		delay(100);
 		mp3.playAdvertisement(advertisement);
 		delay(100);
 		mp3.pause();
@@ -296,21 +333,12 @@ void TonuinoDFPlayer::loop()
 void TonuinoDFPlayer::pause()
 {
 	mp3.pause();
+	tonuinoPlayer.pauseAndStandBy();
 }
 
 void TonuinoDFPlayer::sleep()
 {
 	mp3.sleep();
-}
-
-void TonuinoDFPlayer::playTrack(uint8_t folder, uint8_t track)
-{
-	mp3.playFolderTrack(folder, track);
-}
-
-void TonuinoDFPlayer::playMp3Track(uint16_t track)
-{
-	mp3.playMp3FolderTrack(track);
 }
 
 uint16_t TonuinoDFPlayer::getFolderTrackCount(uint16_t folder)

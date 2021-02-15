@@ -50,7 +50,9 @@ class TonuinoDFPlayer
 	void setFreezeDance(bool active);
 	
 	private:
-	static 	bool newMusisDS;
+	static uint8_t activeFolder;
+	static uint16_t activeTrack;
+	static bool newMusisDS;
 	static bool feedbackOnVolumeChange;
 	static unsigned long freezeDance_nextStopAtMillis;
 

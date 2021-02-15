@@ -139,8 +139,6 @@ void TonuinoPlayer::pauseAndStandBy()
 
 void TonuinoPlayer::trackFinished()
 {
-	Serial.print("Track finished: ");
-	Serial.println(currentTrack());
 	currentTrackFinished = true;
 	
 	// repeat current track
