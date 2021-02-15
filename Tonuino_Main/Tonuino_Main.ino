@@ -43,3 +43,23 @@ void loop()
 }
 
 #endif
+
+// ******************************************
+//  Tonuino Mira Coinbox
+// ******************************************
+
+#ifdef TONUINO_MIRA_COINBOX
+
+#include "src/Tonuino_Mira_Coinbox.h";
+
+void setup()
+{
+  setupMira();
+}
+
+void loop()
+{
+  loopMira();
+}
+
+#endif

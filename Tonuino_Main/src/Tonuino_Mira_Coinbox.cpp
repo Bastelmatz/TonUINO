@@ -1,9 +1,9 @@
 
 #include "Tonuino_Defines_Tools.h"
 
-#ifdef TONUINO_MIRA
+#ifdef TONUINO_MIRA_COINBOX
 
-#include "Tonuino_Mira.h"
+#include "Tonuino_Mira_Coinbox.h"
 #include "shared/Tonuino_Config.h"
 #include "shared/Tonuino_MainController.h"
 
@@ -11,11 +11,12 @@ TonuinoConfig getConfigMira()
 {
 	TonuinoConfig config;
 	
+	config.UseCardReader = false;
 	config.HasPotentiometer = true;
-	// reduce volume for stereo amplifier
-	config.VolumeMax = 10;
+	config.HasUltraSonic = true;
 	
-	config.StopPlayOnCardRemoval = false;
+	config.StartMusicDS.folder = 10;
+	config.StartMusicDS.mode = 1;
 	
 	return config;
 }
