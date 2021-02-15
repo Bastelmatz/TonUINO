@@ -6,12 +6,11 @@ class TonuinoPotentiometer
 	public:
 	void setup(int pin, int min, int max);
 	bool read();
-	static int appliedValue; 
+	int appliedValue = 0; 
 	
 	private:
-	static int pin;
-	static int min;
-	static int max;
-	static int lastValue; 
-	static int hysterese;
+	int pin = 0;
+	int min = 0;
+	int max = 0;
+	int hysterese = 1;
 };
