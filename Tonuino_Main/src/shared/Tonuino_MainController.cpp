@@ -44,7 +44,7 @@ TonuinoPlayer tonuinoPlayer()
 	return dfPlayer.tonuinoPlayer;
 }
 
-void loadDataFromFlash()
+void loadStartFolder()
 {
 	if (mainConfig.StartMusicDS.folder == 0)
 	{
@@ -193,8 +193,6 @@ void setupTonuino(TonuinoConfig config)
 	Serial.println(F("TonUINO MIRA Version 1.0.0"));
 	Serial.println(F("created by Bastelmatz."));
 
-	// load data from EEPROM
-	loadDataFromFlash();
 
 	// DFPlayer Mini initialisieren
 	dfPlayer.setup();
@@ -239,13 +237,13 @@ void setupTonuino(TonuinoConfig config)
 	if (tonuinoButtons.readRaw() == BUTTONDOWN_All) 
 	{
 		tonuinoEEPROM.resetEEPROM();
-		loadDataFromFlash();
 	}
 
 	// play startup sound
 	dfPlayer.playAdvertisement(261);
 
 	// load last folder 
+	loadStartFolder();
 	loadFolder(lastMusicDS);
 }
 

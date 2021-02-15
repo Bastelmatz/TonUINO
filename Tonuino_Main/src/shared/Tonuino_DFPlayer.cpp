@@ -103,7 +103,11 @@ void TonuinoDFPlayer::loadFolder(MusicDataset dataset, uint8_t lastTrack)
 	{
 		lastTrack = 1;
 	}
-	Serial.println(musicDS.folder);
+
+	Serial.print("Load folder ");
+	Serial.print(musicDS.folder);
+	Serial.print(" with mode ");
+	Serial.println(musicDS.mode);
 	tonuinoPlayer.loadFolder(numTracks, musicDS.mode, musicDS.special, musicDS.special2, lastTrack);
 	musicDSLoaded = true;
 	newMusisDS = true;
