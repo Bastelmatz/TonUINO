@@ -14,6 +14,7 @@ void TonuinoPotentiometer::setup(int potiPin, int minScale, int maxScale)
 	pin = potiPin;
 	min = minScale;
 	max = maxScale;
+	
 	pinMode(pin, INPUT_PULLUP);
 }
 

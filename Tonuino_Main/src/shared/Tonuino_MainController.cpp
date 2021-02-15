@@ -1,7 +1,6 @@
 
 #include "Tonuino_MainController.h"
 
-#include <JC_Button.h>
 #include <MFRC522.h>
 #include <avr/sleep.h>
 
@@ -27,13 +26,7 @@ TonuinoEEPROM tonuinoEEPROM;
 
 TonuinoPotentiometer tonuinoPoti;
 
-Button pauseButton(PIN_ButtonPause);
-Button nextButton(PIN_ButtonNext);
-Button previousButton(PIN_ButtonPrevious);
-
-bool ignorePauseButton = false;
-bool ignoreNextButton = false;
-bool ignorePreviousButton = false;
+TonuinoButtons tonuinoButtons;
 
 long sonic_duration = 0; 
 long sonic_distance = 0; 
@@ -229,9 +222,7 @@ void setupTonuino(TonuinoConfig config)
 	digitalWrite(PIN_SonicTrigger, LOW); 
   }
 
-  pinMode(PIN_ButtonPause, INPUT_PULLUP);
-  pinMode(PIN_ButtonNext, INPUT_PULLUP);
-  pinMode(PIN_ButtonPrevious, INPUT_PULLUP);
+	tonuinoButtons.setup(PIN_ButtonPause, PIN_ButtonNext, PIN_ButtonPrevious);
 
   pinMode(PIN_StopLED, OUTPUT);
   
@@ -242,9 +233,7 @@ void setupTonuino(TonuinoConfig config)
   }
 
   // RESET --- ALLE DREI KNÖPFE BEIM STARTEN GEDRÜCKT HALTEN -> alle EINSTELLUNGEN werden gelöscht
-  if (digitalRead(PIN_ButtonPause) == LOW && 
-	  digitalRead(PIN_ButtonNext) == LOW && 
-	  digitalRead(PIN_ButtonPrevious) == LOW) 
+  if (tonuinoButtons.readRaw() == BUTTONDOWN_All) 
   {
     tonuinoEEPROM.resetEEPROM();
     loadDataFromFlash();
@@ -257,18 +246,8 @@ void setupTonuino(TonuinoConfig config)
   loadFolder(lastMusicDS);
 }
 
-void readButtons() 
-{
-	pauseButton.read();
-	nextButton.read();
-	previousButton.read();
-}
-
 void handleButtons()
 {
-	// Buttons werden nun über JS_Button gehandelt, dadurch kann jede Taste doppelt belegt werden
-    readButtons();
-	
 	if (mainConfig.HasPotentiometer)
 	{
 		if (tonuinoPoti.read())
@@ -277,52 +256,58 @@ void handleButtons()
 		}
 	}
 	
+	// Buttons werden nun über JS_Button gehandelt, dadurch kann jede Taste doppelt belegt werden
+	int buttonState = tonuinoButtons.read();	
 	bool isCurrentlyPlaying = dfPlayer.isPlaying();
-	
-	if (pauseButton.wasReleased()) 
+	switch (buttonState)
 	{
-		if (ignorePauseButton == false)
+		case BUTTONCLICK_StartStop: 
 		{
 			dfPlayer.togglePlay();
+			break;
 		}
-		ignorePauseButton = false;
-	} 
-	else if (pauseButton.pressedFor(LONG_PRESS) && ignorePauseButton == false) 
-	{
-		if (isCurrentlyPlaying) 
-		{
-			uint8_t advertTrack = tonuinoPlayer().currentTrackInRange();
-			dfPlayer.playAdvertisement(advertTrack);
-		}
-		else 
-		{
-			playShortCut(0);
-		}
-		ignorePauseButton = true;
-	}
-	if (!dfPlayer.listenUntilTrackEnds)
-	{
-		if (nextButton.wasReleased()) 
+		case BUTTONCLICK_LONG_StartStop:
 		{
 			if (isCurrentlyPlaying) 
 			{
-				dfPlayer.nextTrack();
+				uint8_t advertTrack = tonuinoPlayer().currentTrackInRange();
+				dfPlayer.playAdvertisement(advertTrack);
 			}
 			else 
 			{
-				playShortCut(1);
+				playShortCut(0);
 			}
+			break;
 		}
-		if (previousButton.wasReleased()) 
+		case BUTTONCLICK_Next:
 		{
-			if (isCurrentlyPlaying) 
+			if (!dfPlayer.listenUntilTrackEnds)
 			{
-				dfPlayer.previousTrack();
+				if (isCurrentlyPlaying) 
+				{
+					dfPlayer.nextTrack();
+				}
+				else 
+				{
+					playShortCut(1);
+				}
 			}
-			else 
+			break;
+		}
+		case BUTTONCLICK_Previous:
+		{
+			if (!dfPlayer.listenUntilTrackEnds)
 			{
-				playShortCut(2);
+				if (isCurrentlyPlaying) 
+				{
+					dfPlayer.previousTrack();
+				}
+				else 
+				{
+					playShortCut(2);
+				}
 			}
+			break;
 		}
 	}
 }
@@ -457,8 +442,8 @@ void onCardReturn()
 void waitForNewCard()
 {
 	do {
-		readButtons();
-		if (nextButton.wasReleased() || previousButton.wasReleased()) 
+		int buttonState = tonuinoButtons.read();
+		if (buttonState == BUTTONCLICK_Next || buttonState == BUTTONCLICK_Previous) 
 		{
 			Serial.println(F("Abgebrochen!"));
 			dfPlayer.playMp3Track(802);
@@ -482,8 +467,6 @@ uint8_t voiceMenu(int numberOfOptions, int startMessage, int messageOffset,
 	bool longPressed;
 	do 
 	{
-		valueChanged = false;
-		longPressed = false;
 		// Support for input via console
 		if (Serial.available() > 0) 
 		{
@@ -494,16 +477,17 @@ uint8_t voiceMenu(int numberOfOptions, int startMessage, int messageOffset,
 			}
 		}
 		
-		readButtons();
+		valueChanged = false;
+		longPressed = false;
+		int buttonState = tonuinoButtons.read();
 		dfPlayer.loop();
-		if (pauseButton.pressedFor(LONG_PRESS)) 
+		if (buttonState == BUTTONCLICK_LONG_StartStop) 
 		{
 			dfPlayer.playMp3Track(802);
-			ignorePauseButton = true;
 			checkStandbyAtMillis();
 			return defaultValue;
 		}
-		if (pauseButton.wasReleased()) 
+		if (buttonState == BUTTONCLICK_StartStop) 
 		{
 			if (returnValue != 0) 
 			{
@@ -515,42 +499,28 @@ uint8_t voiceMenu(int numberOfOptions, int startMessage, int messageOffset,
 			delay(1000);
 		}
 
-		if (nextButton.pressedFor(LONG_PRESS)) 
+		if (buttonState == BUTTONCLICK_LONG_Next) 
 		{
 			returnValue = min(returnValue + 10, numberOfOptions);
+			valueChanged = true;
 			longPressed = true;
-			ignoreNextButton = true;
 		} 
-		else if (nextButton.wasReleased()) 
+		else if (buttonState == BUTTONCLICK_Next) 
 		{
-			if (ignoreNextButton) 
-			{
-				ignoreNextButton = false;
-			} 
-			else 
-			{
-				returnValue = min(returnValue + 1, numberOfOptions);
-				valueChanged = true;
-			}
+			returnValue = min(returnValue + 1, numberOfOptions);
+			valueChanged = true;
 		}
 
-		if (previousButton.pressedFor(LONG_PRESS)) 
+		if (buttonState == BUTTONCLICK_LONG_Previous) 
 		{
 			returnValue = max(returnValue - 10, 1);
+			valueChanged = true;
 			longPressed = true;
-			ignorePreviousButton = true;
 		} 
-		else if (previousButton.wasReleased()) 
+		else if (buttonState == BUTTONCLICK_Previous) 
 		{
-			if (ignorePreviousButton) 
-			{
-				ignorePreviousButton = false; 
-			} 
-			else 
-			{
-				returnValue = max(returnValue - 1, 1);
-				valueChanged = true;
-			}
+			returnValue = max(returnValue - 1, 1);
+			valueChanged = true;
 		}
 		if (valueChanged)
 		{

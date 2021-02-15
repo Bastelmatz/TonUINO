@@ -29,8 +29,6 @@ class TonuinoConfig
 	MusicDataset ShortCuts[4];
 };
   
-#define LONG_PRESS 1000
-
 #define PIN_ButtonPause A1
 #define PIN_ButtonNext A3
 #define PIN_ButtonPrevious A4

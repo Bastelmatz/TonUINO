@@ -1,5 +1,5 @@
 
-#include "Tonuino_Config.h"
+#include <SPI.h>
 
 class TonuinoPotentiometer
 {

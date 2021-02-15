@@ -6,6 +6,7 @@
 #include "Tonuino_Modifiers.h"
 #include "Tonuino_Potentiometer.h"
 #include "Tonuino_Config.h"
+#include "Tonuino_Buttons.h"
 
 #include <SPI.h>
 
