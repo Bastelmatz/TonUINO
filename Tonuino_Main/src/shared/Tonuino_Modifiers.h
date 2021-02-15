@@ -12,6 +12,8 @@ typedef enum EModifier
 	MODI_TrackPrevious = 5,
 	MODI_TrackFirst = 6,
 	MODI_TrackLast = 7,
+	MODI_TrackNumber = 8,
+	MODI_ShortCut = 9,
 	
 	MODI_Player_StandbyTime = 10,
 	MODI_Player_SleepTime = 11,
@@ -28,6 +30,14 @@ typedef enum EModifier
 	
 	MODI_ResetCard = 40,
 	MODI_ResetEEPROM = 41,
+};
+
+#include <SPI.h>
+
+struct ModifierDataset 
+{
+	EModifier modi;
+	uint8_t value;
 };
 
 #endif

@@ -193,7 +193,6 @@ void setupTonuino(TonuinoConfig config)
 	Serial.println(F("TonUINO MIRA Version 1.0.0"));
 	Serial.println(F("created by Bastelmatz."));
 
-
 	// DFPlayer Mini initialisieren
 	dfPlayer.setup();
 
@@ -257,69 +256,9 @@ void handleButtons()
 		}
 	}
 	
-	// Buttons werden nun über JS_Button gehandelt, dadurch kann jede Taste doppelt belegt werden
-	int buttonState = tonuinoButtons.read();	
 	bool isCurrentlyPlaying = dfPlayer.isPlaying();
-	if (buttonState == BUTTONCLICK_StartStop)
-	{
-		dfPlayer.togglePlay();
-	}
-	if (buttonState == BUTTONCLICK_LONG_StartStop)
-	{
-		if (isCurrentlyPlaying) 
-		{
-			uint8_t advertTrack = tonuinoPlayer().currentTrackInRange();
-			dfPlayer.playAdvertisement(advertTrack);
-		}
-		else 
-		{
-			playShortCut(0);
-		}
-	}
-	if (buttonState == BUTTONCLICK_Next)
-	{
-		if (isCurrentlyPlaying) 
-		{
-			dfPlayer.nextTrack();
-		}
-		else 
-		{
-			playShortCut(1);
-		}
-	}
-	if (buttonState == BUTTONCLICK_LONG_Next)
-	{
-		if (isCurrentlyPlaying) 
-		{
-			dfPlayer.lastTrack();
-		}
-		else 
-		{
-			playShortCut(1);
-		}
-	}
-	if (buttonState == BUTTONCLICK_Previous)
-	{
-		if (isCurrentlyPlaying) 
-		{
-			dfPlayer.previousTrack();
-		}
-		else 
-		{
-			playShortCut(2);
-		}
-	}
-	if (buttonState == BUTTONCLICK_LONG_Previous)
-	{
-		if (isCurrentlyPlaying) 
-		{
-			dfPlayer.firstTrack();
-		}
-		else 
-		{
-			playShortCut(2);
-		}
-	}
+	ModifierDataset modiDS = tonuinoButtons.getPlayerModification(isCurrentlyPlaying);	
+	handleModifier(modiDS.modi, modiDS.value);
 }
 
 void handleCardReader()
@@ -607,41 +546,73 @@ void handleModifier(EModifier modifier, uint8_t special)
 	{
 		case MODI_LockAll:
 		{
-			allLocked = toggle ? !allLocked : bValue;
+			allLocked = toggle ? !allLocked : bValue; break;
 		}
 		case MODI_LockButtons:
 		{
-			buttonsLocked = toggle ? !buttonsLocked : bValue;
+			buttonsLocked = toggle ? !buttonsLocked : bValue; break;
 		}
 		case MODI_ResetCard:
 		{
 			resetCard();
-			tonuinoRFID.haltAndStop();
+			tonuinoRFID.haltAndStop(); 
+			break;
 		}
 		case MODI_ResetEEPROM:
 		{
 			tonuinoEEPROM.resetEEPROM();
-			dfPlayer.playMp3Track(999);
+			dfPlayer.playMp3Track(999); 
+			break;
 		}
 		case MODI_Player_SleepTime:
 		{
-			setSleepTimerValue(special);
+			setSleepTimerValue(special); break;
 		}
 		case MODI_Player_Random:
 		{
-			tonuinoPlayer().playRandom = toggle ? !tonuinoPlayer().playRandom : bValue;
+			tonuinoPlayer().playRandom = toggle ? !tonuinoPlayer().playRandom : bValue; break;
 		}
 		case MODI_Player_RepeatSingle:
 		{
-			tonuinoPlayer().singleRepetition = toggle ? !tonuinoPlayer().singleRepetition : bValue;
+			tonuinoPlayer().singleRepetition = toggle ? !tonuinoPlayer().singleRepetition : bValue; break;
 		}
 		case MODI_Player_ListenToEnd:
 		{
-			tonuinoPlayer().listenUntilTrackEnds = toggle ? !tonuinoPlayer().listenUntilTrackEnds : bValue;
+			tonuinoPlayer().listenUntilTrackEnds = toggle ? !tonuinoPlayer().listenUntilTrackEnds : bValue; break;
 		}
 		case MODI_Player_FreezeDance:
 		{
-			dfPlayer.freezeDance_active = toggle ? !dfPlayer.freezeDance_active : bValue;
+			dfPlayer.freezeDance_active = toggle ? !dfPlayer.freezeDance_active : bValue; break;
+		}
+		case MODI_TrackToggle:
+		{
+			dfPlayer.togglePlay(); break;
+		}
+		case MODI_TrackNext:
+		{
+			dfPlayer.nextTrack(); break;
+		}
+		case MODI_TrackPrevious:
+		{
+			dfPlayer.previousTrack(); break;
+		}
+		case MODI_TrackFirst:
+		{
+			dfPlayer.firstTrack(); break;
+		}
+		case MODI_TrackLast:
+		{
+			dfPlayer.lastTrack(); break;
+		}
+		case MODI_TrackNumber:
+		{
+			uint8_t advertTrack = tonuinoPlayer().currentTrackInRange();
+			dfPlayer.playAdvertisement(advertTrack);
+			break;
+		}
+		case MODI_ShortCut:
+		{
+			playShortCut(special); break;
 		}
 	}
 }

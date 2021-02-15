@@ -26,4 +26,4 @@ void writeCard(nfcTagStruct nfcTag);
 void resetCard();
 
 void evaluateModifierData(MusicDataset musicDS);
-
+void handleModifier(EModifier modifier, uint8_t special);

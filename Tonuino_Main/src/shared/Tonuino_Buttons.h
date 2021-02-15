@@ -23,6 +23,8 @@ typedef enum EBUTTONSTATE
 
 #define LONG_PRESS 1000
 
+#include "Tonuino_Modifiers.h"
+
 #include <JC_Button.h>
 
 class TonuinoJCButton
@@ -46,6 +48,7 @@ class TonuinoButtons
 	void setup(int pinStartStop, int pinNext, int pinPrevious);
 	int read();
 	int readRaw();
+	ModifierDataset getPlayerModification(bool isCurrentlyPlaying);
 	
 	private:
 	static TonuinoJCButton startStopButton;

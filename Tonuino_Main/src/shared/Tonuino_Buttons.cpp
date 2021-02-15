@@ -47,6 +47,80 @@ int TonuinoButtons::read()
 	return BUTTONACTION_None;
 }
 
+ModifierDataset TonuinoButtons::getPlayerModification(bool isCurrentlyPlaying)
+{
+	int buttonState = read();
+	ModifierDataset modiDS;
+	modiDS.modi = 0;
+	modiDS.value = 0;
+	
+	// Buttons werden nun über JS_Button gehandelt, dadurch kann jede Taste doppelt belegt werden
+	if (buttonState == BUTTONCLICK_StartStop)
+	{
+		modiDS.modi = MODI_TrackToggle;
+	}
+	if (buttonState == BUTTONCLICK_LONG_StartStop)
+	{
+		if (isCurrentlyPlaying) 
+		{
+			modiDS.modi = MODI_TrackNumber;
+		}
+		else 
+		{
+			modiDS.modi = MODI_ShortCut;
+			modiDS.value = 0;
+		}
+	}
+	if (buttonState == BUTTONCLICK_Next)
+	{
+		if (isCurrentlyPlaying) 
+		{
+			modiDS.modi = MODI_TrackNext;
+		}
+		else 
+		{
+			modiDS.modi = MODI_ShortCut;
+			modiDS.value = 1;
+		}
+	}
+	if (buttonState == BUTTONCLICK_LONG_Next)
+	{
+		if (isCurrentlyPlaying) 
+		{
+			modiDS.modi = MODI_TrackLast;
+		}
+		else 
+		{
+			modiDS.modi = MODI_ShortCut;
+			modiDS.value = 1;
+		}
+	}
+	if (buttonState == BUTTONCLICK_Previous)
+	{
+		if (isCurrentlyPlaying) 
+		{
+			modiDS.modi = MODI_TrackPrevious;
+		}
+		else 
+		{
+			modiDS.modi = MODI_ShortCut;
+			modiDS.value = 2;
+		}
+	}
+	if (buttonState == BUTTONCLICK_LONG_Previous)
+	{
+		if (isCurrentlyPlaying) 
+		{
+			modiDS.modi = MODI_TrackFirst;
+		}
+		else 
+		{
+			modiDS.modi = MODI_ShortCut;
+			modiDS.value = 2;
+		}
+	}
+	return modiDS;
+}
 
 // ************************************
 // JC Button
