@@ -501,7 +501,7 @@ uint8_t voiceMenu(int numberOfOptions, int startMessage, int messageOffset,
 		} 
 		else if (buttonState == BUTTONCLICK_Next) 
 		{
-			returnValue = min(returnValue + 1, numberOfOptions);
+			returnValue = returnValue + 1 > numberOfOptions ? defaultValue : returnValue + 1;
 			valueChanged = true;
 		}
 
@@ -513,7 +513,7 @@ uint8_t voiceMenu(int numberOfOptions, int startMessage, int messageOffset,
 		} 
 		else if (buttonState == BUTTONCLICK_Previous) 
 		{
-			returnValue = max(returnValue - 1, 1);
+			returnValue = returnValue < 2 ? numberOfOptions : returnValue - 1;
 			valueChanged = true;
 		}
 		if (valueChanged)
