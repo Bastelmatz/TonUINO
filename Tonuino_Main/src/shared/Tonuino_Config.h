@@ -40,4 +40,7 @@ class TonuinoConfig
 
 #define PIN_Poti A2  // 10kOhm Poti
 
+#define PIN_DFPlayer_Busy 4
+#define PIN_DFPlayer_RX 3  
+#define PIN_DFPlayer_TX 2  
 #endif

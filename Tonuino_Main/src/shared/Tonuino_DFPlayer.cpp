@@ -1,8 +1,8 @@
 
 #include "Tonuino_DFPlayer.h"
+#include "Tonuino_Config.h"
 
-#define busyPin 4
-SoftwareSerial mySoftwareSerial(2, 3); // RX, TX
+SoftwareSerial mySoftwareSerial(PIN_DFPlayer_RX, PIN_DFPlayer_TX); // RX, TX
 
 TonuinoPlayer TonuinoDFPlayer::tonuinoPlayer;
 
@@ -56,7 +56,7 @@ static DFMiniMp3<SoftwareSerial, Mp3Notify> mp3(mySoftwareSerial);
 
 void TonuinoDFPlayer::setup()
 {
-	pinMode(busyPin, INPUT);
+	pinMode(PIN_DFPlayer_Busy, INPUT);
 	
 	// DFPlayer Mini initialisieren
 	mp3.begin();
@@ -68,7 +68,7 @@ void TonuinoDFPlayer::setup()
 
 bool TonuinoDFPlayer::isPlaying() 
 {
-	return !digitalRead(busyPin);
+	return !digitalRead(PIN_DFPlayer_Busy);
 }
 
 void TonuinoDFPlayer::playMp3Track(uint16_t track)
