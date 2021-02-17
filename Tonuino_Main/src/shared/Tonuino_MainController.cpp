@@ -1,6 +1,7 @@
 
 #include "Tonuino_MainController.h"
 
+#include <RotaryEncoder.h>
 #include <MFRC522.h>
 #include <avr/sleep.h>
 
@@ -28,9 +29,7 @@ TonuinoPotentiometer tonuinoPoti;
 
 TonuinoButtons tonuinoButtons;
 
-long sonic_duration = 0; 
-long sonic_distance = 0; 
-bool handle_sonic = false;
+RotaryEncoder rotaryEncoder(PIN_Encoder_DT, PIN_Encoder_CLK, RotaryEncoder::LatchMode::FOUR3);
 
 uint8_t trackInEEPROM = 0;
 nfcTagStruct nextMC;
@@ -246,6 +245,20 @@ void setupTonuino(TonuinoConfig config)
 	loadFolder(lastMusicDS);
 }
 
+void handleRotaryEncoder()
+{
+	static int rotEncPos = 0;
+	rotaryEncoder.tick();
+	int newPos = rotaryEncoder.getPosition();
+
+	if (newPos != rotEncPos)
+	{
+		Serial.print("Pos: ");
+		Serial.print(newPos);
+		rotEncPos = newPos;
+	}   
+}
+
 void handleButtons()
 {
 	if (mainConfig.HasPotentiometer)
@@ -292,38 +305,73 @@ void checkPlayState()
     }
 }
 
+long sonic_duration = 0; 
+long sonic_distance = 0; 
+bool handle_sonic = false;
+bool sendSonicWave = true;
+bool receiveSonicWave = false;
+long sonicSendTime = 0;
+
 void checkUltraSonic()
 {
 	if (!mainConfig.HasUltraSonic)
 	{
 		return;
 	}
-	
-	delay(5); // not necessary
-	digitalWrite(PIN_SonicTrigger, HIGH); 
-	delay(10); // not necessary
-	digitalWrite(PIN_SonicTrigger, LOW);
-	sonic_duration = pulseIn(PIN_SonicEcho, HIGH); 
-	sonic_distance = (sonic_duration/2) * 0.3432; //mm
 
-	Serial.println(millis());
-	Serial.print("Duration: ");
-	Serial.println(sonic_duration);
-	Serial.print("Distance: ");
-	Serial.println(sonic_distance);
-	
-	if (sonic_distance > 10 && sonic_distance < 70)
+	//sonic_duration = pulseIn(PIN_SonicEcho, HIGH); // blocks current thread -> breaks encoder timing
+	if (sendSonicWave)
 	{
-		handle_sonic = true;
+		digitalWrite(PIN_SonicTrigger, HIGH); 
+		digitalWrite(PIN_SonicTrigger, LOW);
+		sendSonicWave = false;
+		receiveSonicWave = false;
+		sonic_distance = 0;
 	}
-	if (sonic_distance > 70)
+	else
 	{
-		if (handle_sonic)
+		if (digitalRead(PIN_SonicEcho) == HIGH)
 		{
-			dfPlayer.playAdvertisement(262);
-			dfPlayer.nextTrack();
+			if (!receiveSonicWave)
+			{
+				sonicSendTime = micros();
+			}
+			receiveSonicWave = true;
 		}
-		handle_sonic = false;
+		if (receiveSonicWave)
+		{
+			sonic_duration = micros() - sonicSendTime;
+			bool sonicEnd = digitalRead(PIN_SonicEcho) == LOW;
+			if (sonicEnd || sonic_duration > 1000 * 1000)
+			{
+				sendSonicWave = true;			
+				sonic_distance = (sonic_duration/2) * 0.3432; //mm
+				//Serial.print("Duration: ");
+				//Serial.println(sonic_duration);
+				if (sonic_distance < 2500)
+				{
+					Serial.print("Distance: ");
+					Serial.println(sonic_distance);
+				}
+			}
+		}
+	}
+
+	if (sendSonicWave) // = sonic received here
+	{
+		if (sonic_distance > 10 && sonic_distance < 70)
+		{
+			handle_sonic = true;
+		}
+		if (sonic_distance > 70)
+		{
+			if (handle_sonic)
+			{
+				dfPlayer.playAdvertisement(262);
+				dfPlayer.nextTrack();
+			}
+			handle_sonic = false;
+		}
 	}
 }
 
@@ -335,6 +383,8 @@ void loopTonuino()
     dfPlayer.loop();
 	checkPlayState();
 	checkUltraSonic();
+	
+	handleRotaryEncoder();
 	
 	if (!allLocked && !buttonsLocked)
 	{

@@ -12,7 +12,6 @@ TonuinoConfig getConfigMira()
 	TonuinoConfig config;
 	
 	config.UseCardReader = false;
-	config.HasPotentiometer = true;
 	config.HasUltraSonic = true;
 	
 	config.StartMusicDS.folder = 10;

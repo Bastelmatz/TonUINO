@@ -32,8 +32,8 @@ class TonuinoConfig
 #define PIN_ButtonPause A1
 #define PIN_ButtonNext A3
 #define PIN_ButtonPrevious A4
-#define PIN_StopLED 6
-#define PIN_Shutdown 7
+#define PIN_StopLED 9 // 6
+#define PIN_Shutdown 10 // 7
 #define PIN_SonicTrigger 5 
 #define PIN_SonicEcho 8 
 #define PIN_OpenAnalog A6
@@ -43,4 +43,7 @@ class TonuinoConfig
 #define PIN_DFPlayer_Busy 4
 #define PIN_DFPlayer_RX 3  
 #define PIN_DFPlayer_TX 2  
+#define PIN_Encoder_CLK 6 // no interrupt pin
+#define PIN_Encoder_DT 7  // no interrupt pin
+
 #endif

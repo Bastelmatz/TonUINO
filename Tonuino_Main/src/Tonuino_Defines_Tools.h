@@ -1,4 +1,4 @@
 
-#define TONUINO_MIRA
-//#define TONUINO_MIRA_COINBOX
+//#define TONUINO_MIRA
+#define TONUINO_MIRA_COINBOX
 //#define TONUINO_RFID_TOOL
