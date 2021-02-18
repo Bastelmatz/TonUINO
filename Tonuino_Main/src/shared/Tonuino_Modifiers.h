@@ -17,6 +17,7 @@ typedef enum EModifier
 	
 	MODI_Player_StandbyTime = 10,
 	MODI_Player_SleepTime = 11,
+	MODI_Player_Volume = 12,
 	
 	MODI_Player_Random = 20,
 	MODI_Player_RepeatSingle = 21,

@@ -19,7 +19,7 @@ TonuinoConfig getConfigMira()
 
 	config.HW.CardReader = false;
 	config.HW.UltraSonic = true;
-	config.HW.Encoder = true;
+	config.HW.RotaryEncoder = true;
 	
 	config.SW.StartMusicDS.folder = 10;
 	config.SW.StartMusicDS.mode = 1;

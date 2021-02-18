@@ -31,9 +31,9 @@ class TonuinoHWConfig
 {
 	public:
 	bool CardReader = true;
-	bool Encoder = false;
 	bool PowerOff = false;
 	bool Potentiometer = false;
+	bool RotaryEncoder = false;
 	bool UltraSonic = false;
 };
 

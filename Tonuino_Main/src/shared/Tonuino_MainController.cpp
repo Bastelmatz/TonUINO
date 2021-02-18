@@ -1,7 +1,6 @@
 
 #include "Tonuino_MainController.h"
 
-#include <RotaryEncoder.h>
 #include <MFRC522.h>
 #include <avr/sleep.h>
 
@@ -29,9 +28,12 @@ TonuinoEEPROM tonuinoEEPROM;
 
 TonuinoPotentiometer tonuinoPoti;
 
+TonuinoUltraSonic ultraSonicSensor;
+bool handle_sonic = false;
+
 TonuinoButtons tonuinoButtons;
 
-RotaryEncoder rotaryEncoder(0,0);
+TonuinoRotaryEncoder rotaryEncoder;
 
 uint8_t trackInEEPROM = 0;
 nfcTagStruct nextMC;
@@ -219,16 +221,14 @@ void setupTonuino(TonuinoConfig config)
 		tonuinoPoti.setup(pinConfig.Poti, swConfig.VolumeMin, swConfig.VolumeMax); 
 	}
 	
-	if (hwConfig.Encoder)
+	if (hwConfig.RotaryEncoder)
 	{
-		rotaryEncoder = RotaryEncoder(pinConfig.Encoder_DT, pinConfig.Encoder_CLK, RotaryEncoder::LatchMode::FOUR3);
+		rotaryEncoder.setup(pinConfig.Encoder_CLK, pinConfig.Encoder_DT); 
 	}
 	
 	if (hwConfig.UltraSonic)
 	{
-		pinMode(pinConfig.SonicTrigger, OUTPUT); 
-		pinMode(pinConfig.SonicEcho, INPUT); 
-		digitalWrite(pinConfig.SonicTrigger, LOW); 
+		ultraSonicSensor.setup(pinConfig.SonicTrigger, pinConfig.SonicEcho);
 	}
 
 	tonuinoButtons.setup(pinConfig.ButtonPause, pinConfig.ButtonNext, pinConfig.ButtonPrevious);
@@ -257,21 +257,12 @@ void setupTonuino(TonuinoConfig config)
 
 void handleRotaryEncoder()
 {
-	if (!hwConfig.Encoder)
+	if (!hwConfig.RotaryEncoder)
 	{
 		return;
 	}
 	
-	static int rotEncPos = 0;
-	rotaryEncoder.tick();
-	int newPos = rotaryEncoder.getPosition();
-
-	if (newPos != rotEncPos)
-	{
-		Serial.print("Pos: ");
-		Serial.print(newPos);
-		rotEncPos = newPos;
-	}   
+	rotaryEncoder.read();
 }
 
 void handleButtons()
@@ -320,13 +311,6 @@ void checkPlayState()
     }
 }
 
-long sonic_duration = 0; 
-long sonic_distance = 0; 
-bool handle_sonic = false;
-bool sendSonicWave = true;
-bool receiveSonicWave = false;
-long sonicSendTime = 0;
-
 void checkUltraSonic()
 {
 	if (!hwConfig.UltraSonic)
@@ -334,59 +318,19 @@ void checkUltraSonic()
 		return;
 	}
 
-	//sonic_duration = pulseIn(PIN_SonicEcho, HIGH); // blocks current thread -> breaks encoder timing
-	if (sendSonicWave)
+	long distance = ultraSonicSensor.read();
+	if (distance > 10 && distance < 70)
 	{
-		digitalWrite(pinConfig.SonicTrigger, HIGH); 
-		digitalWrite(pinConfig.SonicTrigger, LOW);
-		sendSonicWave = false;
-		receiveSonicWave = false;
-		sonic_distance = 0;
+		handle_sonic = true;
 	}
-	else
+	if (distance > 70)
 	{
-		if (digitalRead(pinConfig.SonicEcho) == HIGH)
+		if (handle_sonic)
 		{
-			if (!receiveSonicWave)
-			{
-				sonicSendTime = micros();
-			}
-			receiveSonicWave = true;
+			dfPlayer.playAdvertisement(262);
+			dfPlayer.nextTrack();
 		}
-		if (receiveSonicWave)
-		{
-			sonic_duration = micros() - sonicSendTime;
-			bool sonicEnd = digitalRead(pinConfig.SonicEcho) == LOW;
-			if (sonicEnd || sonic_duration > 1000 * 1000)
-			{
-				sendSonicWave = true;			
-				sonic_distance = (sonic_duration/2) * 0.3432; //mm
-				//Serial.print("Duration: ");
-				//Serial.println(sonic_duration);
-				if (sonic_distance < 2500)
-				{
-					Serial.print("Distance: ");
-					Serial.println(sonic_distance);
-				}
-			}
-		}
-	}
-
-	if (sendSonicWave) // = sonic received here
-	{
-		if (sonic_distance > 10 && sonic_distance < 70)
-		{
-			handle_sonic = true;
-		}
-		if (sonic_distance > 70)
-		{
-			if (handle_sonic)
-			{
-				dfPlayer.playAdvertisement(262);
-				dfPlayer.nextTrack();
-			}
-			handle_sonic = false;
-		}
+		handle_sonic = false;
 	}
 }
 

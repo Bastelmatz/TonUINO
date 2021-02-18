@@ -4,9 +4,11 @@
 #include "Tonuino_Player.h"
 #include "Tonuino_DFPlayer.h"
 #include "Tonuino_Modifiers.h"
-#include "Tonuino_Potentiometer.h"
 #include "Tonuino_Config.h"
 #include "Tonuino_Buttons.h"
+#include "Tonuino_Potentiometer.h"
+#include "Tonuino_RotaryEncoder.h"
+#include "Tonuino_UltraSonic.h"
 
 #include <SPI.h>
 
