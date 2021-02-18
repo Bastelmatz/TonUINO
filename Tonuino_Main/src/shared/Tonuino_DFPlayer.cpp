@@ -1,11 +1,9 @@
 
 #include "Tonuino_DFPlayer.h"
-#include "Tonuino_Config.h"
-
-SoftwareSerial mySoftwareSerial(PIN_DFPlayer_RX, PIN_DFPlayer_TX); // RX, TX
 
 TonuinoPlayer TonuinoDFPlayer::tonuinoPlayer;
 
+uint8_t TonuinoDFPlayer::pin_Busy = 0;
 uint8_t TonuinoDFPlayer::activeFolder = 0;
 uint16_t TonuinoDFPlayer::activeTrack = 0;
 
@@ -21,42 +19,48 @@ bool TonuinoDFPlayer::feedbackOnVolumeChange = false;
 bool TonuinoDFPlayer::freezeDance_active = false;
 unsigned long TonuinoDFPlayer::freezeDance_nextStopAtMillis = 0;
 
-// implement a notification class,
-// its member methods will get called
-//
-class Mp3Notify {
-  public:
-    static void OnError(uint16_t errorCode) {
-      // see DfMp3_Error for code meaning
-      Serial.print("DFPlayer Com Error ");
-      Serial.println(errorCode);
-    }
-    static void PrintlnSourceAction(DfMp3_PlaySources source, const char* action) {
-      if (source & DfMp3_PlaySources_Sd) Serial.print("SD Karte ");
-      if (source & DfMp3_PlaySources_Usb) Serial.print("USB ");
-      if (source & DfMp3_PlaySources_Flash) Serial.print("Flash ");
-      Serial.println(action);
-    }
-    static void OnPlayFinished(DfMp3_PlaySources source, uint16_t track) {
-      TonuinoDFPlayer().trackFinished();
-    }
-    static void OnPlaySourceOnline(DfMp3_PlaySources source) {
-      PrintlnSourceAction(source, "online");
-    }
-    static void OnPlaySourceInserted(DfMp3_PlaySources source) {
-      PrintlnSourceAction(source, "bereit");
-    }
-    static void OnPlaySourceRemoved(DfMp3_PlaySources source) {
-      PrintlnSourceAction(source, "entfernt");
-    }
-};
-
-static DFMiniMp3<SoftwareSerial, Mp3Notify> mp3(mySoftwareSerial);
-
-
-void TonuinoDFPlayer::setup()
+// ********************************************************************
+// implement a notification class, its member methods will get called
+// ********************************************************************
+void TonuinoDFPlayer::Mp3Notify::OnError(uint16_t errorCode) 
 {
-	pinMode(PIN_DFPlayer_Busy, INPUT);
+	// see DfMp3_Error for code meaning
+	Serial.print("DFPlayer Com Error ");
+	Serial.println(errorCode);
+}
+void TonuinoDFPlayer::Mp3Notify::PrintlnSourceAction(DfMp3_PlaySources source, const char* action) 
+{
+	if (source & DfMp3_PlaySources_Sd) Serial.print("SD Karte ");
+	if (source & DfMp3_PlaySources_Usb) Serial.print("USB ");
+	if (source & DfMp3_PlaySources_Flash) Serial.print("Flash ");
+	Serial.println(action);
+}
+void TonuinoDFPlayer::Mp3Notify::OnPlayFinished(DfMp3_PlaySources source, uint16_t track) 
+{
+	TonuinoDFPlayer().trackFinished();
+}
+void TonuinoDFPlayer::Mp3Notify::OnPlaySourceOnline(DfMp3_PlaySources source) 
+{
+	PrintlnSourceAction(source, "online");
+}
+void TonuinoDFPlayer::Mp3Notify::OnPlaySourceInserted(DfMp3_PlaySources source) 
+{
+	PrintlnSourceAction(source, "bereit");
+}
+void TonuinoDFPlayer::Mp3Notify::OnPlaySourceRemoved(DfMp3_PlaySources source) 
+{
+	PrintlnSourceAction(source, "entfernt");
+}
+// ********************************************************************
+
+static SoftwareSerial playerSoftwareSerial = SoftwareSerial(2, 3); // TX, RX
+static DFMiniMp3<SoftwareSerial, TonuinoDFPlayer::Mp3Notify> mp3(playerSoftwareSerial);
+	
+void TonuinoDFPlayer::setup(uint8_t pinBusy)
+{
+	pin_Busy = pinBusy;
+	
+	pinMode(pinBusy, INPUT);
 	
 	// DFPlayer Mini initialisieren
 	mp3.begin();
@@ -68,7 +72,7 @@ void TonuinoDFPlayer::setup()
 
 bool TonuinoDFPlayer::isPlaying() 
 {
-	return !digitalRead(PIN_DFPlayer_Busy);
+	return !digitalRead(pin_Busy);
 }
 
 void TonuinoDFPlayer::playMp3Track(uint16_t track)

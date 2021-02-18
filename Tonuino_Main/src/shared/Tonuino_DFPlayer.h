@@ -8,10 +8,22 @@
 
 #include <DFMiniMp3.h>
 #include <SoftwareSerial.h>
+#include <SPI.h>
 
 class TonuinoDFPlayer
 {
 	public:
+	
+	class Mp3Notify {
+	  public:
+		static void OnError(uint16_t errorCode);
+		static void PrintlnSourceAction(DfMp3_PlaySources source, const char* action);
+		static void OnPlayFinished(DfMp3_PlaySources source, uint16_t track);
+		static void OnPlaySourceOnline(DfMp3_PlaySources source);
+		static void OnPlaySourceInserted(DfMp3_PlaySources source);
+		static void OnPlaySourceRemoved(DfMp3_PlaySources source);
+	};
+
 	static MusicDataset musicDS;
 	static TonuinoPlayer tonuinoPlayer;
 	static uint8_t volume;
@@ -20,7 +32,7 @@ class TonuinoDFPlayer
 	static bool musicDSLoaded;
 	static bool freezeDance_active;
 			
-	void setup();
+	void setup(uint8_t pinBusy);
 	bool isPlaying();
 	void loadFolder(MusicDataset dataset, uint8_t lastTrack);
 	void loadAndPlayFolder(MusicDataset dataset, uint8_t lastTrack);
@@ -50,8 +62,9 @@ class TonuinoDFPlayer
 	uint16_t getFolderTrackCount(uint16_t folder);
 	
 	void setFreezeDance(bool active);
-	
+
 	private:
+	static uint8_t pin_Busy;
 	static uint8_t activeFolder;
 	static uint16_t activeTrack;
 	static bool newMusisDS;

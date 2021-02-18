@@ -11,11 +11,10 @@ TonuinoConfig getConfigMira()
 {
 	TonuinoConfig config;
 	
-	config.HasPotentiometer = true;
-	// reduce volume for stereo amplifier
-	config.VolumeMax = 10;
+	config.HW.Potentiometer = true;
 	
-	config.StopPlayOnCardRemoval = false;
+	config.SW.VolumeMax = 10;  // reduce volume for stereo amplifier
+	config.SW.StopPlayOnCardRemoval = false;
 	
 	return config;
 }

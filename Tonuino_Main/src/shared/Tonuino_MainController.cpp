@@ -15,7 +15,9 @@
     created by Bastelmatz.
 */
 
-TonuinoConfig mainConfig;
+TonuinoPinConfig pinConfig;
+TonuinoSWConfig swConfig;
+TonuinoHWConfig hwConfig;
 
 // RFID reader
 Tonuino_RFID_Reader tonuinoRFID;
@@ -29,7 +31,7 @@ TonuinoPotentiometer tonuinoPoti;
 
 TonuinoButtons tonuinoButtons;
 
-RotaryEncoder rotaryEncoder(PIN_Encoder_DT, PIN_Encoder_CLK, RotaryEncoder::LatchMode::FOUR3);
+RotaryEncoder rotaryEncoder(0,0);
 
 uint8_t trackInEEPROM = 0;
 nfcTagStruct nextMC;
@@ -45,13 +47,13 @@ TonuinoPlayer tonuinoPlayer()
 
 void loadStartFolder()
 {
-	if (mainConfig.StartMusicDS.folder == 0)
+	if (swConfig.StartMusicDS.folder == 0)
 	{
 		lastMusicDS = tonuinoEEPROM.loadLastDatasetFromFlash();
 	}
 	else
 	{
-		lastMusicDS = mainConfig.StartMusicDS;
+		lastMusicDS = swConfig.StartMusicDS;
 	}
 }
 
@@ -100,13 +102,13 @@ void activateFreezeDance(bool active)
 
 void turnOff()
 {
-	if (!mainConfig.UsePowerOff)
+	if (!hwConfig.PowerOff)
 	{
 		return;
 	}
 	Serial.println(F("=== power off!"));
     // enter sleep state
-    digitalWrite(PIN_Shutdown, HIGH);
+    digitalWrite(pinConfig.Shutdown, HIGH);
     delay(500);
 
     // http://discourse.voss.earth/t/intenso-s10000-powerbank-automatische-abschaltung-software-only/805
@@ -158,7 +160,7 @@ void playShortCut(uint8_t shortCut)
 {
 	Serial.println(F("=== playShortCut()"));
 	Serial.println(shortCut);
-	MusicDataset shortCutData = mainConfig.ShortCuts[shortCut];
+	MusicDataset shortCutData = swConfig.ShortCuts[shortCut];
 	if (shortCutData.folder > 0) 
 	{
 		loadAndPlayFolder(shortCutData);
@@ -171,7 +173,10 @@ void playShortCut(uint8_t shortCut)
 
 void setupTonuino(TonuinoConfig config) 
 {
-	mainConfig = config;
+	pinConfig = config.PINS;
+	swConfig = config.SW;
+	hwConfig = config.HW;
+	
 	Serial.begin(115200); // Es gibt ein paar Debug Ausgaben über die serielle Schnittstelle
 
 	// Wert für randomSeed() erzeugen durch das mehrfache Sammeln von rauschenden LSBs eines offenen Analogeingangs
@@ -179,7 +184,7 @@ void setupTonuino(TonuinoConfig config)
 	uint32_t ADCSeed;
 	for (uint8_t i = 0; i < 128; i++) 
 	{
-		ADC_LSB = analogRead(PIN_OpenAnalog) & 0x1;
+		ADC_LSB = analogRead(pinConfig.OpenAnalog) & 0x1;
 		ADCSeed ^= ADC_LSB << (i % 32);
 	}
 	randomSeed(ADCSeed); // Zufallsgenerator initialisieren
@@ -193,42 +198,47 @@ void setupTonuino(TonuinoConfig config)
 	Serial.println(F("created by Bastelmatz."));
 
 	// DFPlayer Mini initialisieren
-	dfPlayer.setup();
+	dfPlayer.setup(pinConfig.DFPlayer_Busy);
 
 	// set settings
-	dfPlayer.volumeMin = mainConfig.VolumeMin;
-	dfPlayer.volumeMax = mainConfig.VolumeMax;
-	dfPlayer.setVolume(mainConfig.VolumeInit);
-	dfPlayer.setEqualizer(mainConfig.Equalizer);
+	dfPlayer.volumeMin = swConfig.VolumeMin;
+	dfPlayer.volumeMax = swConfig.VolumeMax;
+	dfPlayer.setVolume(swConfig.VolumeInit);
+	dfPlayer.setEqualizer(swConfig.Equalizer);
 	setStandbyTimerValue(0);
 	setSleepTimerValue(0);
 
 	// NFC Leser initialisieren
-	if (mainConfig.UseCardReader)
+	if (hwConfig.CardReader)
 	{
 		tonuinoRFID.setupRFID();
 	}
 
-	if (mainConfig.HasPotentiometer)
+	if (hwConfig.Potentiometer)
 	{
-		tonuinoPoti.setup(PIN_Poti, mainConfig.VolumeMin, mainConfig.VolumeMax); 
+		tonuinoPoti.setup(pinConfig.Poti, swConfig.VolumeMin, swConfig.VolumeMax); 
 	}
 	
-	if (mainConfig.HasUltraSonic)
+	if (hwConfig.Encoder)
 	{
-		pinMode(PIN_SonicTrigger, OUTPUT); 
-		pinMode(PIN_SonicEcho, INPUT); 
-		digitalWrite(PIN_SonicTrigger, LOW); 
+		rotaryEncoder = RotaryEncoder(pinConfig.Encoder_DT, pinConfig.Encoder_CLK, RotaryEncoder::LatchMode::FOUR3);
+	}
+	
+	if (hwConfig.UltraSonic)
+	{
+		pinMode(pinConfig.SonicTrigger, OUTPUT); 
+		pinMode(pinConfig.SonicEcho, INPUT); 
+		digitalWrite(pinConfig.SonicTrigger, LOW); 
 	}
 
-	tonuinoButtons.setup(PIN_ButtonPause, PIN_ButtonNext, PIN_ButtonPrevious);
+	tonuinoButtons.setup(pinConfig.ButtonPause, pinConfig.ButtonNext, pinConfig.ButtonPrevious);
 
-	pinMode(PIN_StopLED, OUTPUT);
+	pinMode(pinConfig.StopLED, OUTPUT);
 
-	if (mainConfig.UsePowerOff)
+	if (hwConfig.PowerOff)
 	{
-		pinMode(PIN_Shutdown, OUTPUT);
-		digitalWrite(PIN_Shutdown, LOW);
+		pinMode(pinConfig.Shutdown, OUTPUT);
+		digitalWrite(pinConfig.Shutdown, LOW);
 	}
 
 	// RESET --- ALLE DREI KNÖPFE BEIM STARTEN GEDRÜCKT HALTEN -> alle EINSTELLUNGEN werden gelöscht
@@ -247,6 +257,11 @@ void setupTonuino(TonuinoConfig config)
 
 void handleRotaryEncoder()
 {
+	if (!hwConfig.Encoder)
+	{
+		return;
+	}
+	
 	static int rotEncPos = 0;
 	rotaryEncoder.tick();
 	int newPos = rotaryEncoder.getPosition();
@@ -261,7 +276,7 @@ void handleRotaryEncoder()
 
 void handleButtons()
 {
-	if (mainConfig.HasPotentiometer)
+	if (hwConfig.Potentiometer)
 	{
 		if (tonuinoPoti.read())
 		{
@@ -300,7 +315,7 @@ void checkPlayState()
 	bool isCurrentlyPlaying = dfPlayer.isPlaying();
     if (m_lastPlayState != isCurrentlyPlaying)
     {
-      digitalWrite(PIN_StopLED, isCurrentlyPlaying ? LOW : HIGH);
+      digitalWrite(pinConfig.StopLED, isCurrentlyPlaying ? LOW : HIGH);
       m_lastPlayState = isCurrentlyPlaying;
     }
 }
@@ -314,7 +329,7 @@ long sonicSendTime = 0;
 
 void checkUltraSonic()
 {
-	if (!mainConfig.HasUltraSonic)
+	if (!hwConfig.UltraSonic)
 	{
 		return;
 	}
@@ -322,15 +337,15 @@ void checkUltraSonic()
 	//sonic_duration = pulseIn(PIN_SonicEcho, HIGH); // blocks current thread -> breaks encoder timing
 	if (sendSonicWave)
 	{
-		digitalWrite(PIN_SonicTrigger, HIGH); 
-		digitalWrite(PIN_SonicTrigger, LOW);
+		digitalWrite(pinConfig.SonicTrigger, HIGH); 
+		digitalWrite(pinConfig.SonicTrigger, LOW);
 		sendSonicWave = false;
 		receiveSonicWave = false;
 		sonic_distance = 0;
 	}
 	else
 	{
-		if (digitalRead(PIN_SonicEcho) == HIGH)
+		if (digitalRead(pinConfig.SonicEcho) == HIGH)
 		{
 			if (!receiveSonicWave)
 			{
@@ -341,7 +356,7 @@ void checkUltraSonic()
 		if (receiveSonicWave)
 		{
 			sonic_duration = micros() - sonicSendTime;
-			bool sonicEnd = digitalRead(PIN_SonicEcho) == LOW;
+			bool sonicEnd = digitalRead(pinConfig.SonicEcho) == LOW;
 			if (sonicEnd || sonic_duration > 1000 * 1000)
 			{
 				sendSonicWave = true;			
@@ -391,7 +406,7 @@ void loopTonuino()
 		handleButtons();
 	}
 
-    if (mainConfig.UseCardReader)
+    if (hwConfig.CardReader)
 	{
 		handleCardReader();
 	}
@@ -418,7 +433,7 @@ void onNewCard()
 
 void onCardGone()
 {
-	if (mainConfig.StopPlayOnCardRemoval)
+	if (swConfig.StopPlayOnCardRemoval)
 	{
 		dfPlayer.pauseAndStandBy();
 	}

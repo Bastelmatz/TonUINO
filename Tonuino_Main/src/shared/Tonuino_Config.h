@@ -8,7 +8,36 @@
 #ifndef TONUINO_CONFIG_INCLUDED
 #define TONUINO_CONFIG_INCLUDED
 
-class TonuinoConfig
+class TonuinoPinConfig
+{
+	public:
+	uint8_t ButtonPause = A1;
+	uint8_t ButtonNext = A3;
+	uint8_t ButtonPrevious = A4;
+	uint8_t Poti = A2;  // 10kOhm Poti
+	uint8_t OpenAnalog = A6;
+
+	// For DFPlayer RX and TX (usually 2 and 3) see DFPlayer class
+	uint8_t DFPlayer_Busy = 4;
+	uint8_t Encoder_CLK = 5;
+	uint8_t Encoder_DT = 8;
+	uint8_t StopLED = 6;
+	uint8_t Shutdown = 7;
+	uint8_t SonicTrigger = 5;
+	uint8_t SonicEcho  = 8;
+};
+
+class TonuinoHWConfig
+{
+	public:
+	bool CardReader = true;
+	bool Encoder = false;
+	bool PowerOff = false;
+	bool Potentiometer = false;
+	bool UltraSonic = false;
+};
+
+class TonuinoSWConfig
 {
 	public:
 	uint8_t StandbyTime = 0;
@@ -18,32 +47,18 @@ class TonuinoConfig
 	uint8_t VolumeMax = 25;
 	DfMp3_Eq Equalizer = DfMp3_Eq_Normal;
 
-	bool UseCardReader = true;
-	bool UsePowerOff = false;
-	bool HasPotentiometer = false;
-	bool HasUltraSonic = false;
-
 	bool StopPlayOnCardRemoval = false;
 
 	MusicDataset StartMusicDS { 0, 0, 0, 0 };
 	MusicDataset ShortCuts[4];
 };
-  
-#define PIN_ButtonPause A1
-#define PIN_ButtonNext A3
-#define PIN_ButtonPrevious A4
-#define PIN_StopLED 9 // 6
-#define PIN_Shutdown 10 // 7
-#define PIN_SonicTrigger 5 
-#define PIN_SonicEcho 8 
-#define PIN_OpenAnalog A6
 
-#define PIN_Poti A2  // 10kOhm Poti
-
-#define PIN_DFPlayer_Busy 4
-#define PIN_DFPlayer_RX 3  
-#define PIN_DFPlayer_TX 2  
-#define PIN_Encoder_CLK 6 // no interrupt pin
-#define PIN_Encoder_DT 7  // no interrupt pin
+class TonuinoConfig
+{
+	public:
+	TonuinoPinConfig PINS;
+	TonuinoHWConfig HW;
+	TonuinoSWConfig SW;
+};
 
 #endif

@@ -11,11 +11,18 @@ TonuinoConfig getConfigMira()
 {
 	TonuinoConfig config;
 	
-	config.UseCardReader = false;
-	config.HasUltraSonic = true;
+	config.PINS.StopLED = 9; // 6
+	config.PINS.Shutdown = 10; // 7
+
+	config.PINS.Encoder_CLK = 6; // 5
+	config.PINS.Encoder_DT = 7;  // 8
+
+	config.HW.CardReader = false;
+	config.HW.UltraSonic = true;
+	config.HW.Encoder = true;
 	
-	config.StartMusicDS.folder = 10;
-	config.StartMusicDS.mode = 1;
+	config.SW.StartMusicDS.folder = 10;
+	config.SW.StartMusicDS.mode = 1;
 	
 	return config;
 }
