@@ -158,6 +158,17 @@ void checkCurrentTrack()
 	}
 }
 
+bool m_lastPlayState = true;
+void checkPlayState()
+{
+	bool isCurrentlyPlaying = dfPlayer.isPlaying();
+    if (m_lastPlayState != isCurrentlyPlaying)
+    {
+      digitalWrite(pinConfig.StopLED, isCurrentlyPlaying ? LOW : HIGH);
+      m_lastPlayState = isCurrentlyPlaying;
+    }
+}
+
 void playShortCut(uint8_t shortCut) 
 {
 	Serial.println(F("=== playShortCut()"));
@@ -262,11 +273,16 @@ void handleRotaryEncoder()
 		return;
 	}
 	
-	rotaryEncoder.read();
+	ModifierDataset modiDS = rotaryEncoder.getPlayerModification();	
+	handleModifier(modiDS.modi, modiDS.value);
 }
 
 void handleButtons()
 {
+	if (allLocked || buttonsLocked)
+	{
+		return;
+	}
 	if (hwConfig.Potentiometer)
 	{
 		if (tonuinoPoti.read())
@@ -282,8 +298,12 @@ void handleButtons()
 
 void handleCardReader()
 {
+	if (!hwConfig.CardReader)
+	{
+		return;
+	}
+	
 	byte pollCardResult = tonuinoRFID.tryPollCard();
-
 	if (pollCardResult == MODIFIERCARD_NEW)
 	{
 		evaluateModifierData(tonuinoRFID.readCardData.musicDS);
@@ -300,18 +320,7 @@ void handleCardReader()
 	}    
 }
 
-bool m_lastPlayState = true;
-void checkPlayState()
-{
-	bool isCurrentlyPlaying = dfPlayer.isPlaying();
-    if (m_lastPlayState != isCurrentlyPlaying)
-    {
-      digitalWrite(pinConfig.StopLED, isCurrentlyPlaying ? LOW : HIGH);
-      m_lastPlayState = isCurrentlyPlaying;
-    }
-}
-
-void checkUltraSonic()
+void handleUltraSonic()
 {
 	if (!hwConfig.UltraSonic)
 	{
@@ -341,19 +350,11 @@ void loopTonuino()
 	checkCurrentTrack();
     dfPlayer.loop();
 	checkPlayState();
-	checkUltraSonic();
 	
+	handleUltraSonic();
 	handleRotaryEncoder();
-	
-	if (!allLocked && !buttonsLocked)
-	{
-		handleButtons();
-	}
-
-    if (hwConfig.CardReader)
-	{
-		handleCardReader();
-	}
+	handleButtons();
+	handleCardReader();
 }
 
 void onNewCard()
@@ -576,6 +577,18 @@ void handleModifier(EModifier modifier, uint8_t special)
 		case MODI_Player_SleepTime:
 		{
 			setSleepTimerValue(special); break;
+		}
+		case MODI_Player_Volume:
+		{
+			dfPlayer.setVolume(special); break;
+		}
+		case MODI_Player_VolumeUp:
+		{
+			dfPlayer.volumeUp(); break;
+		}
+		case MODI_Player_VolumeDown:
+		{
+			dfPlayer.volumeDown(); break;
 		}
 		case MODI_Player_Random:
 		{
