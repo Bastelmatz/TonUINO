@@ -5,7 +5,7 @@
 #ifndef TONUINO_STRUCTS_INCLUDED
 #define TONUINO_STRUCTS_INCLUDED
 
-static const uint32_t cardCookie = 322417479;
+static const uint32_t cardCookie = 322417479; // 0x1337 0xb347 magic cookie to identify our nfc tags
 
 struct MusicDataset 
 {

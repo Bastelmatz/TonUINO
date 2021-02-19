@@ -90,10 +90,10 @@ void Tonuino_RFID_Tool_Core::handleCommand()
 
   nfcTagStruct tempCard;
   tempCard.cookie = cardCookie;
-  tempCard.version = 1;
   tempCard.musicDS.folder = receivedDS.folder;
   tempCard.musicDS.special = receivedDS.special;
   tempCard.musicDS.special2 = receivedDS.special2;
+  tempCard.version = 2;
   tempCard.musicDS.mode = receivedDS.mode;
 
   writeCard(tempCard);

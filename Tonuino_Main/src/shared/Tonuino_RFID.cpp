@@ -224,16 +224,17 @@ bool Tonuino_RFID_Reader::readCard()
 
 bool Tonuino_RFID_Reader::writeCard(nfcTagStruct cardData) 
 {
-  byte buffer[16] = {0x13, 0x37, 0xb3, 0x47, // 0x1337 0xb347 magic cookie to identify our nfc tags
-					 0x02,                   // version 1
+  byte buffer[16] = {(cardData.cookie >> 24) & 0xff,
+					 (cardData.cookie >> 16) & 0xff,
+					 (cardData.cookie >> 8) & 0xff,
+					 (cardData.cookie) & 0xff,
+					 cardData.version,   
 					 cardData.musicDS.folder,  // the folder picked by the user
 					 cardData.musicDS.mode,    // the playback mode picked by the user
 					 cardData.musicDS.special, // track or function for admin cards
 					 cardData.musicDS.special2,
 					 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 					};
-
-  byte size = sizeof(buffer);
 
   MFRC522::PICC_Type mifareType = mfrc522.PICC_GetType(mfrc522.uid.sak);
   const bool bIsMifareUL = mifareType == MFRC522::PICC_TYPE_MIFARE_UL;
