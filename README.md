@@ -4,6 +4,20 @@ Die DIY Musikbox (nicht nur) für Kinder
 
 # Change Log
 
+## Version Mira 1.0 (19.02.2021)
+- Complete code refactoring to use multiple .cpp/.h files
+- Remove admin menu and settings
+- Add "Stop on card removal" feature, disabled by default
+- Add Tonuino RFID Tool (to read and write RFID tags)
+- Add central modifier handling (for player modification)
+- Replace modifier classes with respective settings
+- Add loop for voice menu options
+- Play first/last track on long pressed previous/next button while playing
+- Add support for rotary encoder (used for volume control)
+- Add support for ultrasonic sensor (used for track start in coinbox)
+- Add start/fix music dataset (used for coinbox without RFID reader)
+
+
 ## Version 2.1 Mira (15.11.2020)
 - Stop LED an digital Pin 6 hinzugefügt (leuchtet wenn DFPlayer nicht busy ist, d.h. gestoppt ist)
 - Letzte Karte (d.h. Ordner und Modus) wird im EEPROM gespeichert und bei (Neu)Start geladen (sodass beim Neustart die letzte Karte nicht noch einmal aufgelegt werden muss) 
