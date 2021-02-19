@@ -4,7 +4,7 @@
 class TonuinoUltraSonic
 {
 	public:
-	void setup(uint8_t pin, uint8_t min);
+	void setup(uint8_t triggerPIN, uint8_t echoPIN);
 	uint16_t read();
 	
 	private:

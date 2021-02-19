@@ -30,7 +30,7 @@ typedef enum EBUTTONSTATE
 class TonuinoJCButton
 {
 	public:
-	int PIN = 0;
+	int PIN;
 	
 	void setup(int pin, int codeClick, int codeLongPress);
 	int readState();
@@ -39,7 +39,7 @@ class TonuinoJCButton
 	Button jcButton = Button(0);
 	int CODE_Click;
 	int CODE_LongPress;
-	bool ignore = false;
+	bool ignore;
 };
 
 class TonuinoButtons

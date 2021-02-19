@@ -72,7 +72,6 @@ class TonuinoPlayer
 	static bool currentTrackFinished;
 	
 	static uint8_t queue[255];
-	static long standbyTimeInMin;
 
 	uint8_t allTracksCount();
 	static bool reShuffleOnEnd;

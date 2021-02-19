@@ -164,8 +164,8 @@ void checkPlayState()
 	bool isCurrentlyPlaying = dfPlayer.isPlaying();
     if (m_lastPlayState != isCurrentlyPlaying)
     {
-      digitalWrite(pinConfig.StopLED, isCurrentlyPlaying ? LOW : HIGH);
-      m_lastPlayState = isCurrentlyPlaying;
+		digitalWrite(pinConfig.StopLED, isCurrentlyPlaying ? LOW : HIGH);
+		m_lastPlayState = isCurrentlyPlaying;
     }
 }
 
@@ -403,7 +403,7 @@ void waitForNewCard()
 }
 
 uint8_t voiceMenu(int numberOfOptions, int startMessage, int messageOffset,
-                  bool preview = false, int previewFromFolder = 0, int defaultValue = 0, bool exitWithLongPress = false) 
+                  bool preview, int previewFromFolder, int defaultValue) 
 {
 	uint8_t returnValue = defaultValue;
 	if (startMessage != 0)
@@ -490,6 +490,54 @@ uint8_t voiceMenu(int numberOfOptions, int startMessage, int messageOffset,
 	} while (true);
 }
 
+bool setupFolder(MusicDataset * musicDS) 
+{
+	// Ordner abfragen
+	musicDS->folder = voiceMenu(99, 301, 0, true, 0, 0);
+	uint8_t folder = musicDS->folder;
+	if (folder == 0) return false;
+
+	// Wiedergabemodus abfragen
+	musicDS->mode = voiceMenu(9, 310, 310, false, 0, 0);
+	uint8_t mode = musicDS->mode;
+	if (mode == 0) return false;
+
+	int numberOptions = dfPlayer.getFolderTrackCount(folder);
+	// Einzelmodus -> Datei abfragen
+	if (mode == 4)
+	{
+		musicDS->special = voiceMenu(numberOptions, 320, 0, true, folder, 0);
+	}
+	// Spezialmodus Von-Bis
+	if (mode == 7 || mode == 8 || mode == 9) 
+	{
+		musicDS->special = voiceMenu(numberOptions, 321, 0, true, folder, 0);
+		musicDS->special2 = voiceMenu(numberOptions, 322, 0, true, folder, musicDS->special);
+	}
+	return true;
+}
+
+void setupCard() 
+{
+	dfPlayer.pause();
+	Serial.println(F("=== setupCard()"));
+	nfcTagStruct newCard;
+	if (setupFolder(&newCard.musicDS) == true)
+	{
+		// Karte ist konfiguriert -> speichern
+		dfPlayer.pause();
+		do { } while (dfPlayer.isPlaying());
+		writeCard(newCard);
+	}
+	delay(1000);
+}
+
+void writeCard(nfcTagStruct nfcTag) 
+{
+	bool statusOK = tonuinoRFID.writeCard(nfcTag);
+	dfPlayer.playMp3Track(statusOK ? 400 : 401);
+}
+
 void resetCard() 
 {
 	dfPlayer.playMp3Track(800);
@@ -502,50 +550,6 @@ void resetCard()
 
 	Serial.print(F("Karte wird neu konfiguriert!"));
 	setupCard();
-}
-
-bool setupFolder(MusicDataset * musicDS) 
-{
-  // Ordner abfragen
-  musicDS->folder = voiceMenu(99, 301, 0, true, 0, 0, true);
-  if (musicDS->folder == 0) return false;
-
-  int numberOptions = dfPlayer.getFolderTrackCount(musicDS->folder);
-  
-  // Wiedergabemodus abfragen
-  musicDS->mode = voiceMenu(9, 310, 310, false, 0, 0, true);
-  
-  uint8_t mode = musicDS->mode;
-  if (mode == 0) return false;
-
-  // Einzelmodus -> Datei abfragen
-  if (mode == 4)
-  {
-    musicDS->special = voiceMenu(numberOptions, 320, 0, true, musicDS->folder);
-  }
-  // Spezialmodus Von-Bis
-  if (mode == 7 || mode == 8 || mode == 9) 
-  {
-    musicDS->special = voiceMenu(numberOptions, 321, 0, true, musicDS->folder);
-    musicDS->special2 = voiceMenu(numberOptions, 322, 0, true, musicDS->folder, musicDS->special);
-  }
-  return true;
-}
-
-void setupCard() 
-{
-  dfPlayer.pause();
-  Serial.println(F("=== setupCard()"));
-  nfcTagStruct newCard;
-  if (setupFolder(&newCard.musicDS) == true)
-  {
-    // Karte ist konfiguriert -> speichern
-    dfPlayer.pause();
-    do {
-    } while (dfPlayer.isPlaying());
-    writeCard(newCard);
-  }
-  delay(1000);
 }
 
 void handleModifier(EModifier modifier, uint8_t special)
@@ -650,11 +654,5 @@ void evaluateModifierData(MusicDataset musicDS)
 	uint8_t special = musicDS.special;
 	
 	handleModifier(modifier, special);
-}
-
-void writeCard(nfcTagStruct nfcTag) 
-{
-	bool statusOK = tonuinoRFID.writeCard(nfcTag);
-	dfPlayer.playMp3Track(statusOK ? 400 : 401);
 }
 

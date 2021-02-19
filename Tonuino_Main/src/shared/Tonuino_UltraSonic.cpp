@@ -1,8 +1,8 @@
 
 #include "Tonuino_UltraSonic.h"
 
-long sonic_duration = 0; 
-long sonic_distance = 0; 
+uint16_t sonic_duration = 0; 
+uint16_t sonic_distance = 0; 
 bool sendSonicWave = true;
 bool receiveSonicWave = false;
 long sonicSendTime = 0;
