@@ -225,18 +225,19 @@ void TonuinoDFPlayer::trackFinished()
 	{
 		Serial.println("MP3");
 	}
-
-	if (isPlaying())
-	{
-		mp3.pause();
-		delay(1000);
-	}
-	tonuinoPlayer.trackFinished();
 	
-	if (tonuinoPlayer.isPlaying && musicDSLoaded)
+	Serial.print("Current track ");
+	Serial.println(tonuinoPlayer.currentTrack());
+	if (activeTrack == tonuinoPlayer.currentTrack())
 	{
-		nextTrack();
+		tonuinoPlayer.trackFinished();
+		
+		if (tonuinoPlayer.isPlaying && musicDSLoaded)
+		{
+			nextTrack();
+		}
 	}
+	activeTrack = 0;
 }
 
 void TonuinoDFPlayer::waitForTrackToFinish() 
