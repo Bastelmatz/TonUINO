@@ -4,8 +4,7 @@
 uint16_t sonic_duration = 0; 
 uint16_t sonic_distance = 0; 
 bool sendSonicWave = true;
-bool receiveSonicWave = false;
-long sonicSendTime = 0;
+long receiveHighTime = 0;
 
 void TonuinoUltraSonic::setup(uint8_t triggerPIN, uint8_t echoPIN)
 {
@@ -25,24 +24,22 @@ uint16_t TonuinoUltraSonic::read()
 		digitalWrite(pinTrigger, HIGH); 
 		digitalWrite(pinTrigger, LOW);
 		sendSonicWave = false;
-		receiveSonicWave = false;
+		receiveHighTime = 0;
 		sonic_distance = 0;
 	}
 	else
 	{
 		if (digitalRead(pinEcho) == HIGH)
 		{
-			if (!receiveSonicWave)
+			if (receiveHighTime == 0)
 			{
-				sonicSendTime = micros();
+				receiveHighTime = micros();
 			}
-			receiveSonicWave = true;
 		}
-		if (receiveSonicWave)
+		sonic_duration = micros() - receiveHighTime;
+		if (receiveHighTime > 0)
 		{
-			sonic_duration = micros() - sonicSendTime;
-			bool sonicEnd = digitalRead(pinEcho) == LOW;
-			if (sonicEnd || sonic_duration > 1000 * 1000)
+			if (digitalRead(pinEcho) == LOW) // sonic end
 			{
 				sendSonicWave = true;			
 				sonic_distance = (sonic_duration/2) * 0.3432; //mm
@@ -54,6 +51,10 @@ uint16_t TonuinoUltraSonic::read()
 					Serial.println(sonic_distance);
 				}
 			}
+		}
+		if (sonic_duration > 1000 * 1000)
+		{
+			sendSonicWave = true;
 		}
 	}
 	
