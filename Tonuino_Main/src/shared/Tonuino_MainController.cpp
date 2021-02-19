@@ -402,7 +402,7 @@ void waitForNewCard()
 	} while (!tonuinoRFID.cardDetected());
 }
 
-uint8_t voiceMenu(int numberOfOptions, int startMessage, int messageOffset,
+uint8_t voiceMenu(uint8_t numberOfOptions, int startMessage, int messageOffset,
                   bool preview, int previewFromFolder, int defaultValue) 
 {
 	uint8_t returnValue = defaultValue;
@@ -413,8 +413,6 @@ uint8_t voiceMenu(int numberOfOptions, int startMessage, int messageOffset,
 	Serial.print(F("=== voiceMenu() ("));
 	Serial.print(numberOfOptions);
 	Serial.println(F(" Options)"));
-	bool valueChanged;
-	bool longPressed;
 	do 
 	{
 		// Support for input via console
@@ -426,56 +424,28 @@ uint8_t voiceMenu(int numberOfOptions, int startMessage, int messageOffset,
 				return optionSerial;
 			}
 		}
-		
-		valueChanged = false;
-		longPressed = false;
-		int buttonState = tonuinoButtons.read();
+
 		dfPlayer.loop();
 		checkStandbyAtMillis();
-		if (buttonState == BUTTONCLICK_LONG_StartStop) 
+		ModifierDataset modiDS = tonuinoButtons.getMenuModification(returnValue, defaultValue, numberOfOptions);
+		if (modiDS.modi == MODI_MENU_Cancel ||
+			modiDS.modi == MODI_MENU_Choose) 
 		{
-			dfPlayer.playMp3Track(802);
-			return defaultValue;
-		}
-		if (buttonState == BUTTONCLICK_StartStop) 
-		{
-			if (returnValue != 0) 
+			if (modiDS.modi == MODI_MENU_Cancel) 
 			{
-				Serial.print("Use option ");
-				Serial.println(returnValue);
-				return returnValue;
+				dfPlayer.playMp3Track(802);
 			}
-			delay(1000);
+			Serial.print("Use option ");
+			Serial.println(modiDS.value);
+			return modiDS.value;
 		}
-
-		if (buttonState == BUTTONCLICK_LONG_Next) 
+		if (modiDS.modi == MODI_MENU_ChangeSmall ||
+			modiDS.modi == MODI_MENU_ChangeLarge) 
 		{
-			returnValue = min(returnValue + 10, numberOfOptions);
-			valueChanged = true;
-			longPressed = true;
-		} 
-		else if (buttonState == BUTTONCLICK_Next) 
-		{
-			returnValue = returnValue + 1 > numberOfOptions ? defaultValue : returnValue + 1;
-			valueChanged = true;
-		}
-
-		if (buttonState == BUTTONCLICK_LONG_Previous) 
-		{
-			returnValue = max(returnValue - 10, 1);
-			valueChanged = true;
-			longPressed = true;
-		} 
-		else if (buttonState == BUTTONCLICK_Previous) 
-		{
-			returnValue = returnValue < 2 ? numberOfOptions : returnValue - 1;
-			valueChanged = true;
-		}
-		if (valueChanged)
-		{
+			returnValue = modiDS.value;
 			Serial.println(returnValue);
 			dfPlayer.playMP3AndWait(messageOffset + returnValue);
-			if (preview && !longPressed) 
+			if (preview && modiDS.modi == MODI_MENU_ChangeSmall) 
 			{
 				if (previewFromFolder == 0) 
 				{
@@ -502,7 +472,7 @@ bool setupFolder(MusicDataset * musicDS)
 	uint8_t mode = musicDS->mode;
 	if (mode == 0) return false;
 
-	int numberOptions = dfPlayer.getFolderTrackCount(folder);
+	uint8_t numberOptions = dfPlayer.getFolderTrackCount(folder);
 	// Einzelmodus -> Datei abfragen
 	if (mode == 4)
 	{

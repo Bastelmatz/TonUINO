@@ -49,6 +49,7 @@ class TonuinoButtons
 	int read();
 	int readRaw();
 	ModifierDataset getPlayerModification(bool isCurrentlyPlaying);
+	ModifierDataset getMenuModification(uint8_t currentValue, uint8_t defaultValue, uint8_t numberOptions);
 	
 	private:
 	static TonuinoJCButton startStopButton;

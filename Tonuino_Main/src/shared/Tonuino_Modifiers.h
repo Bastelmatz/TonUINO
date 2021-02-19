@@ -33,6 +33,11 @@ typedef enum EModifier
 	
 	MODI_ResetCard = 40,
 	MODI_ResetEEPROM = 41,
+	
+	MODI_MENU_ChangeSmall = 50,
+	MODI_MENU_ChangeLarge = 51,
+	MODI_MENU_Choose = 52,
+	MODI_MENU_Cancel = 53,
 };
 
 #include <SPI.h>

@@ -122,6 +122,47 @@ ModifierDataset TonuinoButtons::getPlayerModification(bool isCurrentlyPlaying)
 	return modiDS;
 }
 
+ModifierDataset TonuinoButtons::getMenuModification(uint8_t currentValue, uint8_t defaultValue, uint8_t numberOptions)
+{
+	int buttonState = read();
+	ModifierDataset modiDS;
+	modiDS.modi = 0;
+	modiDS.value = 0;
+
+	if (buttonState == BUTTONCLICK_LONG_StartStop) 
+	{
+		modiDS.modi = MODI_MENU_Cancel;
+		modiDS.value = currentValue;
+	}
+	if (buttonState == BUTTONCLICK_StartStop) 
+	{
+		modiDS.modi = MODI_MENU_Choose;
+		modiDS.modi = defaultValue;
+	}
+	if (buttonState == BUTTONCLICK_LONG_Next) 
+	{
+		modiDS.modi = MODI_MENU_ChangeLarge;
+		modiDS.value = min(currentValue + 10, numberOptions);
+	} 
+	if (buttonState == BUTTONCLICK_Next) 
+	{
+		modiDS.modi = MODI_MENU_ChangeSmall;
+		modiDS.value = currentValue + 1 > numberOptions ? defaultValue : currentValue + 1;
+	}
+	if (buttonState == BUTTONCLICK_LONG_Previous) 
+	{
+		modiDS.modi = MODI_MENU_ChangeLarge;
+		modiDS.value = max(currentValue - 10, 1);
+	} 
+	if (buttonState == BUTTONCLICK_Previous) 
+	{
+		modiDS.modi = MODI_MENU_ChangeSmall;
+		uint8_t smallestValid = defaultValue + (defaultValue == 0 ? 1 : 0);
+		modiDS.value = currentValue - 1 < smallestValid ? numberOptions : currentValue - 1;
+	}
+	return modiDS;
+}
+
 // ************************************
 // JC Button
 // ************************************
