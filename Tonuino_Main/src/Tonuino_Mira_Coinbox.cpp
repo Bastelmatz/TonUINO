@@ -11,8 +11,8 @@ TonuinoConfig getConfigMira()
 {
 	TonuinoConfig config;
 	
-	config.PINS.StopLED = 9; // 6
-	config.PINS.Shutdown = 10; // 7
+	config.PINS.StopLED = 11; // 6
+	config.PINS.Shutdown = 12; // 7
 
 	config.PINS.Encoder_CLK = 6; // 5
 	config.PINS.Encoder_DT = 7;  // 8

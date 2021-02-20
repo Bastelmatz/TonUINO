@@ -328,11 +328,11 @@ void handleUltraSonic()
 	}
 
 	long distance = ultraSonicSensor.read();
-	if (distance > 10 && distance < 70)
+	if (distance > 10 && distance < 50)
 	{
 		handle_sonic = true;
 	}
-	if (distance > 70)
+	if (distance > 100)
 	{
 		if (handle_sonic)
 		{

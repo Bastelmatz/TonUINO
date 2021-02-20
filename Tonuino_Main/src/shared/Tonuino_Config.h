@@ -23,8 +23,8 @@ class TonuinoPinConfig
 	uint8_t Encoder_DT = 8;
 	uint8_t StopLED = 6;
 	uint8_t Shutdown = 7;
-	uint8_t SonicTrigger = 5;
-	uint8_t SonicEcho  = 8;
+	uint8_t SonicTrigger = 9;
+	uint8_t SonicEcho  = 10;
 };
 
 class TonuinoHWConfig
