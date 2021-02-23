@@ -14,7 +14,6 @@ uint8_t TonuinoDFPlayer::volumeMax = 25;
 MusicDataset TonuinoDFPlayer::musicDS;
 bool TonuinoDFPlayer::musicDSLoaded = false;
 bool TonuinoDFPlayer::newMusisDS = false;
-bool TonuinoDFPlayer::feedbackOnVolumeChange = false;
 
 bool TonuinoDFPlayer::freezeDance_active = false;
 unsigned long TonuinoDFPlayer::freezeDance_nextStopAtMillis = 0;
@@ -295,11 +294,8 @@ void TonuinoDFPlayer::setVolume(uint8_t vol)
 	{
 		volume = vol;
 		mp3.setVolume(volume);
-		if (feedbackOnVolumeChange)
-		{
-			mp3.playAdvertisement(volume);
-			delay(500);
-		}
+		Serial.print(F("Volume: "));
+		Serial.println(volume);
 	}
 }
 
