@@ -29,7 +29,7 @@ TonuinoEEPROM tonuinoEEPROM;
 TonuinoPotentiometer tonuinoPoti;
 
 TonuinoUltraSonic ultraSonicSensor;
-bool handle_sonic = false;
+uint8_t sonicCounter = 0;
 
 TonuinoButtons tonuinoButtons;
 
@@ -334,19 +334,19 @@ void handleUltraSonic()
 		return;
 	}
 
-	long distance = ultraSonicSensor.read();
-	if (distance > 10 && distance < 50)
+	uint16_t distance = ultraSonicSensor.read();
+	if (distance > 20 && distance < 50)
 	{
-		handle_sonic = true;
+		sonicCounter++;
 	}
-	if (distance > 100)
+	if (distance > 70)
 	{
-		if (handle_sonic)
+		if (sonicCounter > 1) // avoid outliers
 		{
 			dfPlayer.playAdvertisement(262);
 			dfPlayer.nextTrack();
 		}
-		handle_sonic = false;
+		sonicCounter = 0;
 	}
 }
 	
