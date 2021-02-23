@@ -21,7 +21,7 @@ bool TonuinoPotentiometer::read()
          || (value < appliedValue * 2 - hysterese && value >= min)))  
     {
 		appliedValue = value / 2;
-		Serial.print("Potentiometer Value: ");
+		Serial.print(F("Potentiometer Value: "));
 		Serial.println(appliedValue);  
 		Serial.println(valueRaw);			
 		return true;

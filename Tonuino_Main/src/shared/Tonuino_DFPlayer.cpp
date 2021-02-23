@@ -25,14 +25,14 @@ unsigned long TonuinoDFPlayer::freezeDance_nextStopAtMillis = 0;
 void TonuinoDFPlayer::Mp3Notify::OnError(uint16_t errorCode) 
 {
 	// see DfMp3_Error for code meaning
-	Serial.print("DFPlayer Com Error ");
+	Serial.print(F("DFPlayer Com Error "));
 	Serial.println(errorCode);
 }
 void TonuinoDFPlayer::Mp3Notify::PrintlnSourceAction(DfMp3_PlaySources source, const char* action) 
 {
-	if (source & DfMp3_PlaySources_Sd) Serial.print("SD Karte ");
-	if (source & DfMp3_PlaySources_Usb) Serial.print("USB ");
-	if (source & DfMp3_PlaySources_Flash) Serial.print("Flash ");
+	if (source & DfMp3_PlaySources_Sd) Serial.print(F("SD Karte "));
+	if (source & DfMp3_PlaySources_Usb) Serial.print(F("USB "));
+	if (source & DfMp3_PlaySources_Flash) Serial.print(F("Flash "));
 	Serial.println(action);
 }
 void TonuinoDFPlayer::Mp3Notify::OnPlayFinished(DfMp3_PlaySources source, uint16_t track) 
@@ -127,9 +127,9 @@ void TonuinoDFPlayer::loadFolder(MusicDataset dataset, uint8_t lastTrack)
 		lastTrack = 1;
 	}
 
-	Serial.print("Load folder ");
+	Serial.print(F("Load folder "));
 	Serial.print(musicDS.folder);
-	Serial.print(" with mode ");
+	Serial.print(F(" with mode "));
 	Serial.println(musicDS.mode);
 	tonuinoPlayer.loadFolder(numTracks, musicDS.mode, musicDS.special, musicDS.special2, lastTrack);
 	musicDSLoaded = true;
@@ -214,19 +214,19 @@ void TonuinoDFPlayer::lastTrack()
 
 void TonuinoDFPlayer::trackFinished()
 {
-	Serial.print("Finished track ");
+	Serial.print(F("Finished track "));
 	Serial.print(activeTrack);
-	Serial.print(" in folder ");
+	Serial.print(F(" in folder "));
 	if (activeFolder > 0)
 	{
 		Serial.println(activeFolder);
 	}
 	else
 	{
-		Serial.println("MP3");
+		Serial.println(F("MP3"));
 	}
 	
-	Serial.print("Current track ");
+	Serial.print(F("Current track "));
 	Serial.println(tonuinoPlayer.currentTrack());
 	if (activeTrack == tonuinoPlayer.currentTrack())
 	{
@@ -259,7 +259,7 @@ void TonuinoDFPlayer::waitForTrackToFinish()
 
 void TonuinoDFPlayer::playAdvertisement(int advertisement)
 {
-	Serial.print("Play advertisement ");
+	Serial.print(F("Play advertisement "));
 	Serial.println(advertisement);
 	if (isPlaying()) 
 	{
@@ -317,7 +317,7 @@ void TonuinoDFPlayer::start()
 void TonuinoDFPlayer::setNextStopAtMillis() 
 {
 	uint16_t seconds = random(5, 30 + 1);
-	Serial.print("Freeze dance - next stop in seconds: ");
+	Serial.print(F("Freeze dance - next stop in seconds: "));
 	Serial.println(seconds);
 	freezeDance_nextStopAtMillis = millis() + seconds * 1000;
 }
@@ -337,7 +337,7 @@ void TonuinoDFPlayer::loop()
 	{
 		if (millis() > freezeDance_nextStopAtMillis) 
 		{
-			Serial.println("Freeze - pause playing ...");
+			Serial.println(F("Freeze - pause playing ..."));
 			setNextStopAtMillis();
 			togglePlay();
 		}

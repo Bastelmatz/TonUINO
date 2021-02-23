@@ -21,14 +21,14 @@ int TonuinoEEPROM::flashAddress_Track(uint8_t folder)
 
 void TonuinoEEPROM::writeLastDatasetToFlash(MusicDataset musicDS) 
 {
-  Serial.println("Write last dataset to flash");
+  Serial.println(F("Write last dataset to flash"));
   EEPROM.put(0, musicDS);
 }
 
 MusicDataset TonuinoEEPROM::loadLastDatasetFromFlash() 
 {
   MusicDataset musicDS;
-  Serial.println("Load last dataset from flash");
+  Serial.println(F("Load last dataset from flash"));
   EEPROM.get(0, musicDS);
   
   Serial.print(F("Last folder: "));

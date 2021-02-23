@@ -10,11 +10,11 @@ void Tonuino_RFID_Tool_Core::transmitTrigger(bool startTrigger)
   // this information is required for Tonuino RFID Tool
   if (startTrigger)
   {
-	Serial.println("Tonuino_RFID_Tool_BEGIN");
+	Serial.println(F("Tonuino_RFID_Tool_BEGIN"));
   }
   else
   {
-	Serial.println("Tonuino_RFID_Tool_END");
+	Serial.println(F("Tonuino_RFID_Tool_END"));
   }
 }
 
@@ -23,20 +23,20 @@ void Tonuino_RFID_Tool_Core::transmitCardData(nfcTagStruct nfcTag)
   // this information is required for Tonuino RFID Tool
   // the formatting and order of the transmitted data is defined and must be in sync with the tool
   transmitTrigger(true);
-  Serial.println("CardData");
-  Serial.print("RFID:");
+  Serial.println(F("CardData"));
+  Serial.print(F("RFID:"));
   //dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size); // doesn't work anymore for some reason
   dump_byte_array(tonuinoRFID.currentCardUid, sizeof(tonuinoRFID.currentCardUid));
   Serial.println();
-  Serial.print("Cookie:");
+  Serial.print(F("Cookie:"));
   Serial.println(nfcTag.cookie);
-  Serial.print("Folder:");
+  Serial.print(F("Folder:"));
   Serial.println(nfcTag.musicDS.folder);
-  Serial.print("Mode:");
+  Serial.print(F("Mode:"));
   Serial.println(nfcTag.musicDS.mode);
-  Serial.print("Special:");
+  Serial.print(F("Special:"));
   Serial.println(nfcTag.musicDS.special);
-  Serial.print("Special2:");
+  Serial.print(F("Special2:"));
   Serial.println(nfcTag.musicDS.special2);
   transmitTrigger(false);
 }
@@ -44,7 +44,7 @@ void Tonuino_RFID_Tool_Core::transmitCardData(nfcTagStruct nfcTag)
 void Tonuino_RFID_Tool_Core::transmitCardRemoval()
 {
 	transmitTrigger(true);
-	Serial.println("CardData");
+	Serial.println(F("CardData"));
 	transmitTrigger(false);
 }
 
@@ -61,7 +61,7 @@ void Tonuino_RFID_Tool_Core::writeCard(nfcTagStruct nfcTag)
 
 void Tonuino_RFID_Tool_Core::handleCommand()
 {
-  Serial.println("RFID_Tool_Command_Received");
+  Serial.println(F("RFID_Tool_Command_Received"));
   Serial.println(readSerialString);
 
   MusicDataset receivedDS;

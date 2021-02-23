@@ -100,13 +100,13 @@ void TonuinoPlayer::showTimerInfo()
 	// Show debug info if timers are used
 	if (sleepTimer.timeInMin > 0)
 	{
-		Serial.print("Sleep timer: ");
+		Serial.print(F("Sleep timer: "));
 		Serial.print(sleepTimer.activeTime);
 		Serial.println(sleepTimer.activeTime > 0 ? "" : " = disabled");
 	}
 	if (standbyTimer.timeInMin > 0)
 	{
-		Serial.print("Standby timer: ");
+		Serial.print(F("Standby timer: "));
 		Serial.print(standbyTimer.activeTime);
 		Serial.println(standbyTimer.activeTime > 0 ? "" : " = disabled");
 	}

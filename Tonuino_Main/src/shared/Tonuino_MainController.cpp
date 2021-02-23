@@ -153,7 +153,7 @@ void checkCurrentTrack()
 		uint8_t currentTrack = tonuinoPlayer().currentTrack();
 		if (currentTrack > 0 && trackInEEPROM != currentTrack)
 		{
-			Serial.print("Save current track to EEPROM: ");
+			Serial.print(F("Save current track to EEPROM: "));
 			Serial.print(currentTrack);
 			tonuinoEEPROM.writeLastTrackToFlash(currentTrack, dfPlayer.musicDS.folder);
 		}
@@ -453,7 +453,7 @@ uint8_t voiceMenu(uint8_t numberOfOptions, int startMessage, int messageOffset,
 			{
 				dfPlayer.playMp3Track(802);
 			}
-			Serial.print("Use option ");
+			Serial.print(F("Use option "));
 			Serial.println(modiDS.value);
 			return modiDS.value;
 		}

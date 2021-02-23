@@ -13,7 +13,7 @@ void TonuinoNeopixel::setup(uint8_t ledCount, uint8_t dataPin)
 	
 	if (ledCount < LED_COUNT)
 	{
-		Serial.print("ERROR in neopixel setup: Increase LED_COUNT to >= ");
+		Serial.print(F("ERROR in neopixel setup: Increase LED_COUNT to >= "));
 		Serial.println(ledCount);
 	}
 	

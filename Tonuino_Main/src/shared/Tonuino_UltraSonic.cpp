@@ -43,11 +43,11 @@ uint16_t TonuinoUltraSonic::read()
 			{
 				sendSonicWave = true;			
 				sonic_distance = (sonic_duration/2) * 0.3432; //mm
-				//Serial.print("Duration: ");
+				//Serial.print(F("Duration: "));
 				//Serial.println(sonic_duration);
 				if (sonic_distance < 2500)
 				{
-					Serial.print("Distance: ");
+					Serial.print(F("Distance: "));
 					Serial.println(sonic_distance);
 				}
 			}

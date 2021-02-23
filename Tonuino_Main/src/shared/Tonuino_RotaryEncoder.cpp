@@ -18,7 +18,7 @@ ModifierDataset TonuinoRotaryEncoder::getPlayerModification()
 	{
 		modiDS.modi = newPos > rotEncPos ? MODI_Player_VolumeUp : MODI_Player_VolumeDown;
 
-		Serial.print("Pos: ");
+		Serial.print(F("Pos: "));
 		Serial.println(newPos);
 		rotEncPos = newPos;
 	}  
