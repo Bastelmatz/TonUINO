@@ -71,14 +71,19 @@ void TonuinoNeopixel::animate()
 	}
 }
 
+void TonuinoNeopixel::saveForRGB(uint8_t index, uint32_t colorRGB)
+{
+	lsrColorR[index] = (colorRGB >> 16 & 0xFF);
+	lsrColorG[index] = (colorRGB >> 8 & 0xFF);
+	lsrColorB[index] = (colorRGB & 0xFF);
+}
+
 void TonuinoNeopixel::defineColors_Rainbow() // hue spectrum (Rainbow)
 {
 	for (i = 0; i < ledsCount; i++)
 	{
 		lsrColors = strip.ColorHSV(i * 65536 / ledsCount, 255, 30);
-		lsrColorR[i] = (lsrColors >> 16 & 0xFF);
-		lsrColorG[i] = (lsrColors >> 8 & 0xFF);
-		lsrColorB[i] = (lsrColors & 0xFF);
+		saveForRGB(i, lsrColors);
 	}
 }
 
@@ -86,11 +91,9 @@ void TonuinoNeopixel::defineColors_GreenToRed() // From green to red
 {
 	for (i = 0; i < ledsCount; i++)
 	{
-		lsrHueCalc = 21000 / (ledsCount - 1) / (ledsCount - 1);
-		lsrColors = strip.ColorHSV(((ledsCount - 1) - i) * (ledsCount - 1) * lsrHueCalc, 255, 30);
-		lsrColorR[i] = (lsrColors >> 16 & 0xFF);
-		lsrColorG[i] = (lsrColors >> 8 & 0xFF);
-		lsrColorB[i] = (lsrColors & 0xFF);
+		lsrHueCalc = 21000 / (ledsCount - 1);
+		lsrColors = strip.ColorHSV(((ledsCount - 1) - i) * lsrHueCalc, 255, 30);
+		saveForRGB(i, lsrColors);
 	}
 }
 
@@ -106,7 +109,7 @@ void TonuinoNeopixel::defineAnimation()
 				currentDelayMS = 150;    
 				updateCounterTarget	= ledsCount; // one circle
 
-				defineColors_GreenToRed();
+				defineColors_Rainbow();
 				
 				if (updateCounter == 0) // only on first run
 				{
