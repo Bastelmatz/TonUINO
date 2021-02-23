@@ -6,10 +6,12 @@ uint16_t loopCountWait = 0;
 uint8_t lastDetectedVolume = 0;
 long lastAnimationTime = 0;
 int16_t currentDelayMS = 0;
+uint8_t ledsCount = 0;
 
 void TonuinoNeopixel::setup(uint8_t ledCount, uint8_t dataPin)
 {
 	strip = Adafruit_NeoPixel(ledCount, dataPin, NEO_GRB + NEO_KHZ800);
+	ledsCount = ledCount;
 	
 	if (ledCount < LED_COUNT)
 	{
@@ -56,15 +58,15 @@ void TonuinoNeopixel::defineColors_Rainbow(bool reset) // hue spectrum (Rainbow)
 	}
 	do
 	{
-		for (i = 0; i < strip.numPixels(); i++)
+		for (i = 0; i < ledsCount; i++)
 		{
-			lsrColors = strip.ColorHSV(i * 65536 / strip.numPixels(), 255, 30);
+			lsrColors = strip.ColorHSV(i * 65536 / ledsCount, 255, 30);
 			lsrColorR[i] = (lsrColors >> 16 & 0xFF);
 			lsrColorG[i] = (lsrColors >> 8 & 0xFF);
 			lsrColorB[i] = (lsrColors & 0xFF);
 		}
 		x++;
-	} while (x < strip.numPixels());
+	} while (x < ledsCount);
 }
 
 void TonuinoNeopixel::defineColors_GreenToRed() // From green to red
@@ -74,8 +76,8 @@ void TonuinoNeopixel::defineColors_GreenToRed() // From green to red
 	{
 		for (i = 0; i < strip.numPixels(); i++)
 		{
-			lsrHueCalc = 21000 / (strip.numPixels() - 1) / (strip.numPixels() - 1);
-			lsrColors = strip.ColorHSV(((strip.numPixels() - 1) - i) * (strip.numPixels() - 1) * lsrHueCalc, 255, 30);
+			lsrHueCalc = 21000 / (ledsCount - 1) / (ledsCount - 1);
+			lsrColors = strip.ColorHSV(((ledsCount - 1) - i) * (ledsCount - 1) * lsrHueCalc, 255, 30);
 			strip.setPixelColor(i, lsrColors);
 			lsrColorR[i] = (lsrColors >> 16 & 0xFF);
 			lsrColorG[i] = (lsrColors >> 8 & 0xFF);
@@ -83,7 +85,7 @@ void TonuinoNeopixel::defineColors_GreenToRed() // From green to red
 		}
 		x++;
 	}
-	while (x < strip.numPixels());
+	while (x < ledsCount);
 }
 
 void TonuinoNeopixel::defineAnimation()
@@ -102,19 +104,19 @@ void TonuinoNeopixel::defineAnimation()
 				// Rotation clockwise
 				y++;
 				x = 0;
-				if (y >= strip.numPixels())
+				if (y >= ledsCount)
 				{
 					y = 0;
 				}
 				do
 				{
-					for (i = 0; i < strip.numPixels(); i++)
+					for (i = 0; i < ledsCount; i++)
 					{
-						strip.setPixelColor((i + y) % strip.numPixels(), lsrColorR[i], lsrColorG[i], lsrColorB[i]);
+						strip.setPixelColor((i + y) % ledsCount, lsrColorR[i], lsrColorG[i], lsrColorB[i]);
 					}
 					x++;
 				}
-				while (x < strip.numPixels());
+				while (x < ledsCount);
 			}
 			// While music paused
 			else
@@ -127,13 +129,13 @@ void TonuinoNeopixel::defineAnimation()
 
 				// Filling increase
 				y++;
-				if (y >= strip.numPixels())
+				if (y >= ledsCount)
 				{
 					y = 0;
 					z++;
 					strip.clear();
 				}
-				if (z >= strip.numPixels())
+				if (z >= ledsCount)
 				{
 					z = 0;
 				}
@@ -157,11 +159,11 @@ void TonuinoNeopixel::defineAnimation()
 
 			// All LEDs alternating in hue spectrum
 			y++;
-			if (y >= (strip.numPixels() * 8) )
+			if (y >= (ledsCount * 8) )
 			{
 				y = 0;
 			}
-			strip.fill(strip.ColorHSV((y * 65536 / strip.numPixels() / 8) , 255, 30), 0, 0);
+			strip.fill(strip.ColorHSV((y * 65536 / ledsCount / 8) , 255, 30), 0, 0);
 		}
 	}
 
@@ -172,7 +174,7 @@ void TonuinoNeopixel::defineAnimation()
 		currentDelayMS = 3000;
 
 		volumeScope = (animConfig.volumeMax - animConfig.volumeMin);
-		volumeScopeAmount = (animConfig.volume - animConfig.volumeMin) * (LED_COUNT - 1) / volumeScope; // Lautstärkenanzeige angepasst an die Anzahl der LEDs
+		volumeScopeAmount = (animConfig.volume - animConfig.volumeMin) * (ledsCount - 1) / volumeScope; // Lautstärkenanzeige angepasst an die Anzahl der LEDs
 
 		defineColors_GreenToRed();
 		
