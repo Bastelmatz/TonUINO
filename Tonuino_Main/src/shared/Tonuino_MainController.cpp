@@ -30,6 +30,7 @@ TonuinoPotentiometer tonuinoPoti;
 
 TonuinoUltraSonic ultraSonicSensor;
 uint8_t sonicCounter = 0;
+bool countdownNextTrack = false;
 
 TonuinoButtons tonuinoButtons;
 
@@ -267,7 +268,8 @@ void setupTonuino(TonuinoConfig config)
 
 	// play startup sound
 	dfPlayer.playAdvertisement(261);
-
+	delay(1000);
+	
 	// load last folder 
 	loadStartFolder();
 	loadFolder(lastMusicDS);
@@ -337,16 +339,23 @@ void handleUltraSonic()
 	uint16_t distance = ultraSonicSensor.read();
 	if (distance > 20 && distance < 50)
 	{
-		sonicCounter++;
+		sonicCounter++; 
 	}
 	if (distance > 70)
 	{
-		if (sonicCounter > 1) // avoid outliers
+		if (sonicCounter > 1 && !countdownNextTrack) // avoid outliers and prevent new call while countdown
 		{
+			dfPlayer.pause();
+			delay(100);
 			dfPlayer.playAdvertisement(262);
-			dfPlayer.nextTrack();
+			countdownNextTrack = true;
 		}
 		sonicCounter = 0;
+	}
+	if (countdownNextTrack && neopixelRing.limitedAnimationFinished)
+	{
+		dfPlayer.nextTrack();
+		countdownNextTrack = false;
 	}
 }
 	
@@ -356,6 +365,7 @@ void handleNeopixels()
 	neopixelRing.animConfig.volumeMin = dfPlayer.volumeMin;
 	neopixelRing.animConfig.volumeMax = dfPlayer.volumeMax;
 	neopixelRing.animConfig.musicLoaded = dfPlayer.musicDSLoaded;
+	neopixelRing.animConfig.musicLoading = countdownNextTrack;
 	neopixelRing.animConfig.musicPlaying = dfPlayer.isPlaying();
 	neopixelRing.animate();
 }

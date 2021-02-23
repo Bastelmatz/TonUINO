@@ -4,11 +4,14 @@
 
 struct AnimationConfig
 {
+	uint8_t mode;
+	
 	uint8_t volume;
 	uint8_t volumeMin;
 	uint8_t volumeMax;
 	
 	bool musicLoaded;
+	bool musicLoading;
 	bool musicPlaying;
 };
 
@@ -21,6 +24,7 @@ class TonuinoNeopixel
 		
 		Adafruit_NeoPixel strip;
 		AnimationConfig animConfig;
+		bool limitedAnimationFinished;
 		
 	private:
 		void defineAnimation();
@@ -28,15 +32,15 @@ class TonuinoNeopixel
 		void defineColors_Rainbow();
 		
 		long lastAnimationTimeMS;
-		int16_t currentDelayMS;
+		uint16_t currentDelayMS;
+		uint8_t updateCounter;
+		uint8_t updateCounterTarget;
 		uint8_t y;
-		uint8_t z;
 		uint8_t i;
 
 		uint8_t lastDetectedVolume;     
 		uint8_t volumeScope;             
 		uint8_t volumeScopeAmount;       
-		uint8_t lsrAnimationMode;        // Animationsmodus - 0: Daueranimation, 2 einmalige Animation (als Unterbrechung zu 0)
 		uint32_t lsrHueCalc;             
 		uint32_t lsrColors;      
 

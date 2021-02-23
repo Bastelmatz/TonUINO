@@ -272,7 +272,6 @@ void TonuinoDFPlayer::playAdvertisement(int advertisement)
 		mp3.playAdvertisement(advertisement);
 		delay(100);
 		mp3.pause();
-		delay(1000);
 	}
 }
 

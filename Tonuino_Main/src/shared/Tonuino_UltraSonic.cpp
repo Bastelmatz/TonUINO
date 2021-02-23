@@ -1,10 +1,10 @@
 
 #include "Tonuino_UltraSonic.h"
 
-uint16_t sonic_duration = 0; 
+uint32_t sonic_duration = 0; 
 uint16_t sonic_distance = 0; 
 bool sendSonicWave = true;
-long receiveHighTime = 0;
+uint32_t receiveHighTime = 0;
 
 void TonuinoUltraSonic::setup(uint8_t triggerPIN, uint8_t echoPIN)
 {
@@ -52,7 +52,7 @@ uint16_t TonuinoUltraSonic::read()
 				}
 			}
 		}
-		if (sonic_duration / 1000 > 1000)
+		if (sonic_duration > 1000 * 1000)
 		{
 			sendSonicWave = true;
 		}

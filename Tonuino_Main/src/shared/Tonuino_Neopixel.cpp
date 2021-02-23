@@ -5,7 +5,10 @@ uint16_t loopCount = 0;
 uint16_t loopCountWait = 0; 
 uint8_t lastDetectedVolume = 0;
 long lastAnimationTime = 0;
-int16_t currentDelayMS = 0;
+uint16_t currentDelayMS = 0;
+uint8_t updateCounter = 0;
+uint8_t updateCounterTarget = 0;
+bool limitedAnimationFinished = false;
 uint8_t ledsCount = 0;
 
 void TonuinoNeopixel::setup(uint8_t ledCount, uint8_t dataPin)
@@ -35,20 +38,33 @@ void TonuinoNeopixel::turnOff()
 
 void TonuinoNeopixel::animate()
 {
-	bool startAnim = millis() - lastAnimationTime > currentDelayMS;
-		
-	lsrAnimationMode = 0; // default looping animation
+	animConfig.mode = 0; 
+	
+	bool updateAnim = millis() - lastAnimationTime > currentDelayMS;
 	// detect volume change and trigger one-time animation
     if (animConfig.volume != lastDetectedVolume)
     {
-		startAnim = true;
-		lsrAnimationMode = 2;
+		updateAnim = true;
+		animConfig.mode = 2;
 		lastDetectedVolume = animConfig.volume;
     }
 	
-	if (startAnim) 
+	if (updateAnim) 
 	{
+		limitedAnimationFinished = false;
+		
 		defineAnimation();
+		
+		if (updateCounterTarget > 0)
+		{
+			updateCounter++;
+			if (updateCounter >= updateCounterTarget)
+			{
+				limitedAnimationFinished = true; // trigger for one-time external action until next animate
+				updateCounterTarget = 0;  // return to endless looping animation after update cycle target is reached
+				updateCounter = 0;
+			}
+		}
 		
 		strip.show();
 		lastAnimationTime = millis();
@@ -72,7 +88,6 @@ void TonuinoNeopixel::defineColors_GreenToRed() // From green to red
 	{
 		lsrHueCalc = 21000 / (ledsCount - 1) / (ledsCount - 1);
 		lsrColors = strip.ColorHSV(((ledsCount - 1) - i) * (ledsCount - 1) * lsrHueCalc, 255, 30);
-		strip.setPixelColor(i, lsrColors);
 		lsrColorR[i] = (lsrColors >> 16 & 0xFF);
 		lsrColorG[i] = (lsrColors >> 8 & 0xFF);
 		lsrColorB[i] = (lsrColors & 0xFF);
@@ -81,49 +96,67 @@ void TonuinoNeopixel::defineColors_GreenToRed() // From green to red
 
 void TonuinoNeopixel::defineAnimation()
 {
-	if (lsrAnimationMode == 0)
+	if (animConfig.mode == 0)
 	{
 		if (animConfig.musicLoaded)
 		{
-			defineColors_Rainbow();
-			
-			// While music playing
-			if (animConfig.musicPlaying)
+			if (animConfig.musicLoading)
 			{
-				currentDelayMS = 200;                        
+				// loading/filling circle
+				currentDelayMS = 150;    
+				updateCounterTarget	= ledsCount; // one circle
 
-				// Rotation clockwise
+				defineColors_GreenToRed();
+				
+				if (updateCounter == 0) // only on first run
+				{
+					strip.clear(); 
+					y = 0;
+				}
+
+				strip.setPixelColor( y , lsrColorR[y], lsrColorG[y], lsrColorB[y]);
+				
 				y++;
 				if (y >= ledsCount)
 				{
 					y = 0;
-				}
-				for (i = 0; i < ledsCount; i++)
-				{
-					strip.setPixelColor((i + y) % ledsCount, lsrColorR[i], lsrColorG[i], lsrColorB[i]);
 				}
 			}
-			// While music paused
 			else
 			{
-				currentDelayMS = 300;                     
-				strip.clear(); // only one point
+				defineColors_Rainbow();
+				
+				// While music playing
+				if (animConfig.musicPlaying)
+				{
+					currentDelayMS = 200;                        
 
-				// Filling increase
-				y++;
-				if (y >= ledsCount)
-				{
-					y = 0;
-					z++;
-					strip.clear();
+					// Rotation clockwise
+					y++;
+					if (y >= ledsCount)
+					{
+						y = 0;
+					}
+					for (i = 0; i < ledsCount; i++)
+					{
+						strip.setPixelColor((i + y) % ledsCount, lsrColorR[i], lsrColorG[i], lsrColorB[i]);
+					}
 				}
-				if (z >= ledsCount)
+				else // While music paused
 				{
-					z = 0;
-				}
-				for (i = 0; i < y + 1 ; i++)
-				{
-					strip.setPixelColor( y , lsrColorR[y], lsrColorG[y], lsrColorB[y]);
+					currentDelayMS = 300;                     
+					strip.clear(); 
+
+					// only one point
+					y++;
+					if (y >= ledsCount)
+					{
+						y = 0;
+					}
+					for (i = 0; i < y + 1 ; i++)
+					{
+						strip.setPixelColor( y , lsrColorR[y], lsrColorG[y], lsrColorB[y]);
+					}
 				}
 			}
 		}
@@ -141,9 +174,9 @@ void TonuinoNeopixel::defineAnimation()
 			strip.fill(strip.ColorHSV((y * 65536 / ledsCount / 8) , 255, 30), 0, 0);
 		}
 	}
-
-	// One time animation for volume change
-	if (lsrAnimationMode == 2)
+	
+	// One time / instant illumination for volume change - no animation
+	if (animConfig.mode == 2)
 	{
 		y = 0; // reset loop animation
 		currentDelayMS = 1500;
@@ -153,7 +186,6 @@ void TonuinoNeopixel::defineAnimation()
 
 		defineColors_GreenToRed();
 		
-		// percentual volume animation
 		strip.clear();
 		for (i = 0; i < volumeScopeAmount + 1; i++)
 		{
