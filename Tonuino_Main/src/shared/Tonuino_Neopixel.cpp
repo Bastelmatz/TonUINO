@@ -20,6 +20,11 @@ void TonuinoNeopixel::setup(uint8_t ledCount, uint8_t dataPin)
 	}
 	
 	strip.begin();
+	
+	// brightness only on setup
+	// - not intended for continuous animation/changes  
+	// - checkout FastLED library for advanced RGB neopixel coding with e.g. animated brightness
+	strip.setBrightness(150); // from 0..255
 }
 
 void TonuinoNeopixel::turnOff()
@@ -50,42 +55,28 @@ void TonuinoNeopixel::animate()
 	}
 }
 
-void TonuinoNeopixel::defineColors_Rainbow(bool reset) // hue spectrum (Rainbow)
+void TonuinoNeopixel::defineColors_Rainbow() // hue spectrum (Rainbow)
 {
-	if (reset)
+	for (i = 0; i < ledsCount; i++)
 	{
-		x = 0;
+		lsrColors = strip.ColorHSV(i * 65536 / ledsCount, 255, 30);
+		lsrColorR[i] = (lsrColors >> 16 & 0xFF);
+		lsrColorG[i] = (lsrColors >> 8 & 0xFF);
+		lsrColorB[i] = (lsrColors & 0xFF);
 	}
-	do
-	{
-		for (i = 0; i < ledsCount; i++)
-		{
-			lsrColors = strip.ColorHSV(i * 65536 / ledsCount, 255, 30);
-			lsrColorR[i] = (lsrColors >> 16 & 0xFF);
-			lsrColorG[i] = (lsrColors >> 8 & 0xFF);
-			lsrColorB[i] = (lsrColors & 0xFF);
-		}
-		x++;
-	} while (x < ledsCount);
 }
 
 void TonuinoNeopixel::defineColors_GreenToRed() // From green to red
 {
-	x = 0;
-	do
+	for (i = 0; i < ledsCount; i++)
 	{
-		for (i = 0; i < strip.numPixels(); i++)
-		{
-			lsrHueCalc = 21000 / (ledsCount - 1) / (ledsCount - 1);
-			lsrColors = strip.ColorHSV(((ledsCount - 1) - i) * (ledsCount - 1) * lsrHueCalc, 255, 30);
-			strip.setPixelColor(i, lsrColors);
-			lsrColorR[i] = (lsrColors >> 16 & 0xFF);
-			lsrColorG[i] = (lsrColors >> 8 & 0xFF);
-			lsrColorB[i] = (lsrColors & 0xFF);
-		}
-		x++;
+		lsrHueCalc = 21000 / (ledsCount - 1) / (ledsCount - 1);
+		lsrColors = strip.ColorHSV(((ledsCount - 1) - i) * (ledsCount - 1) * lsrHueCalc, 255, 30);
+		strip.setPixelColor(i, lsrColors);
+		lsrColorR[i] = (lsrColors >> 16 & 0xFF);
+		lsrColorG[i] = (lsrColors >> 8 & 0xFF);
+		lsrColorB[i] = (lsrColors & 0xFF);
 	}
-	while (x < ledsCount);
 }
 
 void TonuinoNeopixel::defineAnimation()
@@ -94,38 +85,29 @@ void TonuinoNeopixel::defineAnimation()
 	{
 		if (animConfig.musicLoaded)
 		{
+			defineColors_Rainbow();
+			
 			// While music playing
 			if (animConfig.musicPlaying)
 			{
-				currentDelayMS = 100;                        
-
-				defineColors_Rainbow(false);
+				currentDelayMS = 200;                        
 
 				// Rotation clockwise
 				y++;
-				x = 0;
 				if (y >= ledsCount)
 				{
 					y = 0;
 				}
-				do
+				for (i = 0; i < ledsCount; i++)
 				{
-					for (i = 0; i < ledsCount; i++)
-					{
-						strip.setPixelColor((i + y) % ledsCount, lsrColorR[i], lsrColorG[i], lsrColorB[i]);
-					}
-					x++;
+					strip.setPixelColor((i + y) % ledsCount, lsrColorR[i], lsrColorG[i], lsrColorB[i]);
 				}
-				while (x < ledsCount);
 			}
 			// While music paused
 			else
 			{
-				currentDelayMS = 150;                     
-
+				currentDelayMS = 300;                     
 				strip.clear(); // only one point
-				
-				defineColors_Rainbow(true);
 
 				// Filling increase
 				y++;
@@ -139,24 +121,17 @@ void TonuinoNeopixel::defineAnimation()
 				{
 					z = 0;
 				}
-
-				x = 0;
-				do
+				for (i = 0; i < y + 1 ; i++)
 				{
-					for (i = 0; i < y + 1 ; i++)
-					{
-						strip.setPixelColor( y , lsrColorR[y], lsrColorG[y], lsrColorB[y]);
-					}
-					x++;
+					strip.setPixelColor( y , lsrColorR[y], lsrColorG[y], lsrColorB[y]);
 				}
-				while (x < y + 1);
 			}
 		}
 		// default - no music loaded
 		else
 		{
 			currentDelayMS = 200;               
-
+			
 			// All LEDs alternating in hue spectrum
 			y++;
 			if (y >= (ledsCount * 8) )
@@ -170,8 +145,8 @@ void TonuinoNeopixel::defineAnimation()
 	// One time animation for volume change
 	if (lsrAnimationMode == 2)
 	{
-		y = 0;
-		currentDelayMS = 3000;
+		y = 0; // reset loop animation
+		currentDelayMS = 1500;
 
 		volumeScope = (animConfig.volumeMax - animConfig.volumeMin);
 		volumeScopeAmount = (animConfig.volume - animConfig.volumeMin) * (ledsCount - 1) / volumeScope; // Lautstärkenanzeige angepasst an die Anzahl der LEDs
@@ -180,16 +155,10 @@ void TonuinoNeopixel::defineAnimation()
 		
 		// percentual volume animation
 		strip.clear();
-		x = 0;
-		do
+		for (i = 0; i < volumeScopeAmount + 1; i++)
 		{
-			for (i = 0; i < volumeScopeAmount + 1; i++)
-			{
-				strip.setPixelColor(i, lsrColorR[i], lsrColorG[i], lsrColorB[i]);
-			}
-			x++;
+			strip.setPixelColor(i, lsrColorR[i], lsrColorG[i], lsrColorB[i]);
 		}
-		while (x < (volumeScopeAmount + 1));
 	}
 }
 

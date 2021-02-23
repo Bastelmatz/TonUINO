@@ -25,11 +25,10 @@ class TonuinoNeopixel
 	private:
 		void defineAnimation();
 		void defineColors_GreenToRed();
-		void defineColors_Rainbow(bool reset);
+		void defineColors_Rainbow();
 		
 		long lastAnimationTimeMS;
 		int16_t currentDelayMS;
-		uint8_t x;
 		uint8_t y;
 		uint8_t z;
 		uint8_t i;
