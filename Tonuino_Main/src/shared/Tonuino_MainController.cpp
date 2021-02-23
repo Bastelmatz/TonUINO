@@ -195,8 +195,8 @@ void setupTonuino(TonuinoConfig config)
 	Serial.begin(115200); // Es gibt ein paar Debug Ausgaben über die serielle Schnittstelle
 
 	// Wert für randomSeed() erzeugen durch das mehrfache Sammeln von rauschenden LSBs eines offenen Analogeingangs
-	uint32_t ADC_LSB;
-	uint32_t ADCSeed;
+	uint32_t ADC_LSB = 0;
+	uint32_t ADCSeed = 0;
 	for (uint8_t i = 0; i < 128; i++) 
 	{
 		ADC_LSB = analogRead(pinConfig.OpenAnalog) & 0x1;

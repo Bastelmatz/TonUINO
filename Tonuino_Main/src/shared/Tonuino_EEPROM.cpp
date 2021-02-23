@@ -8,7 +8,7 @@ static const int lastFolderSize = 4;
 void TonuinoEEPROM::resetEEPROM()
 {
   Serial.println(F("Reset -> EEPROM wird gelöscht"));
-  for (int i = 0; i < EEPROM.length(); i++) 
+  for (uint16_t i = 0; i < EEPROM.length(); i++) 
   {
     EEPROM.update(i, 0);
   }

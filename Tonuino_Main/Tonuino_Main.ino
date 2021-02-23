@@ -11,7 +11,7 @@
 
 #ifdef TONUINO_RFID_TOOL
 
-#include "src/Tonuino_RFID_Tool.h";
+#include "src/Tonuino_RFID_Tool.h"
 
 void setup()
 {
@@ -30,7 +30,7 @@ void loop()
 
 #ifdef TONUINO_MIRA
 
-#include "src/Tonuino_Mira.h";
+#include "src/Tonuino_Mira.h"
 
 void setup()
 {
@@ -50,7 +50,7 @@ void loop()
 
 #ifdef TONUINO_MIRA_COINBOX
 
-#include "src/Tonuino_Mira_Coinbox.h";
+#include "src/Tonuino_Mira_Coinbox.h"
 
 void setup()
 {

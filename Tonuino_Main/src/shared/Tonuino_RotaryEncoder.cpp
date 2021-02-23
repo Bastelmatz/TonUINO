@@ -12,7 +12,7 @@ ModifierDataset TonuinoRotaryEncoder::getPlayerModification()
 	uint16_t newPos = rotaryEncoder.getPosition();
 
 	ModifierDataset modiDS;
-	modiDS.modi = 0;
+	modiDS.modi = MODI_None;
 	modiDS.value = 0;
 	if (newPos != rotEncPos)
 	{

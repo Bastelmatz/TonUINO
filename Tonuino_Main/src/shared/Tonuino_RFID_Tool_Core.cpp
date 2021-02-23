@@ -116,7 +116,7 @@ void Tonuino_RFID_Tool_Core::listen()
 	if (index > 0)
 	{
 		handleCommand();
-		for(int i = 0; i < sizeof(readSerialString); ++i)
+		for (uint8_t i = 0; i < sizeof(readSerialString); ++i)
 		{
 		  readSerialString[i] = (char)0;
 		}

@@ -51,7 +51,7 @@ ModifierDataset TonuinoButtons::getPlayerModification(bool isCurrentlyPlaying)
 {
 	int buttonState = read();
 	ModifierDataset modiDS;
-	modiDS.modi = 0;
+	modiDS.modi = MODI_None;
 	modiDS.value = 0;
 	
 	// Buttons werden nun über JS_Button gehandelt, dadurch kann jede Taste doppelt belegt werden
@@ -126,7 +126,7 @@ ModifierDataset TonuinoButtons::getMenuModification(uint8_t currentValue, uint8_
 {
 	int buttonState = read();
 	ModifierDataset modiDS;
-	modiDS.modi = 0;
+	modiDS.modi = MODI_None;
 	modiDS.value = 0;
 
 	if (buttonState == BUTTONCLICK_LONG_StartStop) 
@@ -137,7 +137,7 @@ ModifierDataset TonuinoButtons::getMenuModification(uint8_t currentValue, uint8_
 	if (buttonState == BUTTONCLICK_StartStop) 
 	{
 		modiDS.modi = MODI_MENU_Choose;
-		modiDS.modi = defaultValue;
+		modiDS.value = defaultValue;
 	}
 	if (buttonState == BUTTONCLICK_LONG_Next) 
 	{

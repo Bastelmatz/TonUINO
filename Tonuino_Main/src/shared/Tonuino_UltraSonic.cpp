@@ -52,7 +52,7 @@ uint16_t TonuinoUltraSonic::read()
 				}
 			}
 		}
-		if (sonic_duration > 1000 * 1000)
+		if (sonic_duration / 1000 > 1000)
 		{
 			sendSonicWave = true;
 		}

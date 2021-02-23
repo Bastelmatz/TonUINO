@@ -12,12 +12,9 @@
 #define RST_PIN 9
 #define SS_PIN 10
 static MFRC522 mfrc522(SS_PIN, RST_PIN); // Create MFRC522
-static MFRC522::MIFARE_Key key;
 const byte sector = 1;
 const byte blockAddr = 4;
 const byte trailerBlock = 7;
-static MFRC522::StatusCode status;
-
 
 const byte MUSICCARD_NO_CHANGE = 0; // no change detected since last pollCard() call
 const byte MUSICCARD_NEW       = 1; // music card with new UID detected (had no card or other card before)
@@ -56,6 +53,9 @@ public:
 	bool writeCard(nfcTagStruct nfcTag);
 
 private:
+	MFRC522::MIFARE_Key key;
+	MFRC522::StatusCode status;
+	
 	byte pollCard();
 	bool isCardGone();
 	bool isSameMusicCardAsLastOne();

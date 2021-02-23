@@ -3,8 +3,9 @@
 #ifndef TONUINO_MODIFIERS_INCLUDED
 #define TONUINO_MODIFIERS_INCLUDED
 
-typedef enum EModifier
+enum EModifier
 {
+	MODI_None = 0,
 	MODI_TrackPlay = 1,
 	MODI_TrackPause = 2,
 	MODI_TrackToggle = 3,

@@ -5,7 +5,7 @@
 
 #include <SPI.h>
 
-typedef enum EPlayerMode
+enum EPlayerMode
 {
 	AudioDrama = 1, 	// Hörspielmodus: eine zufällige Datei aus dem Ordner
 	Album = 2,			// Album Modus: kompletten Ordner spielen
@@ -19,7 +19,7 @@ typedef enum EPlayerMode
 	Section_Audiobook = 10
 };
 
-typedef enum ETRACKDIRECTION
+enum ETRACKDIRECTION
 {
 	TRACKDIR_Next = 1, 	
 	TRACKDIR_Previous = 2,
