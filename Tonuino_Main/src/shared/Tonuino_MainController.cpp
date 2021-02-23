@@ -35,6 +35,8 @@ TonuinoButtons tonuinoButtons;
 
 TonuinoRotaryEncoder rotaryEncoder;
 
+TonuinoNeopixel neopixelRing;
+
 uint8_t trackInEEPROM = 0;
 nfcTagStruct nextMC;
 MusicDataset lastMusicDS;
@@ -246,6 +248,11 @@ void setupTonuino(TonuinoConfig config)
 
 	pinMode(pinConfig.StopLED, OUTPUT);
 
+	if (hwConfig.NeopixelRing)
+	{
+		neopixelRing.setup(hwConfig.NeopixelLeds, pinConfig.NeopixelData);
+	}
+
 	if (hwConfig.PowerOff)
 	{
 		pinMode(pinConfig.Shutdown, OUTPUT);
@@ -342,6 +349,16 @@ void handleUltraSonic()
 		handle_sonic = false;
 	}
 }
+	
+void handleNeopixels()
+{
+	neopixelRing.animConfig.volume = dfPlayer.volume;
+	neopixelRing.animConfig.volumeMin = dfPlayer.volumeMin;
+	neopixelRing.animConfig.volumeMax = dfPlayer.volumeMax;
+	neopixelRing.animConfig.musicLoaded = dfPlayer.musicDSLoaded;
+	neopixelRing.animConfig.musicPlaying = dfPlayer.isPlaying();
+	neopixelRing.animate();
+}
 
 void loopTonuino() 
 {
@@ -355,6 +372,7 @@ void loopTonuino()
 	handleRotaryEncoder();
 	handleButtons();
 	handleCardReader();
+	handleNeopixels();
 }
 
 void onNewCard()
@@ -625,4 +643,3 @@ void evaluateModifierData(MusicDataset musicDS)
 	
 	handleModifier(modifier, special);
 }
-

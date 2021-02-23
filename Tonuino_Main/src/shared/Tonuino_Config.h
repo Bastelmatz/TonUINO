@@ -25,6 +25,7 @@ class TonuinoPinConfig
 	uint8_t Shutdown = 7;
 	uint8_t SonicTrigger = 9;
 	uint8_t SonicEcho  = 10;
+	uint8_t NeopixelData = 11;
 };
 
 class TonuinoHWConfig
@@ -35,6 +36,9 @@ class TonuinoHWConfig
 	bool Potentiometer = false;
 	bool RotaryEncoder = false;
 	bool UltraSonic = false;
+	bool NeopixelRing = false;
+	
+	uint8_t NeopixelLeds = 12;
 };
 
 class TonuinoSWConfig

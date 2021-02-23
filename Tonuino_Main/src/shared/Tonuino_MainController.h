@@ -9,6 +9,7 @@
 #include "Tonuino_Potentiometer.h"
 #include "Tonuino_RotaryEncoder.h"
 #include "Tonuino_UltraSonic.h"
+#include "Tonuino_Neopixel.h"
 
 #include <SPI.h>
 

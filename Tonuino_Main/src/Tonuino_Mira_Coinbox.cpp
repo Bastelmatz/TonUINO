@@ -17,9 +17,12 @@ TonuinoConfig getConfigMira()
 	config.PINS.Encoder_CLK = 6; // 5
 	config.PINS.Encoder_DT = 7;  // 8
 
+	config.PINS.NeopixelData = 5; // 11
+	
 	config.HW.CardReader = false;
 	config.HW.UltraSonic = true;
 	config.HW.RotaryEncoder = true;
+	config.HW.NeopixelRing = true;
 	
 	config.SW.StartMusicDS.folder = 10;
 	config.SW.StartMusicDS.mode = 1;
