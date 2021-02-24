@@ -338,11 +338,11 @@ void handleUltraSonic()
 	}
 
 	uint16_t distance = ultraSonicSensor.read();
-	if (distance > 20 && distance < 50)
+	if (distance > 20 && distance < 60)
 	{
 		sonicCounter++; 
 	}
-	if (distance > 70)
+	if (distance > 60)
 	{
 		if (sonicCounter > 1 && !countdownNextTrack) // avoid outliers and prevent new call while countdown
 		{

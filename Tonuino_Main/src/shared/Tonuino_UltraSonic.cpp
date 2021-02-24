@@ -4,6 +4,8 @@
 uint32_t sonic_duration = 0; 
 uint16_t sonic_distance = 0; 
 bool sendSonicWave = true;
+bool timedOut = false;
+uint32_t sendHighTime = 0;
 uint32_t receiveHighTime = 0;
 
 void TonuinoUltraSonic::setup(uint8_t triggerPIN, uint8_t echoPIN)
@@ -24,46 +26,53 @@ uint16_t TonuinoUltraSonic::read()
 		digitalWrite(pinTrigger, HIGH); 
 		digitalWrite(pinTrigger, LOW);
 		sendSonicWave = false;
-		receiveHighTime = 0;
-		sonic_distance = 0;
+		timedOut = false;
+		sendHighTime = micros();
+		receiveHighTime = sendHighTime;
+		sonic_duration = 0;
 	}
-	else
+	else 
 	{
+		// wait for wave echo start
 		if (digitalRead(pinEcho) == HIGH)
 		{
-			if (receiveHighTime == 0)
+			if (receiveHighTime == sendHighTime)
 			{
 				receiveHighTime = micros();
 			}
 		}
-		sonic_duration = micros() - receiveHighTime;
-		if (receiveHighTime > 0)
+		sonic_duration = micros() - receiveHighTime; // time since sending high / receiving first high
+		// wait for wave echo end
+		if (receiveHighTime > sendHighTime)
 		{
 			if (digitalRead(pinEcho) == LOW) // sonic end
 			{
 				sendSonicWave = true;			
-				sonic_distance = (sonic_duration/2) * 0.3432; //mm
-				//Serial.print(F("Duration: "));
-				//Serial.println(sonic_duration);
-				if (sonic_distance < 2500)
-				{
-					Serial.print(F("Distance: "));
-					Serial.println(sonic_distance);
-				}
 			}
 		}
-		if (sonic_duration > 1000 * 1000)
+		if (receiveHighTime == sendHighTime ? 
+		    sonic_duration > 100UL * 1000 :  // timout for missing high
+			sonic_duration > 100UL * 1000) 	  // timout for missing low 
 		{
+			timedOut = true;
 			sendSonicWave = true;
 		}
 	}
-	
-	if (sendSonicWave) // = sonic received here
+		
+	sonic_distance = 0;
+	// send distance only for first appearance
+	if (sendSonicWave && !timedOut) // = sonic received here
 	{
-		// send distance only for first appearance
-		return sonic_distance; 
+		sonic_distance = sonic_duration * 0.1716; //mm
+		//Serial.print(F("Duration: "));
+		//Serial.println(sonic_duration);
+		if (sonic_distance < 2000)
+		{
+			Serial.print(F("Distance: "));
+			Serial.println(sonic_distance);
+		}
 	}
-	return 0;
+	return sonic_distance;
 }
 
 
