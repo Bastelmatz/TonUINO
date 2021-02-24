@@ -219,6 +219,7 @@ void setupTonuino(TonuinoConfig config)
 	// set settings
 	dfPlayer.volumeMin = swConfig.VolumeMin;
 	dfPlayer.volumeMax = swConfig.VolumeMax;
+	dfPlayer.volumeIncrement = swConfig.VolumeIncrement;
 	dfPlayer.setVolume(swConfig.VolumeInit);
 	dfPlayer.setEqualizer(swConfig.Equalizer);
 	setStandbyTimerValue(0);

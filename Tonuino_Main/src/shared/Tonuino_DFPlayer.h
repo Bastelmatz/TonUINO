@@ -29,6 +29,7 @@ class TonuinoDFPlayer
 	static uint8_t volume;
 	static uint8_t volumeMin;
 	static uint8_t volumeMax;
+	static uint8_t volumeIncrement;
 	static bool musicDSLoaded;
 	static bool freezeDance_active;
 			

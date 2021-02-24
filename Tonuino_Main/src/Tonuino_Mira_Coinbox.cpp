@@ -26,6 +26,7 @@ TonuinoConfig getConfigMira()
 	
 	config.SW.StartMusicDS.folder = 10;
 	config.SW.StartMusicDS.mode = 1;
+	config.SW.VolumeIncrement = 2;
 	
 	return config;
 }

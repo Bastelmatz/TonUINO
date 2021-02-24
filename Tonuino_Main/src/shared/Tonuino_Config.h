@@ -49,6 +49,7 @@ class TonuinoSWConfig
 	uint8_t VolumeInit = 10;
 	uint8_t VolumeMin = 1;
 	uint8_t VolumeMax = 25;
+	uint8_t VolumeIncrement = 1;
 	DfMp3_Eq Equalizer = DfMp3_Eq_Normal;
 
 	bool StopPlayOnCardRemoval = false;

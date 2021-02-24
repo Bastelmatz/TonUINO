@@ -10,6 +10,7 @@ uint16_t TonuinoDFPlayer::activeTrack = 0;
 uint8_t TonuinoDFPlayer::volume = 0;
 uint8_t TonuinoDFPlayer::volumeMin = 0;
 uint8_t TonuinoDFPlayer::volumeMax = 25;
+uint8_t TonuinoDFPlayer::volumeIncrement = 1;
 
 MusicDataset TonuinoDFPlayer::musicDS;
 bool TonuinoDFPlayer::musicDSLoaded = false;
@@ -276,12 +277,12 @@ void TonuinoDFPlayer::playAdvertisement(int advertisement)
 
 void TonuinoDFPlayer::volumeUp()
 {
-	setVolume(volume + 1);
+	setVolume(min(volume + volumeIncrement, volumeMax));
 }
 
 void TonuinoDFPlayer::volumeDown()
 {
-	setVolume(volume - 1);
+	setVolume(max(volume - volumeIncrement, volumeMin));
 }
 
 void TonuinoDFPlayer::setVolume(uint8_t vol)
