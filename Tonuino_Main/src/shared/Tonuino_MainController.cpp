@@ -457,6 +457,10 @@ uint8_t voiceMenu(uint8_t numberOfOptions, int startMessage, int messageOffset,
 		dfPlayer.loop();
 		checkStandbyAtMillis();
 		ModifierDataset modiDS = tonuinoButtons.getMenuModification(returnValue, defaultValue, numberOfOptions);
+		if (modiDS.modi == MODI_None && hwConfig.RotaryEncoder)
+		{
+			modiDS = rotaryEncoder.getMenuModification(returnValue, defaultValue, numberOfOptions);
+		}
 		if (modiDS.modi == MODI_MENU_Cancel ||
 			modiDS.modi == MODI_MENU_Choose) 
 		{
