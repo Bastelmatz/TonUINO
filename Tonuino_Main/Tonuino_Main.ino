@@ -63,3 +63,23 @@ void loop()
 }
 
 #endif
+
+// ******************************************
+//  Tonuino Mira Troy
+// ******************************************
+
+#ifdef TONUINO_MIRA_TROY
+
+#include "src/Tonuino_Mira_Troy.h"
+
+void setup()
+{
+  setupMira();
+}
+
+void loop()
+{
+  loopMira();
+}
+
+#endif
