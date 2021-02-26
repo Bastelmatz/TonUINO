@@ -613,6 +613,14 @@ void handleModifier(EModifier modifier, uint8_t special)
 		{
 			dfPlayer.freezeDance_active = toggle ? !dfPlayer.freezeDance_active : bValue; break;
 		}
+		case MODI_TrackPlay:
+		{
+			dfPlayer.continueTitle(); break;
+		}
+		case MODI_TrackPause:
+		{
+			dfPlayer.pauseAndStandBy(); break;
+		}
 		case MODI_TrackToggle:
 		{
 			dfPlayer.togglePlay(); break;
