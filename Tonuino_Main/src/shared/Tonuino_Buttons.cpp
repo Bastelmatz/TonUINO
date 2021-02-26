@@ -73,15 +73,7 @@ ModifierDataset TonuinoButtons::getPlayerModification(bool isCurrentlyPlaying)
 	}
 	if (buttonState == BUTTONCLICK_Next)
 	{
-		if (isCurrentlyPlaying) 
-		{
-			modiDS.modi = MODI_TrackNext;
-		}
-		else 
-		{
-			modiDS.modi = MODI_ShortCut;
-			modiDS.value = 1;
-		}
+		modiDS.modi = MODI_TrackNext;
 	}
 	if (buttonState == BUTTONCLICK_LONG_Next)
 	{
@@ -97,15 +89,7 @@ ModifierDataset TonuinoButtons::getPlayerModification(bool isCurrentlyPlaying)
 	}
 	if (buttonState == BUTTONCLICK_Previous)
 	{
-		if (isCurrentlyPlaying) 
-		{
-			modiDS.modi = MODI_TrackPrevious;
-		}
-		else 
-		{
-			modiDS.modi = MODI_ShortCut;
-			modiDS.value = 2;
-		}
+		modiDS.modi = MODI_TrackPrevious;
 	}
 	if (buttonState == BUTTONCLICK_LONG_Previous)
 	{
