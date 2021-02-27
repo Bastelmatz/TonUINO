@@ -111,7 +111,9 @@ void turnOff()
 	{
 		return;
 	}
-	Serial.println(F("=== power off!"));
+	dfPlayer.playAdvertisement(302);
+	delay(2000);
+	
     // enter sleep state
     digitalWrite(pinConfig.Shutdown, HIGH);
     delay(500);
@@ -222,8 +224,8 @@ void setupTonuino(TonuinoConfig config)
 	dfPlayer.volumeIncrement = swConfig.VolumeIncrement;
 	dfPlayer.setVolume(swConfig.VolumeInit);
 	dfPlayer.setEqualizer(swConfig.Equalizer);
-	setStandbyTimerValue(0);
-	setSleepTimerValue(0);
+	setStandbyTimerValue(swConfig.StandbyTimeInMin);
+	setSleepTimerValue(swConfig.SleepTimeInMin);
 
 	// NFC Leser initialisieren
 	if (hwConfig.CardReader)

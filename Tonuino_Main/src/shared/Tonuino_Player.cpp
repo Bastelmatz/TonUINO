@@ -20,14 +20,12 @@ uint8_t TonuinoPlayer::allTracksCount()
 // *********************************
 // Timer Class
 // *********************************
-unsigned long TonuinoTimer::activeTime = 0;
-uint8_t TonuinoTimer::timeInMin = 0;
 
 void TonuinoTimer::activate()
 {
 	if (timeInMin > 0)
 	{
-		activeTime = millis() + (timeInMin * 60 * 1000);
+		activeTime = millis() + (timeInMin * 60UL * 1000UL);
 	}
 	else
 	{

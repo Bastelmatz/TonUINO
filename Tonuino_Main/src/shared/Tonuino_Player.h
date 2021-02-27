@@ -30,8 +30,8 @@ enum ETRACKDIRECTION
 class TonuinoTimer
 {
 	public:
-	static unsigned long activeTime;
-	static uint8_t timeInMin;
+	unsigned long activeTime = 0;
+	uint8_t timeInMin = 0;
 	
 	void activate();
 	void disable();

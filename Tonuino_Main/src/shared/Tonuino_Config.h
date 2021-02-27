@@ -44,8 +44,8 @@ class TonuinoHWConfig
 class TonuinoSWConfig
 {
 	public:
-	uint8_t StandbyTime = 0;
-	uint8_t SleepTime = 0;
+	uint8_t StandbyTimeInMin = 0;
+	uint8_t SleepTimeInMin = 0;
 	uint8_t VolumeInit = 10;
 	uint8_t VolumeMin = 1;
 	uint8_t VolumeMax = 25;
