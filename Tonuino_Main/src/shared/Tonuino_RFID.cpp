@@ -241,17 +241,17 @@ bool Tonuino_RFID_Reader::readCard()
   return true;
 }
 
-bool Tonuino_RFID_Reader::writeCard(nfcTagStruct cardData) 
+bool Tonuino_RFID_Reader::writeCard(MusicDataset musicDS) 
 {
-  byte buffer[16] = {(cardData.cookie >> 24) & 0xff,
-					 (cardData.cookie >> 16) & 0xff,
-					 (cardData.cookie >> 8) & 0xff,
-					 (cardData.cookie) & 0xff,
-					 cardData.version,   
-					 cardData.musicDS.folder,  // the folder picked by the user
-					 cardData.musicDS.mode,    // the playback mode picked by the user
-					 cardData.musicDS.special, // track or function for admin cards
-					 cardData.musicDS.special2,
+  byte buffer[16] = {(cardCookie >> 24) & 0xff,
+					 (cardCookie >> 16) & 0xff,
+					 (cardCookie >> 8) & 0xff,
+					 (cardCookie) & 0xff,
+					 2,   
+					 musicDS.folder,  // the folder picked by the user
+					 musicDS.mode,    // the playback mode picked by the user
+					 musicDS.special, // track or function for admin cards
+					 musicDS.special2,
 					 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 					};
   

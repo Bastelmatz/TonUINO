@@ -50,7 +50,7 @@ public:
 	
 	byte tryPollCard();
 
-	bool writeCard(nfcTagStruct nfcTag);
+	bool writeCard(MusicDataset musicDS);
 
 private:
 	MFRC522::MIFARE_Key key;

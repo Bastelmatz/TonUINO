@@ -25,7 +25,7 @@ void onNewCard();
 void onCardGone();
 void onCardReturn();
 void setupCard();
-void writeCard(nfcTagStruct nfcTag);
+void writeCard(MusicDataset musicDS);
 void resetCard();
 
 void evaluateModifierData(MusicDataset musicDS);

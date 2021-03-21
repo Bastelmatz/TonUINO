@@ -535,20 +535,20 @@ void setupCard()
 {
 	dfPlayer.pause();
 	Serial.println(F("=== setupCard()"));
-	nfcTagStruct newCard;
-	if (setupFolder(&newCard.musicDS) == true)
+	MusicDataset newMusicDS;
+	if (setupFolder(&newMusicDS) == true)
 	{
 		// Karte ist konfiguriert -> speichern
 		dfPlayer.pause();
 		do { } while (dfPlayer.isPlaying());
-		writeCard(newCard);
+		writeCard(newMusicDS);
 	}
 	delay(1000);
 }
 
-void writeCard(nfcTagStruct nfcTag) 
+void writeCard(MusicDataset musicDS) 
 {
-	bool statusOK = tonuinoRFID.writeCard(nfcTag);
+	bool statusOK = tonuinoRFID.writeCard(musicDS);
 	dfPlayer.playMp3Track(statusOK ? 400 : 401);
 }
 

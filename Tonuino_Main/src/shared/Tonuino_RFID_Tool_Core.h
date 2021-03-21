@@ -14,7 +14,7 @@ class Tonuino_RFID_Tool_Core
 	
 	private:
 	void transmitTrigger(bool startTrigger);
-	void writeCard(nfcTagStruct nfcTag);
+	void writeCard(MusicDataset musicDS);
 	void handleCommand();
 };
 

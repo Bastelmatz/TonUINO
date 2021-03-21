@@ -48,13 +48,12 @@ void Tonuino_RFID_Tool_Core::transmitCardRemoval()
 	transmitTrigger(false);
 }
 
-void Tonuino_RFID_Tool_Core::writeCard(nfcTagStruct nfcTag)
+void Tonuino_RFID_Tool_Core::writeCard(MusicDataset musicDS)
 {
-  tonuinoRFID.writeCard(nfcTag);
+  tonuinoRFID.writeCard(musicDS);
   tonuinoRFID.haltAndStop();
   
   // force new card detection
-  transmitCardData(nfcTag);
   tonuinoRFID.hasMusicCard = false;
   tonuinoRFID.hasModifierCard = false;
 }
@@ -88,15 +87,13 @@ void Tonuino_RFID_Tool_Core::handleCommand()
   Serial.println(receivedDS.special);
   Serial.println(receivedDS.special2);
 
-  nfcTagStruct tempCard;
-  tempCard.cookie = cardCookie;
-  tempCard.musicDS.folder = receivedDS.folder;
-  tempCard.musicDS.special = receivedDS.special;
-  tempCard.musicDS.special2 = receivedDS.special2;
-  tempCard.version = 2;
-  tempCard.musicDS.mode = receivedDS.mode;
+  MusicDataset musicDS;
+  musicDS.folder = receivedDS.folder;
+  musicDS.special = receivedDS.special;
+  musicDS.special2 = receivedDS.special2;
+  musicDS.mode = receivedDS.mode;
 
-  writeCard(tempCard);
+  writeCard(musicDS);
 }
 
 void Tonuino_RFID_Tool_Core::listen()
