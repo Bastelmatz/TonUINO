@@ -57,7 +57,8 @@ ModifierDataset TonuinoButtons::getPlayerModification(bool isCurrentlyPlaying)
 	// Buttons werden nun über JS_Button gehandelt, dadurch kann jede Taste doppelt belegt werden
 	if (buttonState == BUTTONCLICK_StartStop)
 	{
-		modiDS.modi = MODI_TrackToggle;
+		modiDS.modi = MODI_TrackContinue;
+		modiDS.value = 2;
 	}
 	if (buttonState == BUTTONCLICK_LONG_StartStop)
 	{

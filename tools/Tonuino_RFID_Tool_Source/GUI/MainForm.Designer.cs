@@ -57,12 +57,12 @@
             this.lblLastCommentCaption = new System.Windows.Forms.Label();
             this.lblLastComment = new System.Windows.Forms.Label();
             this.pnlCardDetected = new System.Windows.Forms.Panel();
-            this.lblSleepTimeReadCaption = new System.Windows.Forms.Label();
-            this.lblSleepTime = new System.Windows.Forms.Label();
+            this.lblReadModiValueCaption = new System.Windows.Forms.Label();
+            this.lblReadModiValue = new System.Windows.Forms.Label();
             this.pnlModiCardAction = new System.Windows.Forms.Panel();
-            this.lblSleepTimeUnit = new System.Windows.Forms.Label();
-            this.lblSleepTimeCaption = new System.Windows.Forms.Label();
-            this.textBox_SleepTime = new System.Windows.Forms.TextBox();
+            this.lblMinutes = new System.Windows.Forms.Label();
+            this.lblModiValue = new System.Windows.Forms.Label();
+            this.textBox_ModiValue = new System.Windows.Forms.TextBox();
             this.pnlModeCardOptions = new System.Windows.Forms.Panel();
             this.btnWriteModiCard = new System.Windows.Forms.Button();
             this.pnlMusicCardAction = new System.Windows.Forms.Panel();
@@ -72,8 +72,11 @@
             this.pnlSeparator = new System.Windows.Forms.Panel();
             this.pnlPorts = new System.Windows.Forms.Panel();
             this.lblPorts = new System.Windows.Forms.Label();
+            this.lblModeBehaviour = new System.Windows.Forms.Label();
+            this.pnlModeBehaviour = new System.Windows.Forms.Panel();
             this.comboBox_Ports = new Tonuino_RFID_Creator.ExtendedComboBox();
             this.comboBox_MusicCardModes = new Tonuino_RFID_Creator.ExtendedComboBox();
+            this.comboBox_ModiBehaviour = new Tonuino_RFID_Creator.ExtendedComboBox();
             this.comboBox_ModiCardOptions = new Tonuino_RFID_Creator.ExtendedComboBox();
             this.pnlModes.SuspendLayout();
             this.pnlCardDetected.SuspendLayout();
@@ -82,6 +85,7 @@
             this.pnlMusicCardAction.SuspendLayout();
             this.pnlCardAction.SuspendLayout();
             this.pnlPorts.SuspendLayout();
+            this.pnlModeBehaviour.SuspendLayout();
             this.SuspendLayout();
             // 
             // lblConnectedPort
@@ -350,8 +354,8 @@
             // 
             // pnlCardDetected
             // 
-            this.pnlCardDetected.Controls.Add(this.lblSleepTimeReadCaption);
-            this.pnlCardDetected.Controls.Add(this.lblSleepTime);
+            this.pnlCardDetected.Controls.Add(this.lblReadModiValueCaption);
+            this.pnlCardDetected.Controls.Add(this.lblReadModiValue);
             this.pnlCardDetected.Controls.Add(this.lblRFIDCaption);
             this.pnlCardDetected.Controls.Add(this.lblRFID);
             this.pnlCardDetected.Controls.Add(this.lblLastComment);
@@ -369,29 +373,31 @@
             this.pnlCardDetected.Size = new System.Drawing.Size(229, 289);
             this.pnlCardDetected.TabIndex = 36;
             // 
-            // lblSleepTimeReadCaption
+            // lblReadModiValueCaption
             // 
-            this.lblSleepTimeReadCaption.Location = new System.Drawing.Point(3, 93);
-            this.lblSleepTimeReadCaption.Name = "lblSleepTimeReadCaption";
-            this.lblSleepTimeReadCaption.Size = new System.Drawing.Size(70, 13);
-            this.lblSleepTimeReadCaption.TabIndex = 34;
-            this.lblSleepTimeReadCaption.Text = "Sleep Time:";
-            this.lblSleepTimeReadCaption.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.lblReadModiValueCaption.Location = new System.Drawing.Point(3, 93);
+            this.lblReadModiValueCaption.Name = "lblReadModiValueCaption";
+            this.lblReadModiValueCaption.Size = new System.Drawing.Size(70, 13);
+            this.lblReadModiValueCaption.TabIndex = 34;
+            this.lblReadModiValueCaption.Text = "Sleep Time:";
+            this.lblReadModiValueCaption.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
-            // lblSleepTime
+            // lblReadModiValue
             // 
-            this.lblSleepTime.AutoSize = true;
-            this.lblSleepTime.Location = new System.Drawing.Point(78, 93);
-            this.lblSleepTime.Name = "lblSleepTime";
-            this.lblSleepTime.Size = new System.Drawing.Size(41, 13);
-            this.lblSleepTime.TabIndex = 35;
-            this.lblSleepTime.Text = "label10";
+            this.lblReadModiValue.AutoSize = true;
+            this.lblReadModiValue.Location = new System.Drawing.Point(78, 93);
+            this.lblReadModiValue.Name = "lblReadModiValue";
+            this.lblReadModiValue.Size = new System.Drawing.Size(41, 13);
+            this.lblReadModiValue.TabIndex = 35;
+            this.lblReadModiValue.Text = "label10";
             // 
             // pnlModiCardAction
             // 
-            this.pnlModiCardAction.Controls.Add(this.lblSleepTimeUnit);
-            this.pnlModiCardAction.Controls.Add(this.lblSleepTimeCaption);
-            this.pnlModiCardAction.Controls.Add(this.textBox_SleepTime);
+            this.pnlModiCardAction.Controls.Add(this.pnlModeBehaviour);
+            this.pnlModiCardAction.Controls.Add(this.lblModeBehaviour);
+            this.pnlModiCardAction.Controls.Add(this.lblMinutes);
+            this.pnlModiCardAction.Controls.Add(this.lblModiValue);
+            this.pnlModiCardAction.Controls.Add(this.textBox_ModiValue);
             this.pnlModiCardAction.Controls.Add(this.pnlModeCardOptions);
             this.pnlModiCardAction.Controls.Add(this.btnWriteModiCard);
             this.pnlModiCardAction.Location = new System.Drawing.Point(435, 112);
@@ -399,32 +405,32 @@
             this.pnlModiCardAction.Size = new System.Drawing.Size(181, 258);
             this.pnlModiCardAction.TabIndex = 39;
             // 
-            // lblSleepTimeUnit
+            // lblMinutes
             // 
-            this.lblSleepTimeUnit.AutoSize = true;
-            this.lblSleepTimeUnit.Location = new System.Drawing.Point(153, 62);
-            this.lblSleepTimeUnit.Name = "lblSleepTimeUnit";
-            this.lblSleepTimeUnit.Size = new System.Drawing.Size(23, 13);
-            this.lblSleepTimeUnit.TabIndex = 31;
-            this.lblSleepTimeUnit.Text = "min";
+            this.lblMinutes.AutoSize = true;
+            this.lblMinutes.Location = new System.Drawing.Point(142, 62);
+            this.lblMinutes.Name = "lblMinutes";
+            this.lblMinutes.Size = new System.Drawing.Size(23, 13);
+            this.lblMinutes.TabIndex = 31;
+            this.lblMinutes.Text = "min";
             // 
-            // lblSleepTimeCaption
+            // lblModiValue
             // 
-            this.lblSleepTimeCaption.Location = new System.Drawing.Point(18, 62);
-            this.lblSleepTimeCaption.Name = "lblSleepTimeCaption";
-            this.lblSleepTimeCaption.Size = new System.Drawing.Size(77, 13);
-            this.lblSleepTimeCaption.TabIndex = 29;
-            this.lblSleepTimeCaption.Text = "Sleep Time:";
-            this.lblSleepTimeCaption.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.lblModiValue.Location = new System.Drawing.Point(18, 62);
+            this.lblModiValue.Name = "lblModiValue";
+            this.lblModiValue.Size = new System.Drawing.Size(59, 13);
+            this.lblModiValue.TabIndex = 29;
+            this.lblModiValue.Text = "Value:";
+            this.lblModiValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
-            // textBox_SleepTime
+            // textBox_ModiValue
             // 
-            this.textBox_SleepTime.Location = new System.Drawing.Point(104, 59);
-            this.textBox_SleepTime.MaxLength = 3;
-            this.textBox_SleepTime.Name = "textBox_SleepTime";
-            this.textBox_SleepTime.Size = new System.Drawing.Size(43, 20);
-            this.textBox_SleepTime.TabIndex = 30;
-            this.textBox_SleepTime.TextChanged += new System.EventHandler(this.textBoxSetting_Time_TextChanged);
+            this.textBox_ModiValue.Location = new System.Drawing.Point(82, 59);
+            this.textBox_ModiValue.MaxLength = 3;
+            this.textBox_ModiValue.Name = "textBox_ModiValue";
+            this.textBox_ModiValue.Size = new System.Drawing.Size(54, 20);
+            this.textBox_ModiValue.TabIndex = 30;
+            this.textBox_ModiValue.TextChanged += new System.EventHandler(this.textBoxSetting_ModiValue_TextChanged);
             // 
             // pnlModeCardOptions
             // 
@@ -526,6 +532,24 @@
             this.lblPorts.Text = "COM Ports:";
             this.lblPorts.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
+            // lblModeBehaviour
+            // 
+            this.lblModeBehaviour.Location = new System.Drawing.Point(19, 91);
+            this.lblModeBehaviour.Name = "lblModeBehaviour";
+            this.lblModeBehaviour.Size = new System.Drawing.Size(58, 13);
+            this.lblModeBehaviour.TabIndex = 32;
+            this.lblModeBehaviour.Text = "Behaviour:";
+            this.lblModeBehaviour.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // pnlModeBehaviour
+            // 
+            this.pnlModeBehaviour.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pnlModeBehaviour.Controls.Add(this.comboBox_ModiBehaviour);
+            this.pnlModeBehaviour.Location = new System.Drawing.Point(82, 88);
+            this.pnlModeBehaviour.Name = "pnlModeBehaviour";
+            this.pnlModeBehaviour.Size = new System.Drawing.Size(88, 23);
+            this.pnlModeBehaviour.TabIndex = 33;
+            // 
             // comboBox_Ports
             // 
             this.comboBox_Ports.BackColor = System.Drawing.SystemColors.Window;
@@ -550,6 +574,18 @@
             this.comboBox_MusicCardModes.Size = new System.Drawing.Size(156, 21);
             this.comboBox_MusicCardModes.TabIndex = 16;
             this.comboBox_MusicCardModes.SelectedValueChanged += new System.EventHandler(this.comboBoxCardModes_SelectedValueChanged);
+            // 
+            // comboBox_ModiBehaviour
+            // 
+            this.comboBox_ModiBehaviour.BackColor = System.Drawing.SystemColors.Window;
+            this.comboBox_ModiBehaviour.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.comboBox_ModiBehaviour.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox_ModiBehaviour.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.comboBox_ModiBehaviour.FormattingEnabled = true;
+            this.comboBox_ModiBehaviour.Location = new System.Drawing.Point(0, 0);
+            this.comboBox_ModiBehaviour.Name = "comboBox_ModiBehaviour";
+            this.comboBox_ModiBehaviour.Size = new System.Drawing.Size(86, 21);
+            this.comboBox_ModiBehaviour.TabIndex = 16;
             // 
             // comboBox_ModiCardOptions
             // 
@@ -595,6 +631,7 @@
             this.pnlCardAction.ResumeLayout(false);
             this.pnlCardAction.PerformLayout();
             this.pnlPorts.ResumeLayout(false);
+            this.pnlModeBehaviour.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -632,9 +669,9 @@
         private System.Windows.Forms.Label lblLastComment;
         private System.Windows.Forms.Panel pnlCardDetected;
         private System.Windows.Forms.Panel pnlModiCardAction;
-        private System.Windows.Forms.Label lblSleepTimeUnit;
-        private System.Windows.Forms.Label lblSleepTimeCaption;
-        private System.Windows.Forms.TextBox textBox_SleepTime;
+        private System.Windows.Forms.Label lblMinutes;
+        private System.Windows.Forms.Label lblModiValue;
+        private System.Windows.Forms.TextBox textBox_ModiValue;
         private System.Windows.Forms.Panel pnlModeCardOptions;
         private Tonuino_RFID_Creator.ExtendedComboBox comboBox_ModiCardOptions;
         private System.Windows.Forms.Button btnWriteModiCard;
@@ -646,8 +683,11 @@
         private System.Windows.Forms.Panel pnlPorts;
         private Tonuino_RFID_Creator.ExtendedComboBox comboBox_Ports;
         private System.Windows.Forms.Label lblPorts;
-        private System.Windows.Forms.Label lblSleepTimeReadCaption;
-        private System.Windows.Forms.Label lblSleepTime;
+        private System.Windows.Forms.Label lblReadModiValueCaption;
+        private System.Windows.Forms.Label lblReadModiValue;
+        private System.Windows.Forms.Panel pnlModeBehaviour;
+        private ExtendedComboBox comboBox_ModiBehaviour;
+        private System.Windows.Forms.Label lblModeBehaviour;
     }
 }
 

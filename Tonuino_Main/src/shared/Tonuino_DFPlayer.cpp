@@ -257,7 +257,7 @@ void TonuinoDFPlayer::waitForTrackToFinish()
 	} while (isPlaying());
 }
 
-void TonuinoDFPlayer::playAdvertisement(int advertisement)
+void TonuinoDFPlayer::playAdvertisement(uint16_t advertisement)
 {
 	Serial.print(F("Play advertisement "));
 	Serial.println(advertisement);

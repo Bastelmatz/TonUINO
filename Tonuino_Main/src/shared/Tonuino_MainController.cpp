@@ -174,21 +174,6 @@ void checkPlayState()
     }
 }
 
-void playShortCut(uint8_t shortCut) 
-{
-	Serial.println(F("=== playShortCut()"));
-	Serial.println(shortCut);
-	MusicDataset shortCutData = swConfig.ShortCuts[shortCut];
-	if (shortCutData.folder > 0) 
-	{
-		loadAndPlayFolder(shortCutData);
-	}
-	else
-	{
-		Serial.println(F("Shortcut not configured!"));
-	}
-}
-
 void setupTonuino(TonuinoConfig config) 
 {
 	pinConfig = config.PINS;
@@ -566,7 +551,22 @@ void resetCard()
 	setupCard();
 }
 
-void handleModifier(EModifier modifier, uint8_t special)
+void playShortCut(uint8_t shortCut) 
+{
+	Serial.println(F("=== playShortCut()"));
+	Serial.println(shortCut);
+	MusicDataset shortCutData = swConfig.ShortCuts[shortCut];
+	if (shortCutData.folder > 0) 
+	{
+		loadAndPlayFolder(shortCutData);
+	}
+	else
+	{
+		Serial.println(F("Shortcut not configured!"));
+	}
+}
+
+void handleModifier(EModifier modifier, uint16_t special)
 {
 	bool toggle = special == 2;
 	bool bValue = special == 1;
@@ -624,17 +624,17 @@ void handleModifier(EModifier modifier, uint8_t special)
 		{
 			dfPlayer.freezeDance_active = toggle ? !dfPlayer.freezeDance_active : bValue; break;
 		}
-		case MODI_TrackPlay:
+		case MODI_TrackContinue:
 		{
-			dfPlayer.continueTitle(); break;
-		}
-		case MODI_TrackPause:
-		{
-			dfPlayer.pauseAndStandBy(); break;
-		}
-		case MODI_TrackToggle:
-		{
-			dfPlayer.togglePlay(); break;
+			if (toggle)
+			{
+				dfPlayer.togglePlay();
+			}
+			else
+			{
+				bValue ? dfPlayer.continueTitle() : dfPlayer.pauseAndStandBy();
+			}
+			break;
 		}
 		case MODI_TrackNext:
 		{
@@ -662,6 +662,10 @@ void handleModifier(EModifier modifier, uint8_t special)
 		{
 			playShortCut(special); break;
 		}
+		case MODI_Advertisement:
+		{
+			dfPlayer.playAdvertisement(special);
+		}
 	}
 }
 
@@ -669,6 +673,8 @@ void evaluateModifierData(MusicDataset musicDS)
 {
 	EModifier modifier = static_cast<EModifier>(musicDS.mode);
 	uint8_t special = musicDS.special;
+	uint8_t special2 = musicDS.special2;
 	
-	handleModifier(modifier, special);
+	uint16_t value = special2 << 8 | special;
+	handleModifier(modifier, value);
 }

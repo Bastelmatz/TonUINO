@@ -29,4 +29,4 @@ void writeCard(MusicDataset musicDS);
 void resetCard();
 
 void evaluateModifierData(MusicDataset musicDS);
-void handleModifier(EModifier modifier, uint8_t special);
+void handleModifier(EModifier modifier, uint16_t special);

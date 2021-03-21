@@ -46,7 +46,7 @@ class TonuinoDFPlayer
 	void firstTrack();
 	void lastTrack();
 	void waitForTrackToFinish();
-	void playAdvertisement(int advertisement);
+	void playAdvertisement(uint16_t advertisement);
 	void playMP3AndWait(uint16_t track);
 	void volumeUp();
 	void volumeDown();

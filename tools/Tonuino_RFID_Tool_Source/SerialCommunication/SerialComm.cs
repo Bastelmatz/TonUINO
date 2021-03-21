@@ -168,8 +168,10 @@ namespace Tonuino_RFID_Creator
                     if (folder == 0)
                     {
                         EModiType modiType = ModiType.FromNumber(getByte(textLines[3]));
-                        TimeSpan sleepTime = TimeSpan.FromMinutes(getByte(textLines[4]));
-                        data = new ModiCardData(rfid, cookie, modiType, sleepTime);
+                        byte special = getByte(textLines[4]);
+                        byte special2 = getByte(textLines[5]);
+                        ushort modeValue = (ushort)(special2 << 8 | special);
+                        data = new ModiCardData(rfid, cookie, modiType, modeValue);
                     }
                     else
                     {
@@ -214,7 +216,13 @@ namespace Tonuino_RFID_Creator
             return 0;
         }
 
-        public static void Write(ICardData cardData)
+        public static void Write(IMusicCardData cardData)
+        {
+            string formattedLineText = toString(cardData);
+            WriteLine(formattedLineText);
+        }
+
+        public static void Write(IModiCardData cardData)
         {
             string formattedLineText = toString(cardData);
             WriteLine(formattedLineText);
@@ -222,7 +230,7 @@ namespace Tonuino_RFID_Creator
 
         private const string SEPARATOR = ";";
 
-        private static string toString(ICardData data)
+        private static string toString(IMusicCardData data)
         {
             // Defined order - has to be in sync with Tonuino sketch - don't change!!
             List<byte> items = new List<byte>()
@@ -231,6 +239,19 @@ namespace Tonuino_RFID_Creator
                 data.Raw_Mode,
                 data.Raw_Special,
                 data.Raw_Special2
+            };
+            return string.Join(SEPARATOR, items);
+        }
+
+        private static string toString(IModiCardData data)
+        {
+            // Defined order - has to be in sync with Tonuino sketch - don't change!!
+            List<byte> items = new List<byte>()
+            {
+                0,
+                data.Raw_Mode,
+                (byte)(data.Raw_Value & 0xff),
+                (byte)((data.Raw_Value >> 8) & 0xff)
             };
             return string.Join(SEPARATOR, items);
         }

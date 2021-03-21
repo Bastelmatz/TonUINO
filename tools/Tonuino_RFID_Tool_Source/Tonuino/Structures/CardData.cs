@@ -3,7 +3,7 @@ using System;
 
 namespace Tonuino_RFID_Creator
 {
-    public interface ICardData
+    public interface IMusicCardData
     {
         byte Raw_Mode { get; }
         byte Raw_Folder { get; }
@@ -11,12 +11,24 @@ namespace Tonuino_RFID_Creator
         byte Raw_Special2 { get; }
     }
 
-    public class CardDataRaw : ICardData
+    public class MusicCardDataRaw : IMusicCardData
     {
         public byte Raw_Mode { get; set; }
         public byte Raw_Folder { get; set; }
         public byte Raw_Special { get; set; }
         public byte Raw_Special2 { get; set; }
+    }
+
+    public interface IModiCardData
+    {
+        byte Raw_Mode { get; }
+        ushort Raw_Value { get; }
+    }
+
+    public class ModiCardDataRaw : IModiCardData
+    {
+        public byte Raw_Mode { get; set; }
+        public ushort Raw_Value { get; set; }
     }
 
     public class CardData
@@ -39,7 +51,7 @@ namespace Tonuino_RFID_Creator
         }
     }
 
-    public class MusicCardData : CardData, ICardData
+    public class MusicCardData : CardData, IMusicCardData
     {
         public MusicMode Mode { get; }
         public byte Folder { get; }
@@ -61,9 +73,9 @@ namespace Tonuino_RFID_Creator
         }
     }
 
-    public class ModiCardData : CardData
+    public class LegacyModiCardData : CardData
     {
-        public ModiType ModiType { get; }
+        public LegacyModiType ModiType { get; }
         public TimeSpan SleepTime { get; }
 
         public int Raw_Mode => ModiType.Index;
@@ -71,11 +83,27 @@ namespace Tonuino_RFID_Creator
         public int Raw_Special => ModiType.UseSleepTimeSetting ? SleepTime.Minutes : 0;
         public int Raw_Special2 => 0;
 
-        public ModiCardData(long rfid, int cookie, EModiType modiType, TimeSpan sleepTime) 
+        public LegacyModiCardData(long rfid, int cookie, ELegacyModiType modiType, TimeSpan sleepTime) 
             : base (rfid, cookie)
         {
-            ModiType = new ModiType(modiType);
+            ModiType = new LegacyModiType(modiType);
             SleepTime = sleepTime;
+        }
+    }
+
+    public class ModiCardData : CardData
+    {
+        public ModiType ModiType { get; }
+        public ushort Value { get; }
+
+        public int Raw_Mode => ModiType.Index;
+        public int Raw_Special => Value;
+
+        public ModiCardData(long rfid, int cookie, EModiType modiType, ushort value)
+            : base(rfid, cookie)
+        {
+            ModiType = new ModiType(modiType);
+            Value = value;
         }
     }
 }

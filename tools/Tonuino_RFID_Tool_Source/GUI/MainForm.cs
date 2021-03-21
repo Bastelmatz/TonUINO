@@ -23,7 +23,19 @@ namespace Tonuino_RFID_Creator
 
             Instance = this;
 
-            initGUI();
+            try
+            {
+                initGUI();
+            }
+            catch (Exception ex)
+            {
+                showException(ex, "Init GUI");
+            }
+        }
+
+        private void showException(Exception ex, string caption)
+        {
+            MessageBox.Show(ex.Message, caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -72,6 +84,8 @@ namespace Tonuino_RFID_Creator
             // set modi card options
             List<ModiType> modiTypes = ModiType.AllValidModes();
             comboBox_ModiCardOptions.SetItems(modiTypes);
+
+            comboBox_ModiBehaviour.SetItems(new List<string> { "Set", "Undo", "Toggle" });
         }
 
         // *****************************
@@ -179,9 +193,9 @@ namespace Tonuino_RFID_Creator
             // Text
             bool useStartEndTrack = false;
             bool useSingleTrack = false;
-            bool isModifierCard = false;
             bool isMusicCard = false;
-            bool isSleepModi = false;
+            bool isModifierCard = false;
+            bool hasModiValue = false;
             if (data is MusicCardData)
             {
                 isMusicCard = true;
@@ -199,18 +213,24 @@ namespace Tonuino_RFID_Creator
             {
                 isModifierCard = true;
                 ModiCardData modiData = (ModiCardData)data;
-                isSleepModi = modiData.ModiType.UseSleepTimeSetting;
+                hasModiValue = modiData.ModiType.RequiresValue;
 
                 lblMode.Text = modiData.ModiType.Name;
-                lblSleepTime.Text = modiData.SleepTime.Minutes + " min";
+                lblReadModiValue.Text = modiData.Value.ToString();
+                if (modiData.ModiType.IsMinutesValue)
+                {
+                    lblReadModiValue.Text += " min";
+                }
             }
 
-            lblCardDetected.Text = "Card Data - " + (exists ? data.IsNewCard ? "New" : "Tonuino " + (isModifierCard ? "Modification" : "Music") : "No") + " Card";
+            string cardPrefix = isModifierCard ? "Modification" : "Music";
+            lblCardDetected.Text = "Card Data - " + (exists ? data.IsNewCard ? "New" : "Tonuino " + cardPrefix : "No") + " Card";
             lblRFID.Text = data.RFID + " | Hex: " + data.RFIDHex;
 
             // Visibility
             if (!data.IsNewCard)
             {
+                // legacy modifier not implemented in GUI
                 radio_ModiCard.Checked = isModifierCard;
                 radio_MusicCard.Checked = !isModifierCard; // in case control isn't visible
             }
@@ -222,7 +242,7 @@ namespace Tonuino_RFID_Creator
             lblFolderCaption.Visible = lblFolder.Visible = isDefinedCard && !isModifierCard;
             lblEndPosCaption.Visible = lblEndPos.Visible = isDefinedCard && useStartEndTrack;
             lblStartPosCaption.Visible = lblStartPos.Visible = isDefinedCard && (useStartEndTrack || useSingleTrack);
-            lblSleepTimeReadCaption.Visible = lblSleepTime.Visible = isModifierCard && isSleepModi;
+            lblReadModiValueCaption.Visible = lblReadModiValue.Visible = isModifierCard && hasModiValue;
         }
 
         private void updateCardActionVisibility()
@@ -248,9 +268,14 @@ namespace Tonuino_RFID_Creator
             if (pnlModiCardAction.Visible)
             {
                 ModiType modiType = (ModiType)comboBox_ModiCardOptions.SelectedItem;
-                bool useSleepTime = modiType == null ? false : modiType.UseSleepTimeSetting;
+                bool requiresValue = modiType == null ? false : modiType.RequiresValue;
+                bool isMinutes = modiType == null ? false : modiType.IsMinutesValue;
+                bool isBool = modiType == null ? false : modiType.IsBool;
 
-                textBox_SleepTime.Visible = lblSleepTimeCaption.Visible = lblSleepTimeUnit.Visible = useSleepTime;
+                textBox_ModiValue.Visible = lblModiValue.Visible = requiresValue && !isBool;
+                lblMinutes.Visible = isMinutes;
+
+                pnlModeBehaviour.Visible = lblModeBehaviour.Visible = isBool;
             }
         }
 
@@ -319,14 +344,25 @@ namespace Tonuino_RFID_Creator
             return 0;
         }
 
-        private ICardData getMusicCardData()
+        private ushort getShort(TextBox textBox)
+        {
+            string text = textBox.Text;
+            ushort parsedInt = 0;
+            if (textBox.Visible && ushort.TryParse(text, out parsedInt))
+            {
+                return parsedInt;
+            }
+            return 0;
+        }
+
+        private IMusicCardData getMusicCardData()
         {
             MusicMode mode = (MusicMode)comboBox_MusicCardModes.SelectedItem;
             byte folder = getByte(textBoxFolderOnSD);
             byte startTrack = getByte(textBoxStartOnSD);
             byte endTrack = getByte(textBoxEndOnSD);
 
-            ICardData musicData = new CardDataRaw()
+            IMusicCardData musicData = new MusicCardDataRaw()
             {
                 Raw_Folder = folder,
                 Raw_Mode = mode.Ident.Index,
@@ -336,17 +372,15 @@ namespace Tonuino_RFID_Creator
             return musicData;
         }
 
-        private ICardData getModiCardData()
+        private IModiCardData getModiCardData()
         {
             ModiType modiType = (ModiType)comboBox_ModiCardOptions.SelectedItem;
-            byte sleepTime = getByte(textBox_SleepTime);
+            ushort modiValue = getShort(textBox_ModiValue);
 
-            ICardData modiData = new CardDataRaw()
+            IModiCardData modiData = new ModiCardDataRaw()
             {
-                Raw_Folder = 0,
                 Raw_Mode = modiType.Ident.Index,
-                Raw_Special = sleepTime,
-                Raw_Special2 = 0
+                Raw_Value = modiValue,
             };
             return modiData;
         }
@@ -373,13 +407,13 @@ namespace Tonuino_RFID_Creator
 
         private void btnWriteMusicCard_Click(object sender, EventArgs e)
         {
-            ICardData cardData = getMusicCardData();
+            IMusicCardData cardData = getMusicCardData();
             SerialComm.Write(cardData);
         }
 
         private void btnWriteModiCard_Click(object sender, EventArgs e)
         {
-            ICardData cardData = getModiCardData();
+            IModiCardData cardData = getModiCardData();
             SerialComm.Write(cardData);
         }
 
@@ -388,9 +422,9 @@ namespace Tonuino_RFID_Creator
             updateCardActionVisibility();
         }
 
-        private void textBoxSetting_Time_TextChanged(object sender, EventArgs e)
+        private void textBoxSetting_ModiValue_TextChanged(object sender, EventArgs e)
         {
-            limitText((TextBox)sender, 0, 60);
+            limitText((TextBox)sender, 0, 999);
         }
 
         private void textBoxFolderOnSD_TextChanged(object sender, EventArgs e)
@@ -418,7 +452,6 @@ namespace Tonuino_RFID_Creator
         {
             updateWriteDataControls();
         }
-
         #endregion
     }
 }

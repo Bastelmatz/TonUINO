@@ -50,8 +50,6 @@ namespace Tonuino_RFID_Creator
 
         protected abstract void createAllocation();
 
-
-
         public static T FromNumber(byte number)
         {
             foreach (Ident<T> ident in m_allocation)

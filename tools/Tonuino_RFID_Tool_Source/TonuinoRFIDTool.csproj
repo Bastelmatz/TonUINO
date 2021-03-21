@@ -61,6 +61,7 @@
     <Compile Include="Tonuino\Definitions\BaseType.cs" />
     <Compile Include="Tonuino\Definitions\EqualizerType.cs" />
     <Compile Include="Tonuino\Definitions\ModiType.cs" />
+    <Compile Include="Tonuino\Definitions\LegacyModiType.cs" />
     <Compile Include="Tonuino\Definitions\MusicMode.cs" />
     <Compile Include="Tonuino\Structures\CardData.cs" />
     <EmbeddedResource Include="GUI\MainForm.resx">
