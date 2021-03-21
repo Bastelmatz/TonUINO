@@ -304,6 +304,13 @@ void handleButtons()
 	}
 	
 	bool isCurrentlyPlaying = dfPlayer.isPlaying();
+	
+	if (!isCurrentlyPlaying && tonuinoButtons.readRaw() == BUTTONDOWN_All) 
+	{
+		handleModifier(MODI_ResetCard, 0);
+		return;
+	}
+	
 	ModifierDataset modiDS = tonuinoButtons.getPlayerModification(isCurrentlyPlaying);	
 	handleModifier(modiDS.modi, modiDS.value);
 }
@@ -329,7 +336,7 @@ void handleCardReader()
 		case MUSICCARD_NEW: onNewCard(); break;
 		case ALLCARDS_GONE: onCardGone(); break;
 		case MUSICCARD_IS_BACK:	onCardReturn(); break;
-	}    
+	}
 }
 
 void handleUltraSonic()
@@ -422,11 +429,13 @@ void onCardReturn()
 
 void waitForNewCard()
 {
+	// Some time for the user to leave the next/previous button, if they are pressed before (e.g. as a trigger)
+	delay(2000);
 	do {
 		int buttonState = tonuinoButtons.read();
 		if (buttonState == BUTTONCLICK_Next || buttonState == BUTTONCLICK_Previous) 
 		{
-			Serial.println(F("Abgebrochen!"));
+			Serial.println(F("Waiting for new card aborted!"));
 			dfPlayer.playMp3Track(802);
 			break;
 		}
@@ -547,7 +556,7 @@ void resetCard()
 {
 	dfPlayer.playMp3Track(800);
 	waitForNewCard();
-
+	
 	if (!tonuinoRFID.cardSerialFound())
 	{
 		return;
@@ -654,11 +663,6 @@ void handleModifier(EModifier modifier, uint8_t special)
 			playShortCut(special); break;
 		}
 	}
-}
-
-void handleModifier(EModifier modifier)
-{
-	handleModifier(modifier, 0);
 }
 
 void evaluateModifierData(MusicDataset musicDS)

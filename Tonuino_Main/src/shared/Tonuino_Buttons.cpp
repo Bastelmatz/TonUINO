@@ -116,12 +116,12 @@ ModifierDataset TonuinoButtons::getMenuModification(uint8_t currentValue, uint8_
 	if (buttonState == BUTTONCLICK_LONG_StartStop) 
 	{
 		modiDS.modi = MODI_MENU_Cancel;
-		modiDS.value = currentValue;
+		modiDS.value = defaultValue;
 	}
 	if (buttonState == BUTTONCLICK_StartStop) 
 	{
 		modiDS.modi = MODI_MENU_Choose;
-		modiDS.value = defaultValue;
+		modiDS.value = currentValue;
 	}
 	if (buttonState == BUTTONCLICK_LONG_Next) 
 	{
