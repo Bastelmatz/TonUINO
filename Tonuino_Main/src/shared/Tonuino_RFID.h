@@ -55,11 +55,13 @@ public:
 private:
 	MFRC522::MIFARE_Key key;
 	MFRC522::StatusCode status;
+	bool isMifareUL;
 	
 	byte pollCard();
 	bool isCardGone();
 	bool isSameMusicCardAsLastOne();
 	bool readCard();
+	bool tryAuthenticate();
 };
 
 #endif

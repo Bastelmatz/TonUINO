@@ -133,7 +133,7 @@ byte Tonuino_RFID_Reader::tryPollCard()
   return MUSICCARD_NO_CHANGE;
 }
 
-bool Tonuino_RFID_Reader::readCard() 
+bool Tonuino_RFID_Reader::tryAuthenticate()
 {
   // Show some details of the PICC (that is: the tag/card)
   Serial.print(F("Card UID:"));
@@ -142,21 +142,19 @@ bool Tonuino_RFID_Reader::readCard()
   Serial.print(F("PICC type: "));
   MFRC522::PICC_Type piccType = mfrc522.PICC_GetType(mfrc522.uid.sak);
   Serial.println(mfrc522.PICC_GetTypeName(piccType));
-  const bool bIsMifareUL = piccType == MFRC522::PICC_TYPE_MIFARE_UL;
   
-  byte buffer[18+12];   // add more room at the end so that UL read with offset of up to 12 bytes fits
-  byte size = 18;
-
-  // Authenticate using key A
-  if (bIsMifareUL)
+  isMifareUL = piccType == MFRC522::PICC_TYPE_MIFARE_UL;
+	
+  // authentificate with the card and set card specific parameters
+  if (isMifareUL)
   {
-	byte pACK[] = {0, 0}; //16 bit PassWord ACK returned by the readCardData
-	Serial.println(F("Authenticating MIFARE UL..."));
+	byte pACK[] = {0, 0}; //16 bit PassWord ACK returned by the NFCtag
+	Serial.println(F("Authenticating UL..."));
 	status = mfrc522.PCD_NTAG216_AUTH(key.keyByte, pACK);
   }
   else // Mifare Mini, 1K, 4K
   {
-	Serial.println(F("Authenticating Classic using key A..."));
+	Serial.println(F("Authenticating again using key A..."));
 	status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, trailerBlock, &key, &(mfrc522.uid));
   }
 
@@ -166,9 +164,30 @@ bool Tonuino_RFID_Reader::readCard()
 	Serial.println(mfrc522.GetStatusCodeName(status));
 	return false;
   }
+  return true;
+}
 
+bool Tonuino_RFID_Reader::readCard() 
+{
+  byte buffer[18+12];   // add more room at the end so that UL read with offset of up to 12 bytes fits
+  byte size = 18;
+
+  if (!tryAuthenticate()) 
+  {
+	return false;
+  }
+
+  //for (int i = 0; i < 32; i++)
+  //{
+    //  // Show the whole sector as it currently is
+    //Serial.print(F("Current data in sector "));
+    //Serial.println(i);
+    //mfrc522.PICC_DumpMifareClassicSectorToSerial(&(mfrc522.uid), &key, i);
+    //Serial.println();
+  //}
+	
   // Read data from the block
-  if (bIsMifareUL)
+  if (isMifareUL)
   {
 	// UL cards read 4 bytes at once -> 4 parts for 16 bytes
 	for (byte part = 0; part < 4; part++)
@@ -235,27 +254,9 @@ bool Tonuino_RFID_Reader::writeCard(nfcTagStruct cardData)
 					 cardData.musicDS.special2,
 					 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 					};
-
-  MFRC522::PICC_Type mifareType = mfrc522.PICC_GetType(mfrc522.uid.sak);
-  const bool bIsMifareUL = mifareType == MFRC522::PICC_TYPE_MIFARE_UL;
   
-  // authentificate with the card and set card specific parameters
-  if (bIsMifareUL)
+  if (!tryAuthenticate()) 
   {
-	byte pACK[] = {0, 0}; //16 bit PassWord ACK returned by the NFCtag
-	Serial.println(F("Authenticating UL..."));
-	status = mfrc522.PCD_NTAG216_AUTH(key.keyByte, pACK);
-  }
-  else // Mifare Mini, 1K, 4K
-  {
-	Serial.println(F("Authenticating again using key A..."));
-	status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, trailerBlock, &key, &(mfrc522.uid));
-  }
-
-  if (status != MFRC522::STATUS_OK) 
-  {
-	Serial.print(F("PCD_Authenticate() failed: "));
-	Serial.println(mfrc522.GetStatusCodeName(status));
 	return false;
   }
 
@@ -266,7 +267,7 @@ bool Tonuino_RFID_Reader::writeCard(nfcTagStruct cardData)
   dump_byte_array(buffer, 16);
   Serial.println();
 
-  if (bIsMifareUL)
+  if (isMifareUL)
   {
 	byte buffer2[16];
 	byte size2 = sizeof(buffer2);
