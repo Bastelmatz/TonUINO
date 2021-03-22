@@ -234,7 +234,7 @@ namespace Tonuino_RFID_Creator
                 radio_ModiCard.Checked = isModifierCard;
                 radio_MusicCard.Checked = !isModifierCard; // in case control isn't visible
             }
-            pnlCardDetected.Visible = pnlCardAction.Visible = exists;
+            pnlCardDetected.Visible = pnlCardAction.Visible = true; // exists;
             updateCardActionVisibility();
 
             bool isDefinedCard = isMusicCard || isModifierCard;

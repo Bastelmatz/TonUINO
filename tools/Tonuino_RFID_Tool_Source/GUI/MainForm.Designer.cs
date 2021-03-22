@@ -52,6 +52,7 @@
             this.btnWriteMusicCard = new System.Windows.Forms.Button();
             this.checkExtendCard = new System.Windows.Forms.CheckBox();
             this.pnlModes = new System.Windows.Forms.Panel();
+            this.comboBox_MusicCardModes = new Tonuino_RFID_Creator.ExtendedComboBox();
             this.lblComment = new System.Windows.Forms.Label();
             this.textBoxComment = new System.Windows.Forms.TextBox();
             this.lblLastCommentCaption = new System.Windows.Forms.Label();
@@ -60,10 +61,14 @@
             this.lblReadModiValueCaption = new System.Windows.Forms.Label();
             this.lblReadModiValue = new System.Windows.Forms.Label();
             this.pnlModiCardAction = new System.Windows.Forms.Panel();
+            this.pnlModeBehaviour = new System.Windows.Forms.Panel();
+            this.comboBox_ModiBehaviour = new Tonuino_RFID_Creator.ExtendedComboBox();
+            this.lblModeBehaviour = new System.Windows.Forms.Label();
             this.lblMinutes = new System.Windows.Forms.Label();
             this.lblModiValue = new System.Windows.Forms.Label();
             this.textBox_ModiValue = new System.Windows.Forms.TextBox();
             this.pnlModeCardOptions = new System.Windows.Forms.Panel();
+            this.comboBox_ModiCardOptions = new Tonuino_RFID_Creator.ExtendedComboBox();
             this.btnWriteModiCard = new System.Windows.Forms.Button();
             this.pnlMusicCardAction = new System.Windows.Forms.Panel();
             this.radio_MusicCard = new System.Windows.Forms.RadioButton();
@@ -71,21 +76,16 @@
             this.pnlCardAction = new System.Windows.Forms.Panel();
             this.pnlSeparator = new System.Windows.Forms.Panel();
             this.pnlPorts = new System.Windows.Forms.Panel();
-            this.lblPorts = new System.Windows.Forms.Label();
-            this.lblModeBehaviour = new System.Windows.Forms.Label();
-            this.pnlModeBehaviour = new System.Windows.Forms.Panel();
             this.comboBox_Ports = new Tonuino_RFID_Creator.ExtendedComboBox();
-            this.comboBox_MusicCardModes = new Tonuino_RFID_Creator.ExtendedComboBox();
-            this.comboBox_ModiBehaviour = new Tonuino_RFID_Creator.ExtendedComboBox();
-            this.comboBox_ModiCardOptions = new Tonuino_RFID_Creator.ExtendedComboBox();
+            this.lblPorts = new System.Windows.Forms.Label();
             this.pnlModes.SuspendLayout();
             this.pnlCardDetected.SuspendLayout();
             this.pnlModiCardAction.SuspendLayout();
+            this.pnlModeBehaviour.SuspendLayout();
             this.pnlModeCardOptions.SuspendLayout();
             this.pnlMusicCardAction.SuspendLayout();
             this.pnlCardAction.SuspendLayout();
             this.pnlPorts.SuspendLayout();
-            this.pnlModeBehaviour.SuspendLayout();
             this.SuspendLayout();
             // 
             // lblConnectedPort
@@ -315,6 +315,19 @@
             this.pnlModes.Size = new System.Drawing.Size(158, 23);
             this.pnlModes.TabIndex = 27;
             // 
+            // comboBox_MusicCardModes
+            // 
+            this.comboBox_MusicCardModes.BackColor = System.Drawing.SystemColors.Window;
+            this.comboBox_MusicCardModes.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.comboBox_MusicCardModes.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox_MusicCardModes.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.comboBox_MusicCardModes.FormattingEnabled = true;
+            this.comboBox_MusicCardModes.Location = new System.Drawing.Point(0, 0);
+            this.comboBox_MusicCardModes.Name = "comboBox_MusicCardModes";
+            this.comboBox_MusicCardModes.Size = new System.Drawing.Size(156, 21);
+            this.comboBox_MusicCardModes.TabIndex = 16;
+            this.comboBox_MusicCardModes.SelectedValueChanged += new System.EventHandler(this.comboBoxCardModes_SelectedValueChanged);
+            // 
             // lblComment
             // 
             this.lblComment.AutoSize = true;
@@ -379,7 +392,7 @@
             this.lblReadModiValueCaption.Name = "lblReadModiValueCaption";
             this.lblReadModiValueCaption.Size = new System.Drawing.Size(70, 13);
             this.lblReadModiValueCaption.TabIndex = 34;
-            this.lblReadModiValueCaption.Text = "Sleep Time:";
+            this.lblReadModiValueCaption.Text = "Value:";
             this.lblReadModiValueCaption.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // lblReadModiValue
@@ -404,6 +417,36 @@
             this.pnlModiCardAction.Name = "pnlModiCardAction";
             this.pnlModiCardAction.Size = new System.Drawing.Size(181, 258);
             this.pnlModiCardAction.TabIndex = 39;
+            // 
+            // pnlModeBehaviour
+            // 
+            this.pnlModeBehaviour.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pnlModeBehaviour.Controls.Add(this.comboBox_ModiBehaviour);
+            this.pnlModeBehaviour.Location = new System.Drawing.Point(82, 88);
+            this.pnlModeBehaviour.Name = "pnlModeBehaviour";
+            this.pnlModeBehaviour.Size = new System.Drawing.Size(88, 23);
+            this.pnlModeBehaviour.TabIndex = 33;
+            // 
+            // comboBox_ModiBehaviour
+            // 
+            this.comboBox_ModiBehaviour.BackColor = System.Drawing.SystemColors.Window;
+            this.comboBox_ModiBehaviour.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.comboBox_ModiBehaviour.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox_ModiBehaviour.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.comboBox_ModiBehaviour.FormattingEnabled = true;
+            this.comboBox_ModiBehaviour.Location = new System.Drawing.Point(0, 0);
+            this.comboBox_ModiBehaviour.Name = "comboBox_ModiBehaviour";
+            this.comboBox_ModiBehaviour.Size = new System.Drawing.Size(86, 21);
+            this.comboBox_ModiBehaviour.TabIndex = 16;
+            // 
+            // lblModeBehaviour
+            // 
+            this.lblModeBehaviour.Location = new System.Drawing.Point(19, 91);
+            this.lblModeBehaviour.Name = "lblModeBehaviour";
+            this.lblModeBehaviour.Size = new System.Drawing.Size(58, 13);
+            this.lblModeBehaviour.TabIndex = 32;
+            this.lblModeBehaviour.Text = "Behaviour:";
+            this.lblModeBehaviour.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // lblMinutes
             // 
@@ -440,6 +483,19 @@
             this.pnlModeCardOptions.Name = "pnlModeCardOptions";
             this.pnlModeCardOptions.Size = new System.Drawing.Size(158, 23);
             this.pnlModeCardOptions.TabIndex = 27;
+            // 
+            // comboBox_ModiCardOptions
+            // 
+            this.comboBox_ModiCardOptions.BackColor = System.Drawing.SystemColors.Window;
+            this.comboBox_ModiCardOptions.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.comboBox_ModiCardOptions.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox_ModiCardOptions.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.comboBox_ModiCardOptions.FormattingEnabled = true;
+            this.comboBox_ModiCardOptions.Location = new System.Drawing.Point(0, 0);
+            this.comboBox_ModiCardOptions.Name = "comboBox_ModiCardOptions";
+            this.comboBox_ModiCardOptions.Size = new System.Drawing.Size(156, 21);
+            this.comboBox_ModiCardOptions.TabIndex = 16;
+            this.comboBox_ModiCardOptions.SelectedIndexChanged += new System.EventHandler(this.comboBox_ModiCardOptions_SelectedIndexChanged);
             // 
             // btnWriteModiCard
             // 
@@ -522,34 +578,6 @@
             this.pnlPorts.Size = new System.Drawing.Size(86, 23);
             this.pnlPorts.TabIndex = 46;
             // 
-            // lblPorts
-            // 
-            this.lblPorts.AutoSize = true;
-            this.lblPorts.Location = new System.Drawing.Point(12, 23);
-            this.lblPorts.Name = "lblPorts";
-            this.lblPorts.Size = new System.Drawing.Size(61, 13);
-            this.lblPorts.TabIndex = 45;
-            this.lblPorts.Text = "COM Ports:";
-            this.lblPorts.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // lblModeBehaviour
-            // 
-            this.lblModeBehaviour.Location = new System.Drawing.Point(19, 91);
-            this.lblModeBehaviour.Name = "lblModeBehaviour";
-            this.lblModeBehaviour.Size = new System.Drawing.Size(58, 13);
-            this.lblModeBehaviour.TabIndex = 32;
-            this.lblModeBehaviour.Text = "Behaviour:";
-            this.lblModeBehaviour.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // pnlModeBehaviour
-            // 
-            this.pnlModeBehaviour.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pnlModeBehaviour.Controls.Add(this.comboBox_ModiBehaviour);
-            this.pnlModeBehaviour.Location = new System.Drawing.Point(82, 88);
-            this.pnlModeBehaviour.Name = "pnlModeBehaviour";
-            this.pnlModeBehaviour.Size = new System.Drawing.Size(88, 23);
-            this.pnlModeBehaviour.TabIndex = 33;
-            // 
             // comboBox_Ports
             // 
             this.comboBox_Ports.BackColor = System.Drawing.SystemColors.Window;
@@ -562,43 +590,15 @@
             this.comboBox_Ports.Size = new System.Drawing.Size(84, 21);
             this.comboBox_Ports.TabIndex = 16;
             // 
-            // comboBox_MusicCardModes
+            // lblPorts
             // 
-            this.comboBox_MusicCardModes.BackColor = System.Drawing.SystemColors.Window;
-            this.comboBox_MusicCardModes.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.comboBox_MusicCardModes.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox_MusicCardModes.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.comboBox_MusicCardModes.FormattingEnabled = true;
-            this.comboBox_MusicCardModes.Location = new System.Drawing.Point(0, 0);
-            this.comboBox_MusicCardModes.Name = "comboBox_MusicCardModes";
-            this.comboBox_MusicCardModes.Size = new System.Drawing.Size(156, 21);
-            this.comboBox_MusicCardModes.TabIndex = 16;
-            this.comboBox_MusicCardModes.SelectedValueChanged += new System.EventHandler(this.comboBoxCardModes_SelectedValueChanged);
-            // 
-            // comboBox_ModiBehaviour
-            // 
-            this.comboBox_ModiBehaviour.BackColor = System.Drawing.SystemColors.Window;
-            this.comboBox_ModiBehaviour.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.comboBox_ModiBehaviour.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox_ModiBehaviour.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.comboBox_ModiBehaviour.FormattingEnabled = true;
-            this.comboBox_ModiBehaviour.Location = new System.Drawing.Point(0, 0);
-            this.comboBox_ModiBehaviour.Name = "comboBox_ModiBehaviour";
-            this.comboBox_ModiBehaviour.Size = new System.Drawing.Size(86, 21);
-            this.comboBox_ModiBehaviour.TabIndex = 16;
-            // 
-            // comboBox_ModiCardOptions
-            // 
-            this.comboBox_ModiCardOptions.BackColor = System.Drawing.SystemColors.Window;
-            this.comboBox_ModiCardOptions.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.comboBox_ModiCardOptions.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox_ModiCardOptions.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.comboBox_ModiCardOptions.FormattingEnabled = true;
-            this.comboBox_ModiCardOptions.Location = new System.Drawing.Point(0, 0);
-            this.comboBox_ModiCardOptions.Name = "comboBox_ModiCardOptions";
-            this.comboBox_ModiCardOptions.Size = new System.Drawing.Size(156, 21);
-            this.comboBox_ModiCardOptions.TabIndex = 16;
-            this.comboBox_ModiCardOptions.SelectedIndexChanged += new System.EventHandler(this.comboBox_ModiCardOptions_SelectedIndexChanged);
+            this.lblPorts.AutoSize = true;
+            this.lblPorts.Location = new System.Drawing.Point(12, 23);
+            this.lblPorts.Name = "lblPorts";
+            this.lblPorts.Size = new System.Drawing.Size(61, 13);
+            this.lblPorts.TabIndex = 45;
+            this.lblPorts.Text = "COM Ports:";
+            this.lblPorts.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // MainForm
             // 
@@ -625,13 +625,13 @@
             this.pnlCardDetected.PerformLayout();
             this.pnlModiCardAction.ResumeLayout(false);
             this.pnlModiCardAction.PerformLayout();
+            this.pnlModeBehaviour.ResumeLayout(false);
             this.pnlModeCardOptions.ResumeLayout(false);
             this.pnlMusicCardAction.ResumeLayout(false);
             this.pnlMusicCardAction.PerformLayout();
             this.pnlCardAction.ResumeLayout(false);
             this.pnlCardAction.PerformLayout();
             this.pnlPorts.ResumeLayout(false);
-            this.pnlModeBehaviour.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 

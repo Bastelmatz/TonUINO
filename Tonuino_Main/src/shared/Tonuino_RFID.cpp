@@ -59,7 +59,7 @@ byte Tonuino_RFID_Reader::pollCard()
   }
   else
   {
-	if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial() && readCard())
+	if (cardDetected() && cardSerialFound() && readCard())
 	{
 	  retries = maxRetries;
 	  bool currentCardIsUL = mfrc522.PICC_GetType(mfrc522.uid.sak) == MFRC522::PICC_TYPE_MIFARE_UL;

@@ -50,12 +50,33 @@ void Tonuino_RFID_Tool_Core::transmitCardRemoval()
 
 void Tonuino_RFID_Tool_Core::writeCard(MusicDataset musicDS)
 {
-  tonuinoRFID.writeCard(musicDS);
-  tonuinoRFID.haltAndStop();
-  
-  // force new card detection
-  tonuinoRFID.hasMusicCard = false;
-  tonuinoRFID.hasModifierCard = false;
+	tonuinoRFID.setupRFID();
+	
+	Serial.println(F("Wait 10s for card..."));
+	long startTime = millis();
+	do {
+		if (millis() - startTime > 10000)
+		{
+			Serial.println(F("Wait for card aborted!"));
+			break;
+		}
+		delay (10);
+	} while (!tonuinoRFID.cardDetected());
+	if (!tonuinoRFID.cardSerialFound())
+	{
+		Serial.println(F("No card serial found!"));
+		return;
+	}
+	
+	if (tonuinoRFID.writeCard(musicDS))
+	{
+		Serial.println(F("Card written!"));
+	}
+	tonuinoRFID.haltAndStop();
+
+	// force new card detection
+	tonuinoRFID.hasMusicCard = false;
+	tonuinoRFID.hasModifierCard = false;
 }
 
 void Tonuino_RFID_Tool_Core::handleCommand()
