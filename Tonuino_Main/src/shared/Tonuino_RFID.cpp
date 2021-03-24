@@ -241,9 +241,15 @@ bool Tonuino_RFID_Reader::readCard()
   return true;
 }
 
+bool Tonuino_RFID_Reader::resetCard()
+{
+	byte buffer[16] = { 0 };
+	return writeCard(buffer);
+} 
+
 bool Tonuino_RFID_Reader::writeCard(MusicDataset musicDS) 
 {
-  byte buffer[16] = {(cardCookie >> 24) & 0xff,
+	byte buffer[16] = {(cardCookie >> 24) & 0xff,
 					 (cardCookie >> 16) & 0xff,
 					 (cardCookie >> 8) & 0xff,
 					 (cardCookie) & 0xff,
@@ -254,45 +260,49 @@ bool Tonuino_RFID_Reader::writeCard(MusicDataset musicDS)
 					 musicDS.special2,
 					 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 					};
-  
-  if (!tryAuthenticate()) 
-  {
-	return false;
-  }
+	return writeCard(buffer);
+}
 
-  // Write data to the block
-  Serial.print(F("Writing data into block "));
-  Serial.print(blockAddr);
-  Serial.println(F(" ..."));
-  dump_byte_array(buffer, 16);
-  Serial.println();
-
-  if (isMifareUL)
-  {
-	byte buffer2[16];
-	byte size2 = sizeof(buffer2);
-	
-	for (byte part = 0; part < 4; part++)
+bool Tonuino_RFID_Reader::writeCard(byte buffer[16]) 
+{
+	if (!tryAuthenticate()) 
 	{
-	  memset(buffer2, 0, size2);
-	  memcpy(buffer2, buffer + (4 * part), 4);
-	  status = mfrc522.MIFARE_Write(8 + part, buffer2, 16);
+		return false;
 	}
-  }
-  else // Mifare Mini, 1K, 4K
-  {
-	status = mfrc522.MIFARE_Write(blockAddr, buffer, 16);
-  }
 
-  if (status != MFRC522::STATUS_OK) 
-  {
-	Serial.print(F("MIFARE_Write() failed: "));
-	Serial.println(mfrc522.GetStatusCodeName(status));
-  }
-  Serial.println();
-  delay(2000);
-  
-  return status == MFRC522::STATUS_OK;
+	// Write data to the block
+	Serial.print(F("Writing data into block "));
+	Serial.print(blockAddr);
+	Serial.println(F(" ..."));
+	dump_byte_array(buffer, 16);
+	Serial.println();
+
+	if (isMifareUL)
+	{
+		byte buffer2[16];
+		byte size2 = sizeof(buffer2);
+
+		for (byte part = 0; part < 4; part++)
+		{
+			memset(buffer2, 0, size2);
+			memcpy(buffer2, buffer + (4 * part), 4);
+			status = mfrc522.MIFARE_Write(8 + part, buffer2, 16);
+		}
+	}
+	else // Mifare Mini, 1K, 4K
+	{
+		status = mfrc522.MIFARE_Write(blockAddr, buffer, 16);
+	}
+
+	if (status != MFRC522::STATUS_OK) 
+	{
+		Serial.print(F("MIFARE_Write() failed: "));
+		Serial.println(mfrc522.GetStatusCodeName(status));
+	}
+	Serial.println();
+	delay(2000);
+
+	return status == MFRC522::STATUS_OK;
 }
 
 /**

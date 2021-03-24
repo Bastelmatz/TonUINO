@@ -36,8 +36,9 @@ enum EModifier
 	MODI_LockAll = 40,
 	MODI_LockButtons = 41,
 	
-	MODI_ResetCard = 50,
-	MODI_ResetEEPROM = 51,
+	MODI_SetupCard = 50,
+	MODI_ResetCard = 51,
+	MODI_ResetEEPROM = 52,
 	
 	MODI_MENU_ChangeSmall = 60,
 	MODI_MENU_ChangeLarge = 61,

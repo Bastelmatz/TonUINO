@@ -50,7 +50,9 @@ public:
 	
 	byte tryPollCard();
 
+	bool resetCard();
 	bool writeCard(MusicDataset musicDS);
+	bool writeCard(byte buffer[16]);
 
 private:
 	MFRC522::MIFARE_Key key;

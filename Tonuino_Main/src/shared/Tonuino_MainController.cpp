@@ -290,7 +290,7 @@ void handleButtons()
 	
 	bool isCurrentlyPlaying = dfPlayer.isPlaying();
 	
-	if (!isCurrentlyPlaying && tonuinoButtons.read() == BUTTONPRESSED_All) 
+	if (!isCurrentlyPlaying && tonuinoButtons.read() == BUTTONPRESSED_LONG_All) 
 	{
 		handleModifier(MODI_ResetCard, 0);
 		return;
@@ -393,8 +393,6 @@ void onNewCard()
 	// Neue Karte konfigurieren
 	else if (nextMC.cookie != cardCookie) 
 	{
-		dfPlayer.musicDSLoaded = false;
-		dfPlayer.playMP3AndWait(300);
 		setupCard();
 	}
 }
@@ -410,21 +408,6 @@ void onCardGone()
 void onCardReturn()
 {
 	dfPlayer.continueTitle();
-}
-
-void waitForNewCard()
-{
-	// Some time for the user to leave the next/previous button, if they are pressed before (e.g. as a trigger)
-	delay(2000);
-	do {
-		uint8_t buttonState = tonuinoButtons.read();
-		if (buttonState == BUTTONCLICK_Next || buttonState == BUTTONCLICK_Previous) 
-		{
-			Serial.println(F("Waiting for new card aborted!"));
-			dfPlayer.playMp3Track(802);
-			break;
-		}
-	} while (!tonuinoRFID.cardDetected());
 }
 
 uint8_t voiceMenu(uint8_t numberOfOptions, int startMessage, int messageOffset,
@@ -516,8 +499,25 @@ bool setupFolder(MusicDataset * musicDS)
 	return true;
 }
 
+void waitForNewCard()
+{
+	// wait = Some time for the user to leave the next/previous button, if they are pressed before (e.g. as a trigger)
+	dfPlayer.playMP3AndWait(800);
+	do {
+		uint8_t buttonState = tonuinoButtons.read();
+		if (buttonState == BUTTONCLICK_Next || buttonState == BUTTONCLICK_Previous) 
+		{
+			Serial.println(F("Waiting for new card aborted!"));
+			dfPlayer.playMp3Track(802);
+			break;
+		}
+	} while (!tonuinoRFID.cardDetected());
+}
+
 void setupCard() 
 {
+	dfPlayer.musicDSLoaded = false;
+	dfPlayer.playMP3AndWait(300);
 	dfPlayer.pause();
 	Serial.println(F("=== setupCard()"));
 	MusicDataset newMusicDS;
@@ -528,6 +528,7 @@ void setupCard()
 		do { } while (dfPlayer.isPlaying());
 		writeCard(newMusicDS);
 	}
+	tonuinoRFID.haltAndStop();
 	delay(1000);
 }
 
@@ -539,16 +540,19 @@ void writeCard(MusicDataset musicDS)
 
 void resetCard() 
 {
-	dfPlayer.playMp3Track(800);
 	waitForNewCard();
 	
 	if (!tonuinoRFID.cardSerialFound())
 	{
+		Serial.println(F("No card serial found."));
 		return;
 	}
 
-	Serial.print(F("Karte wird neu konfiguriert!"));
-	setupCard();
+	Serial.println(F("Reset card!"));
+	bool statusOK = tonuinoRFID.resetCard();
+	dfPlayer.playMp3Track(statusOK ? 400 : 401);
+	tonuinoRFID.haltAndStop();
+	delay(1000);
 }
 
 void playShortCut(uint8_t shortCut) 
@@ -580,11 +584,13 @@ void handleModifier(EModifier modifier, uint16_t special)
 		{
 			buttonsLocked = toggle ? !buttonsLocked : bValue; break;
 		}
+		case MODI_SetupCard:
+		{
+			setupCard(); break;
+		}
 		case MODI_ResetCard:
 		{
-			resetCard();
-			tonuinoRFID.haltAndStop(); 
-			break;
+			resetCard(); break;
 		}
 		case MODI_ResetEEPROM:
 		{
