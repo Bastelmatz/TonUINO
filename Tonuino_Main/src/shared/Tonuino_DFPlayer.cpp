@@ -251,28 +251,52 @@ void TonuinoDFPlayer::waitForTrackToFinish()
 	} while (!isPlaying() && millis() < currentTime + TIMEOUT);
 	delay(1000);
 	// now wait until the player is not busy anymore
+	Serial.print(F("Wait for track to finish..."));
 	do 
 	{
+		// to do:
+		// main controller loop is not handled during wait
+		// solution: 
+		// - Set an IsWaiting flag here to true
+		// - call main controller loop 
+		// - Adjust main controller loop: 
+		//      - Consider IsWaiting where any cross sequence interaction should be prevented, 
+		//        e.g. only allow/call LED animations, but handle no inputs like buttons
+		//      - Set IsWaiting to false if DFPlayer IsPlaying is false
 		mp3.loop();
 	} while (isPlaying());
 }
 
-void TonuinoDFPlayer::playAdvertisement(uint16_t advertisement)
+
+void TonuinoDFPlayer::playAdvertisement(uint16_t advertisement, bool wait)
 {
 	Serial.print(F("Play advertisement "));
 	Serial.println(advertisement);
-	if (isPlaying()) 
-	{
-		mp3.playAdvertisement(advertisement);
-		waitForTrackToFinish();
-	}
-	else 
+	bool wasNotPlaying = !isPlaying();
+	if (wasNotPlaying) 
 	{
 		mp3.start();
-		mp3.playAdvertisement(advertisement);
+	}
+	mp3.playAdvertisement(advertisement);
+	if (wait)
+	{
+		waitForTrackToFinish();
+	}
+	if (wasNotPlaying) 
+	{
 		delay(100);
 		mp3.pause();
 	}
+}
+
+void TonuinoDFPlayer::playAdvertisement(uint16_t advertisement)
+{
+	playAdvertisement(advertisement, false);
+}
+
+void TonuinoDFPlayer::playAdvertisementAndWait(uint16_t advertisement)
+{
+	playAdvertisement(advertisement, true);
 }
 
 void TonuinoDFPlayer::volumeUp()

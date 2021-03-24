@@ -99,7 +99,7 @@ void activateFreezeDance(bool active)
 	if (dfPlayer.isPlaying()) 
 	{
 		delay(1000);
-		dfPlayer.playAdvertisement(300);
+		dfPlayer.playAdvertisementAndWait(300);
 		delay(500);
 	}
 	dfPlayer.setFreezeDance(active);
@@ -111,8 +111,7 @@ void turnOff()
 	{
 		return;
 	}
-	dfPlayer.playAdvertisement(302);
-	delay(2000);
+	dfPlayer.playAdvertisementAndWait(302);
 	
     // enter sleep state
     digitalWrite(pinConfig.Shutdown, HIGH);
@@ -255,8 +254,7 @@ void setupTonuino(TonuinoConfig config)
 	}
 
 	// play startup sound
-	dfPlayer.playAdvertisement(261);
-	delay(1000);
+	dfPlayer.playAdvertisementAndWait(261);
 	
 	// load last folder 
 	loadStartFolder();
@@ -655,7 +653,7 @@ void handleModifier(EModifier modifier, uint16_t special)
 		case MODI_TrackNumber:
 		{
 			uint8_t advertTrack = tonuinoPlayer().currentTrackInRange();
-			dfPlayer.playAdvertisement(advertTrack);
+			dfPlayer.playAdvertisementAndWait(advertTrack);
 			break;
 		}
 		case MODI_ShortCut:
@@ -664,7 +662,7 @@ void handleModifier(EModifier modifier, uint16_t special)
 		}
 		case MODI_Advertisement:
 		{
-			dfPlayer.playAdvertisement(special);
+			dfPlayer.playAdvertisementAndWait(special);
 		}
 	}
 }

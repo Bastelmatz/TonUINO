@@ -47,6 +47,9 @@ class TonuinoDFPlayer
 	void lastTrack();
 	void waitForTrackToFinish();
 	void playAdvertisement(uint16_t advertisement);
+	void playAdvertisementAndWait(uint16_t advertisement);
+	void playAdvertisement(uint16_t advertisement, bool wait);
+	void playMp3Track(uint16_t track);
 	void playMP3AndWait(uint16_t track);
 	void volumeUp();
 	void volumeDown();
@@ -59,7 +62,6 @@ class TonuinoDFPlayer
 	void pause();
 	void sleep();
 	void playTrack(uint8_t folder, uint8_t track);
-	void playMp3Track(uint16_t track);
 	uint16_t getFolderTrackCount(uint16_t folder);
 	
 	void setFreezeDance(bool active);
