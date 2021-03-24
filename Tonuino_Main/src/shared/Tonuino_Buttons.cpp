@@ -1,55 +1,64 @@
 
 #include "Tonuino_Buttons.h"
 
-TonuinoJCButton TonuinoButtons::startStopButton;
-TonuinoJCButton TonuinoButtons::nextButton;
-TonuinoJCButton TonuinoButtons::previousButton;
+TonuinoButton TonuinoButtons::startStopButton;
+TonuinoButton TonuinoButtons::nextButton;
+TonuinoButton TonuinoButtons::previousButton;
 
-void TonuinoButtons::setup(int pinStartStop, int pinNext, int pinPrevious)
+void TonuinoButtons::setup(uint8_t pinStartStop, uint8_t pinNext, uint8_t pinPrevious)
 {
-	startStopButton.setup(pinStartStop, BUTTONCLICK_StartStop, BUTTONCLICK_LONG_StartStop);
-	nextButton.setup(pinNext, BUTTONCLICK_Next, BUTTONCLICK_LONG_Next);
-	previousButton.setup(pinPrevious, BUTTONCLICK_Previous, BUTTONCLICK_LONG_Previous);
+	startStopButton.setup(pinStartStop, BUTTONCLICK_StartStop, BUTTONPRESSED_StartStop, BUTTONPRESSED_LONG_StartStop);
+	nextButton.setup(pinNext, BUTTONCLICK_Next, BUTTONPRESSED_Next, BUTTONPRESSED_LONG_Next);
+	previousButton.setup(pinPrevious, BUTTONCLICK_Previous, BUTTONPRESSED_Previous, BUTTONPRESSED_LONG_Previous);
 }
 
-int TonuinoButtons::readRaw()
+uint8_t TonuinoButtons::read()
 {
-	if (digitalRead(startStopButton.PIN) == LOW && 
-		digitalRead(nextButton.PIN) == LOW && 
-		digitalRead(previousButton.PIN) == LOW) 
-	{
-		return BUTTONDOWN_All;
-	}
-	return read();
+	return read(false);
 }
 
-int TonuinoButtons::read()
+uint8_t TonuinoButtons::readOnce()
 {
-	int stateStartStop = startStopButton.readState();
-	int stateNext = nextButton.readState();
-	int statePrevious = previousButton.readState();
+	return read(true);
+}
+
+uint8_t TonuinoButtons::read(bool onlyOnce)
+{
+	startStopButton.setState(onlyOnce);
+	nextButton.setState(onlyOnce);
+	previousButton.setState(onlyOnce);
 	
-	// start-stop
-	if (stateStartStop != BUTTONACTION_None) 
+	// all buttons
+	if (startStopButton.isAnyPressed() && nextButton.isAnyPressed() && previousButton.isAnyPressed())
 	{
-		return stateStartStop;
+		if (startStopButton.isPressedLong() && nextButton.isPressedLong() && previousButton.isPressedLong()
+		)
+		{
+			return BUTTONPRESSED_LONG_All;
+		}
+		return BUTTONPRESSED_All;
+	}
+	// start-stop
+	if (startStopButton.hasAnyState()) 
+	{
+		return startStopButton.state;
 	}
 	// next
-	if (stateNext != BUTTONACTION_None) 
+	if (nextButton.hasAnyState()) 
 	{
-		return stateNext;
+		return nextButton.state;
 	}
 	// previous
-	if (statePrevious != BUTTONACTION_None) 
+	if (previousButton.hasAnyState()) 
 	{
-		return statePrevious;
+		return previousButton.state;
 	}
 	return BUTTONACTION_None;
 }
 
 ModifierDataset TonuinoButtons::getPlayerModification(bool isCurrentlyPlaying)
 {
-	int buttonState = read();
+	uint8_t buttonState = readOnce();
 	ModifierDataset modiDS;
 	modiDS.modi = MODI_None;
 	modiDS.value = 0;
@@ -60,7 +69,7 @@ ModifierDataset TonuinoButtons::getPlayerModification(bool isCurrentlyPlaying)
 		modiDS.modi = MODI_TrackContinue;
 		modiDS.value = 2;
 	}
-	if (buttonState == BUTTONCLICK_LONG_StartStop)
+	if (buttonState == BUTTONPRESSED_LONG_StartStop)
 	{
 		if (isCurrentlyPlaying) 
 		{
@@ -76,7 +85,7 @@ ModifierDataset TonuinoButtons::getPlayerModification(bool isCurrentlyPlaying)
 	{
 		modiDS.modi = MODI_TrackNext;
 	}
-	if (buttonState == BUTTONCLICK_LONG_Next)
+	if (buttonState == BUTTONPRESSED_LONG_Next)
 	{
 		if (isCurrentlyPlaying) 
 		{
@@ -92,7 +101,7 @@ ModifierDataset TonuinoButtons::getPlayerModification(bool isCurrentlyPlaying)
 	{
 		modiDS.modi = MODI_TrackPrevious;
 	}
-	if (buttonState == BUTTONCLICK_LONG_Previous)
+	if (buttonState == BUTTONPRESSED_LONG_Previous)
 	{
 		if (isCurrentlyPlaying) 
 		{
@@ -109,12 +118,12 @@ ModifierDataset TonuinoButtons::getPlayerModification(bool isCurrentlyPlaying)
 
 ModifierDataset TonuinoButtons::getMenuModification(uint8_t currentValue, uint8_t defaultValue, uint8_t numberOptions)
 {
-	int buttonState = read();
+	uint8_t buttonState = readOnce();
 	ModifierDataset modiDS;
 	modiDS.modi = MODI_None;
 	modiDS.value = 0;
 
-	if (buttonState == BUTTONCLICK_LONG_StartStop) 
+	if (buttonState == BUTTONPRESSED_LONG_StartStop) 
 	{
 		modiDS.modi = MODI_MENU_Cancel;
 		modiDS.value = defaultValue;
@@ -124,7 +133,7 @@ ModifierDataset TonuinoButtons::getMenuModification(uint8_t currentValue, uint8_
 		modiDS.modi = MODI_MENU_Choose;
 		modiDS.value = currentValue;
 	}
-	if (buttonState == BUTTONCLICK_LONG_Next) 
+	if (buttonState == BUTTONPRESSED_LONG_Next) 
 	{
 		modiDS.modi = MODI_MENU_ChangeLarge;
 		modiDS.value = min(currentValue + 10, numberOptions);
@@ -134,7 +143,7 @@ ModifierDataset TonuinoButtons::getMenuModification(uint8_t currentValue, uint8_
 		modiDS.modi = MODI_MENU_ChangeSmall;
 		modiDS.value = currentValue + 1 > numberOptions ? defaultValue : currentValue + 1;
 	}
-	if (buttonState == BUTTONCLICK_LONG_Previous) 
+	if (buttonState == BUTTONPRESSED_LONG_Previous) 
 	{
 		modiDS.modi = MODI_MENU_ChangeLarge;
 		modiDS.value = max(currentValue - 10, 1);
@@ -149,37 +158,79 @@ ModifierDataset TonuinoButtons::getMenuModification(uint8_t currentValue, uint8_
 }
 
 // ************************************
-// JC Button
+// Tonuino Button
 // ************************************
 
-void TonuinoJCButton::setup(int pin, int codeClick, int codeLongPress)
+void TonuinoButton::setup(uint8_t pin, uint8_t codeClick, uint8_t codePressed, uint8_t codeLongPressed)
 {
 	PIN = pin;
 	CODE_Click = codeClick;
-	CODE_LongPress = codeLongPress;
+	CODE_Pressed = codePressed;
+	CODE_LongPressed = codeLongPressed;
 	
-	jcButton = Button(pin);
 	pinMode(pin, INPUT_PULLUP);
 }
 
-int TonuinoJCButton::readState()
+bool TonuinoButton::hasAnyState()
 {
-	jcButton.read();
-	
-	if (jcButton.wasReleased()) 
+	return state != BUTTONACTION_None;
+}
+
+bool TonuinoButton::isAnyPressed()
+{
+	return state == CODE_Pressed || state == CODE_LongPressed;
+}
+
+bool TonuinoButton::isPressedLong()
+{
+	return state == CODE_LongPressed;
+}
+
+void TonuinoButton::setState(bool onlyOnce)
+{
+	long currentTime = millis();
+	if (currentTime - lastCheckTime > 100)
 	{
-		if (ignore == false)
+		lastCheckTime = currentTime;
+		isPressed = digitalRead(PIN) == LOW;
+		if (isPressed)
 		{
-			return CODE_Click;
+			lastPressedTime = currentTime;
 		}
-		ignore = false;
-	} 
-	else if (jcButton.pressedFor(LONG_PRESS) && ignore == false) 
-	{
-		ignore = true;
-		return CODE_LongPress;
+		else
+		{
+			lastReleasedTime = currentTime;
+		}
 	}
-	return BUTTONACTION_None;
+	
+	uint8_t currentState = BUTTONACTION_None;
+	if (isPressed)
+	{
+		ignore = false;
+		if (currentTime - lastReleasedTime > LONG_PRESS)
+		{
+			currentState = CODE_LongPressed;
+		}
+		else
+		{
+			currentState = CODE_Pressed;
+		}
+	}
+	else
+	{
+		if (currentTime - lastPressedTime < 1000)
+		{
+			if (!onlyOnce || ignore == false)
+			{
+				if (onlyOnce)
+				{
+					ignore = true;
+				}
+				currentState = CODE_Click;
+			}
+		}
+	}
+	state = currentState;
 }
 
 

@@ -248,7 +248,7 @@ void setupTonuino(TonuinoConfig config)
 	}
 
 	// RESET --- ALLE DREI KNÖPFE BEIM STARTEN GEDRÜCKT HALTEN -> alle EINSTELLUNGEN werden gelöscht
-	if (tonuinoButtons.readRaw() == BUTTONDOWN_All) 
+	if (tonuinoButtons.read() == BUTTONPRESSED_All) 
 	{
 		tonuinoEEPROM.resetEEPROM();
 	}
@@ -288,7 +288,7 @@ void handleButtons()
 	
 	bool isCurrentlyPlaying = dfPlayer.isPlaying();
 	
-	if (!isCurrentlyPlaying && tonuinoButtons.readRaw() == BUTTONDOWN_All) 
+	if (!isCurrentlyPlaying && tonuinoButtons.read() == BUTTONPRESSED_All) 
 	{
 		handleModifier(MODI_ResetCard, 0);
 		return;
@@ -415,7 +415,7 @@ void waitForNewCard()
 	// Some time for the user to leave the next/previous button, if they are pressed before (e.g. as a trigger)
 	delay(2000);
 	do {
-		int buttonState = tonuinoButtons.read();
+		uint8_t buttonState = tonuinoButtons.read();
 		if (buttonState == BUTTONCLICK_Next || buttonState == BUTTONCLICK_Previous) 
 		{
 			Serial.println(F("Waiting for new card aborted!"));
