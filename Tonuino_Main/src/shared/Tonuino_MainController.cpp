@@ -421,6 +421,7 @@ uint8_t voiceMenu(uint8_t numberOfOptions, int startMessage, int messageOffset,
 	Serial.print(F("=== voiceMenu() ("));
 	Serial.print(numberOfOptions);
 	Serial.println(F(" Options)"));
+	bool doPreview = false;
 	do 
 	{
 		// Support for input via console
@@ -454,20 +455,26 @@ uint8_t voiceMenu(uint8_t numberOfOptions, int startMessage, int messageOffset,
 		if (modiDS.modi == MODI_MENU_ChangeSmall ||
 			modiDS.modi == MODI_MENU_ChangeLarge) 
 		{
+			doPreview = false;
 			returnValue = modiDS.value;
 			Serial.println(returnValue);
-			dfPlayer.playMP3AndWait(messageOffset + returnValue);
+			dfPlayer.playMp3Track(messageOffset + returnValue);
 			if (preview && modiDS.modi == MODI_MENU_ChangeSmall) 
 			{
-				if (previewFromFolder == 0) 
-				{
-					dfPlayer.playTrack(returnValue, 1);
-				}
-				else 
-				{
-					dfPlayer.playTrack(previewFromFolder, returnValue);
-				}
+				doPreview = true;
 			}
+		}
+		if (doPreview && !dfPlayer.isPlaying())
+		{
+			if (previewFromFolder == 0) 
+			{
+				dfPlayer.playTrack(returnValue, 1);
+			}
+			else 
+			{
+				dfPlayer.playTrack(previewFromFolder, returnValue);
+			}
+			doPreview = false;
 		}
 	} while (true);
 }
