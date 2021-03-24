@@ -251,7 +251,7 @@ void TonuinoDFPlayer::waitForTrackToFinish()
 	} while (!isPlaying() && millis() < currentTime + TIMEOUT);
 	delay(1000);
 	// now wait until the player is not busy anymore
-	Serial.print(F("Wait for track to finish..."));
+	Serial.println(F("Wait for track to finish..."));
 	do 
 	{
 		// to do:
