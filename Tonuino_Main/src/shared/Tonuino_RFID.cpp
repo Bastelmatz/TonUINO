@@ -171,76 +171,70 @@ bool Tonuino_RFID_Reader::tryAuthenticate()
 
 bool Tonuino_RFID_Reader::readCard() 
 {
-  byte buffer[18+12];   // add more room at the end so that UL read with offset of up to 12 bytes fits
-  byte size = 18;
+	byte buffer[18+12];   // add more room at the end so that UL read with offset of up to 12 bytes fits
+	byte size = 18;
 
-  if (!tryAuthenticate()) 
-  {
-	return false;
-  }
-
-  //for (int i = 0; i < 32; i++)
-  //{
-    //  // Show the whole sector as it currently is
-    //Serial.print(F("Current data in sector "));
-    //Serial.println(i);
-    //mfrc522.PICC_DumpMifareClassicSectorToSerial(&(mfrc522.uid), &key, i);
-    //Serial.println();
-  //}
-	
-  // Read data from the block
-  if (isMifareUL)
-  {
-	// UL cards read 4 bytes at once -> 4 parts for 16 bytes
-	for (byte part = 0; part < 4; part++)
+	if (!tryAuthenticate()) 
 	{
-	  status = mfrc522.MIFARE_Read(8 + part, buffer + 4 * part, &size);
-	  if (status != MFRC522::STATUS_OK) 
-	  {
+		return false;
+	}
+
+	//for (int i = 0; i < 32; i++)
+	//{
+	//  // Show the whole sector as it currently is
+	//Serial.print(F("Current data in sector "));
+	//Serial.println(i);
+	//mfrc522.PICC_DumpMifareClassicSectorToSerial(&(mfrc522.uid), &key, i);
+	//Serial.println();
+	//}
+
+	// Read data from the block
+	if (isMifareUL)
+	{
+		// UL cards read 4 bytes at once -> 4 parts for 16 bytes
+		for (byte part = 0; part < 4; part++)
+		{
+			status = mfrc522.MIFARE_Read(8 + part, buffer + 4 * part, &size);
+		}
+	}
+	else // Mifare Mini, 1K, 4K
+	{
+		Serial.print(F("Reading data from block "));
+		Serial.print(blockAddr);
+		Serial.println(F(" ..."));
+		// classic cards read 16 bytes at once
+		status = mfrc522.MIFARE_Read(blockAddr, buffer, &size);
+	}
+	if (status != MFRC522::STATUS_OK) 
+	{
 		Serial.print(F("MIFARE_Read() failed: "));
 		Serial.println(mfrc522.GetStatusCodeName(status));
 		return false;
-	  }
 	}
-  }
-  else // Mifare Mini, 1K, 4K
-  {
-	Serial.print(F("Reading data from block "));
-	Serial.print(blockAddr);
-	Serial.println(F(" ..."));
-	// classic cards read 16 bytes at once
-	status = mfrc522.MIFARE_Read(blockAddr, buffer, &size);
-	if (status != MFRC522::STATUS_OK) 
-	{
-	  Serial.print(F("MIFARE_Read() failed: "));
-	  Serial.println(mfrc522.GetStatusCodeName(status));
-	  return false;
-	}
-  }
+	
+	Serial.print(F("Data on Card "));
+	Serial.println(F(":"));
+	dump_byte_array(buffer, 16);
+	Serial.println();
+	Serial.println();
 
-  Serial.print(F("Data on Card "));
-  Serial.println(F(":"));
-  dump_byte_array(buffer, 16);
-  Serial.println();
-  Serial.println();
+	uint32_t tempCookie;
+	tempCookie = (uint32_t)buffer[0] << 24;
+	tempCookie += (uint32_t)buffer[1] << 16;
+	tempCookie += (uint32_t)buffer[2] << 8;
+	tempCookie += (uint32_t)buffer[3];
 
-  uint32_t tempCookie;
-  tempCookie = (uint32_t)buffer[0] << 24;
-  tempCookie += (uint32_t)buffer[1] << 16;
-  tempCookie += (uint32_t)buffer[2] << 8;
-  tempCookie += (uint32_t)buffer[3];
+	readCardData.cookie = tempCookie;
+	readCardData.version = buffer[4];
+	readCardData.musicDS.folder = buffer[5];
+	readCardData.musicDS.mode = buffer[6];
+	readCardData.musicDS.special = buffer[7];
+	readCardData.musicDS.special2 = buffer[8];
 
-  readCardData.cookie = tempCookie;
-  readCardData.version = buffer[4];
-  readCardData.musicDS.folder = buffer[5];
-  readCardData.musicDS.mode = buffer[6];
-  readCardData.musicDS.special = buffer[7];
-  readCardData.musicDS.special2 = buffer[8];
- 
-  // store info about current card
-  memcpy(currentCardUid, mfrc522.uid.uidByte, 4);
+	// store info about current card
+	memcpy(currentCardUid, mfrc522.uid.uidByte, 4);
 
-  return true;
+	return true;
 }
 
 bool Tonuino_RFID_Reader::resetCard()
