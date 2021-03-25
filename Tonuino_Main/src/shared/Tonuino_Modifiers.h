@@ -5,10 +5,6 @@
 
 enum EModifier
 {
-	// Use separate value for bool parameters: 
-	// - 0 for not set, 
-	// - 1 for set
-	// - >1 (e.g.2) for toggle
 	MODI_None = 0,
 	MODI_TrackContinue = 1, 
 	MODI_TrackNext = 2,
@@ -44,6 +40,43 @@ enum EModifier
 	MODI_MENU_ChangeLarge = 61,
 	MODI_MENU_Choose = 62,
 	MODI_MENU_Cancel = 63,
+};
+
+enum EModifierBoolValue
+{
+	MODI_BOOLVAL_None = 0,
+	MODI_BOOLVAL_Set = 1, 
+	MODI_BOOLVAL_Undo = 2,
+	MODI_BOOLVAL_Toggle = 3,
+	
+	MODI_BOOLVAL_OnRemoval_Set = 10,
+	MODI_BOOLVAL_OnRemoval_Undo = 11,
+	MODI_BOOLVAL_OnRemoval_Toggle = 12,
+	
+	MODI_BOOLVAL_Set_OnRemoval_Undo = 20,
+	MODI_BOOLVAL_Undo_OnRemoval_Set = 21,
+	MODI_BOOLVAL_Toggle_OnRemoval_Toggle = 22,
+};
+
+class TONUINOMODIFIER
+{
+	public:
+	static bool isBoolModifer(EModifier modi)
+	{
+		switch (modi)
+		{
+			case MODI_TrackContinue:
+			case MODI_Player_Random:
+			case MODI_Player_RepeatSingle:
+			case MODI_Player_RepeatAll:
+			case MODI_Player_ListenToEnd:
+			case MODI_Player_StopOnCardRemoval:
+			case MODI_Player_FreezeDance:
+			case MODI_LockAll:
+			case MODI_LockButtons: return true;
+		}
+		return false;
+	}
 };
 
 #include <SPI.h>

@@ -85,7 +85,9 @@ namespace Tonuino_RFID_Creator
             List<ModiType> modiTypes = ModiType.AllValidModes();
             comboBox_ModiCardOptions.SetItems(modiTypes);
 
-            comboBox_ModiBehaviour.SetItems(new List<string> { "Set", "Undo", "Toggle" });
+            // set modi card bool value options
+            List<ModiBoolValue> modiBoolValues = ModiBoolValue.AllValidValues();
+            comboBox_ModiBehaviour.SetItems(modiBoolValues);
         }
 
         // *****************************
@@ -375,7 +377,8 @@ namespace Tonuino_RFID_Creator
         private IModiCardData getModiCardData()
         {
             ModiType modiType = (ModiType)comboBox_ModiCardOptions.SelectedItem;
-            ushort modiValue = getShort(textBox_ModiValue);
+            ModiBoolValue modiBoolValue = (ModiBoolValue)comboBox_ModiBehaviour.SelectedItem;
+            ushort modiValue = textBox_ModiValue.Visible ? getShort(textBox_ModiValue) : modiBoolValue.Ident.Index;
 
             IModiCardData modiData = new ModiCardDataRaw()
             {

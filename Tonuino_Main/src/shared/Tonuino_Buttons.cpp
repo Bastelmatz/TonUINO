@@ -67,7 +67,7 @@ ModifierDataset TonuinoButtons::getPlayerModification(bool isCurrentlyPlaying)
 	if (buttonState == BUTTONCLICK_StartStop)
 	{
 		modiDS.modi = MODI_TrackContinue;
-		modiDS.value = 2;
+		modiDS.value = MODI_BOOLVAL_Toggle;
 	}
 	if (buttonState == BUTTONPRESSED_LONG_StartStop)
 	{

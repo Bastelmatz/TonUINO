@@ -60,6 +60,7 @@
     <Compile Include="SerialCommunication\SerialComm.cs" />
     <Compile Include="Tonuino\Definitions\BaseType.cs" />
     <Compile Include="Tonuino\Definitions\EqualizerType.cs" />
+    <Compile Include="Tonuino\Definitions\ModiBoolValue.cs" />
     <Compile Include="Tonuino\Definitions\ModiType.cs" />
     <Compile Include="Tonuino\Definitions\LegacyModiType.cs" />
     <Compile Include="Tonuino\Definitions\MusicMode.cs" />

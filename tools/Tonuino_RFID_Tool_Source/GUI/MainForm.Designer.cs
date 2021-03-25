@@ -422,9 +422,9 @@
             // 
             this.pnlModeBehaviour.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pnlModeBehaviour.Controls.Add(this.comboBox_ModiBehaviour);
-            this.pnlModeBehaviour.Location = new System.Drawing.Point(82, 88);
+            this.pnlModeBehaviour.Location = new System.Drawing.Point(14, 110);
             this.pnlModeBehaviour.Name = "pnlModeBehaviour";
-            this.pnlModeBehaviour.Size = new System.Drawing.Size(88, 23);
+            this.pnlModeBehaviour.Size = new System.Drawing.Size(157, 23);
             this.pnlModeBehaviour.TabIndex = 33;
             // 
             // comboBox_ModiBehaviour
@@ -436,12 +436,12 @@
             this.comboBox_ModiBehaviour.FormattingEnabled = true;
             this.comboBox_ModiBehaviour.Location = new System.Drawing.Point(0, 0);
             this.comboBox_ModiBehaviour.Name = "comboBox_ModiBehaviour";
-            this.comboBox_ModiBehaviour.Size = new System.Drawing.Size(86, 21);
+            this.comboBox_ModiBehaviour.Size = new System.Drawing.Size(155, 21);
             this.comboBox_ModiBehaviour.TabIndex = 16;
             // 
             // lblModeBehaviour
             // 
-            this.lblModeBehaviour.Location = new System.Drawing.Point(19, 91);
+            this.lblModeBehaviour.Location = new System.Drawing.Point(12, 91);
             this.lblModeBehaviour.Name = "lblModeBehaviour";
             this.lblModeBehaviour.Size = new System.Drawing.Size(58, 13);
             this.lblModeBehaviour.TabIndex = 32;

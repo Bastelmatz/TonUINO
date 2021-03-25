@@ -310,7 +310,7 @@ void handleCardReader()
 	byte pollCardResult = tonuinoRFID.tryPollCard();
 	if (pollCardResult == MODIFIERCARD_NEW)
 	{
-		evaluateModifierData(tonuinoRFID.readCardData.musicDS);
+		evaluateModifierCardData(tonuinoRFID.readCardData.musicDS, false);
 	}
 	if (allLocked)
 	{
@@ -402,6 +402,10 @@ void onCardGone()
 	if (swConfig.StopPlayOnCardRemoval)
 	{
 		dfPlayer.pauseAndStandBy();
+	}
+	if (tonuinoRFID.lastCardWasModifierCard)
+	{
+		evaluateModifierCardData(tonuinoRFID.readCardData.musicDS, true);
 	}
 }
 
@@ -579,8 +583,57 @@ void playShortCut(uint8_t shortCut)
 
 void handleModifier(EModifier modifier, uint16_t special)
 {
-	bool toggle = special == 2;
-	bool bValue = special == 1;
+	handleModifier(modifier, special, false);
+}
+
+void handleModifier(EModifier modifier, uint16_t special, bool isCardRemoval)
+{
+	if (modifier == MODI_None)
+	{
+		return;
+	}
+	
+	Serial.print(F("Handle modifier: "));
+	Serial.print(modifier);
+	Serial.print(F(" - value: "));
+	Serial.println(special);
+	bool toggle = false;
+	bool bValue = false;
+	if (TONUINOMODIFIER::isBoolModifer(modifier))
+	{
+		EModifierBoolValue modifierBoolValue = static_cast<EModifierBoolValue>(special);
+		bool applyOnRemoval = false;
+		bool applyAlways = false;
+		switch (modifierBoolValue)
+		{
+			case MODI_BOOLVAL_OnRemoval_Set:
+			case MODI_BOOLVAL_OnRemoval_Undo:
+			case MODI_BOOLVAL_OnRemoval_Toggle: applyOnRemoval = true; break;
+			case MODI_BOOLVAL_Set_OnRemoval_Undo:
+			case MODI_BOOLVAL_Undo_OnRemoval_Set:
+			case MODI_BOOLVAL_Toggle_OnRemoval_Toggle: applyAlways = true; break;
+		}
+		if (!applyAlways && isCardRemoval != applyOnRemoval)
+		{
+			return;
+		}
+		switch (modifierBoolValue)
+		{
+			case MODI_BOOLVAL_Toggle:
+			case MODI_BOOLVAL_OnRemoval_Toggle:
+			case MODI_BOOLVAL_Toggle_OnRemoval_Toggle: toggle = true; break;
+		}
+		if (isCardRemoval)
+		{
+			bValue = modifierBoolValue == MODI_BOOLVAL_OnRemoval_Set || 
+					 modifierBoolValue == MODI_BOOLVAL_Undo_OnRemoval_Set;
+		}
+		else
+		{
+			bValue = modifierBoolValue == MODI_BOOLVAL_Set || 
+					 modifierBoolValue == MODI_BOOLVAL_Set_OnRemoval_Undo;
+		}
+	}
 	switch (modifier)
 	{
 		case MODI_LockAll:
@@ -682,12 +735,12 @@ void handleModifier(EModifier modifier, uint16_t special)
 	}
 }
 
-void evaluateModifierData(MusicDataset musicDS)
+void evaluateModifierCardData(MusicDataset musicDS, bool isCardRemoval)
 {
 	EModifier modifier = static_cast<EModifier>(musicDS.mode);
 	uint8_t special = musicDS.special;
 	uint8_t special2 = musicDS.special2;
 	
 	uint16_t value = special2 << 8 | special;
-	handleModifier(modifier, value);
+	handleModifier(modifier, value, isCardRemoval);
 }

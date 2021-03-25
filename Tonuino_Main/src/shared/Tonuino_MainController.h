@@ -28,5 +28,6 @@ void setupCard();
 void writeCard(MusicDataset musicDS);
 void resetCard();
 
-void evaluateModifierData(MusicDataset musicDS);
+void evaluateModifierCardData(MusicDataset musicDS, bool isCardRemoval);
 void handleModifier(EModifier modifier, uint16_t special);
+void handleModifier(EModifier modifier, uint16_t special, bool isCardRemoval);

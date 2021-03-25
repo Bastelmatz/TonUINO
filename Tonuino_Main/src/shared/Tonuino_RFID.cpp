@@ -3,6 +3,7 @@
 
 bool Tonuino_RFID_Reader::hasMusicCard = false;
 bool Tonuino_RFID_Reader::hasModifierCard = false;
+bool Tonuino_RFID_Reader::lastCardWasModifierCard = false;
 
 byte Tonuino_RFID_Reader::lastMusicCardUid[4];
 byte Tonuino_RFID_Reader::currentCardUid[4];
@@ -51,10 +52,11 @@ byte Tonuino_RFID_Reader::pollCard()
   {
 	if (isCardGone())
 	{
-	  hasMusicCard = false;
-	  hasModifierCard = false;
+		lastCardWasModifierCard = hasModifierCard;
+		hasMusicCard = false;
+		hasModifierCard = false;
 		 
-	  return ALLCARDS_GONE;
+		return ALLCARDS_GONE;
 	}
   }
   else

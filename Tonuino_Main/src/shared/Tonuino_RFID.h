@@ -30,9 +30,10 @@ class Tonuino_RFID_Reader
 public:
 	static bool hasMusicCard;
 	static bool hasModifierCard;
-
+	static bool lastCardWasModifierCard;
+	
 	nfcTagStruct readCardData;
-
+	
 	// Card detection
 	bool hasAnyCard();
 	static byte lastMusicCardUid[4];
