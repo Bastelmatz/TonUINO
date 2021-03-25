@@ -255,6 +255,7 @@ void setupTonuino(TonuinoConfig config)
 
 	// play startup sound
 	dfPlayer.playAdvertisementAndWait(261);
+	dfPlayer.pause();
 	// give DFPlayer some time
 	delay(1000);
 	
