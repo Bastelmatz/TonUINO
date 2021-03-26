@@ -16,6 +16,8 @@
 void loopTonuino();
 void setupTonuino(TonuinoConfig config);
 
+void handlePotentiometer();
+
 uint8_t getLastTrack(MusicDataset folder);
 void loadAndPlayFolder(MusicDataset theFolder);
 void loadFolder(MusicDataset theFolder);

@@ -253,6 +253,8 @@ void setupTonuino(TonuinoConfig config)
 		tonuinoEEPROM.resetEEPROM();
 	}
 
+	// set volume according to poti
+	handlePotentiometer();
 	// play startup sound
 	dfPlayer.playAdvertisementAndWait(261);
 	dfPlayer.pause();
@@ -275,18 +277,24 @@ void handleRotaryEncoder()
 	handleModifier(modiDS.modi, modiDS.value);
 }
 
+void handlePotentiometer()
+{
+	if (!hwConfig.Potentiometer)
+	{
+		return;
+	}
+	
+	if (tonuinoPoti.read())
+	{
+		dfPlayer.setVolume(tonuinoPoti.appliedValue);
+	}
+}
+
 void handleButtons()
 {
 	if (allLocked || buttonsLocked)
 	{
 		return;
-	}
-	if (hwConfig.Potentiometer)
-	{
-		if (tonuinoPoti.read())
-		{
-			dfPlayer.setVolume(tonuinoPoti.appliedValue);
-		}
 	}
 	
 	bool isCurrentlyPlaying = dfPlayer.isPlaying();
@@ -376,6 +384,7 @@ void loopTonuino()
 	
 	handleUltraSonic();
 	handleRotaryEncoder();
+	handlePotentiometer();
 	handleButtons();
 	handleCardReader();
 	handleNeopixels();
