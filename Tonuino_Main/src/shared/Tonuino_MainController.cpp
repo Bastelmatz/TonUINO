@@ -409,19 +409,30 @@ void onNewCard()
 
 void onCardGone()
 {
-	if (swConfig.StopPlayOnCardRemoval)
-	{
-		dfPlayer.pauseAndStandBy();
-	}
 	if (tonuinoRFID.lastCardWasModifierCard)
 	{
 		evaluateModifierCardData(tonuinoRFID.readCardData.musicDS, true);
+	}
+	else
+	{
+		// on music card gone
+		if (swConfig.StopPlayOnCardRemoval)
+		{
+			dfPlayer.pauseAndStandBy();
+		}
 	}
 }
 
 void onCardReturn()
 {
-	dfPlayer.continueTitle();
+	if (swConfig.StopPlayOnCardRemoval || !dfPlayer.isPlaying())
+	{
+		dfPlayer.continueTitle();
+	}
+	else
+	{
+		dfPlayer.nextTrack();
+	}
 }
 
 uint8_t voiceMenu(uint8_t numberOfOptions, int startMessage, int messageOffset,
