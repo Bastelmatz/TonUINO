@@ -104,9 +104,9 @@ namespace Tonuino_RFID_Creator
         #endregion
 
         // *****************************
-        // Card Data Handling
+        // Read Card Data
         // ***************************** 
-        #region Card Data Handling
+        #region Read Card Data
 
         public static CardData CurrentCardRead { get; set; } = new CardData();
 
@@ -216,44 +216,66 @@ namespace Tonuino_RFID_Creator
             return 0;
         }
 
+        #endregion
+
+        // *****************************
+        // Write Card Data
+        // ***************************** 
+        #region Write Card Data 
+
         public static void Write(IMusicCardData cardData)
         {
-            string formattedLineText = toString(cardData);
-            WriteLine(formattedLineText);
+            List<byte> listBytes = getBytes(cardData);
+            writeBytes(listBytes);
         }
 
         public static void Write(IModiCardData cardData)
         {
-            string formattedLineText = toString(cardData);
-            WriteLine(formattedLineText);
+            List<byte> listBytes = getBytes(cardData);
+            writeBytes(listBytes);
         }
 
+        public static void ResetCard()
+        {
+            List<byte> listBytes = new List<byte>();
+            for (int i = 0; i < MAXBYTES; i++)
+            {
+                listBytes.Add(0);
+            }
+            writeBytes(listBytes);
+        }
+
+        private const int MAXBYTES = 16;
         private const string SEPARATOR = ";";
 
-        private static string toString(IMusicCardData data)
+        private static void writeBytes(List<byte> listBytes)
+        {
+            string lineStr = string.Join(SEPARATOR, listBytes);
+            WriteLine(lineStr);
+        }
+
+        private static List<byte> getBytes(IMusicCardData data)
         {
             // Defined order - has to be in sync with Tonuino sketch - don't change!!
-            List<byte> items = new List<byte>()
+            return new List<byte>()
             {
                 data.Raw_Folder,
                 data.Raw_Mode,
                 data.Raw_Special,
                 data.Raw_Special2
             };
-            return string.Join(SEPARATOR, items);
         }
 
-        private static string toString(IModiCardData data)
+        private static List<byte> getBytes(IModiCardData data)
         {
             // Defined order - has to be in sync with Tonuino sketch - don't change!!
-            List<byte> items = new List<byte>()
+            return new List<byte>()
             {
                 0,
                 data.Raw_Mode,
                 (byte)(data.Raw_Value & 0xff),
                 (byte)((data.Raw_Value >> 8) & 0xff)
             };
-            return string.Join(SEPARATOR, items);
         }
 
         #endregion

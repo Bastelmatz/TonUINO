@@ -420,6 +420,11 @@ namespace Tonuino_RFID_Creator
             SerialComm.Write(cardData);
         }
 
+        private void btnResetCard_Click(object sender, EventArgs e)
+        {
+            SerialComm.ResetCard();
+        }
+
         private void radio_Card_CheckedChanged(object sender, EventArgs e)
         {
             updateCardActionVisibility();

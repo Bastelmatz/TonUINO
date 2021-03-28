@@ -6,7 +6,8 @@ static Tonuino_RFID_Reader tonuinoRFID;
 class Tonuino_RFID_Tool_Core
 {
 	public:
-	static char readSerialString[20];
+	#define READBYTESMAX 32
+	static char readSerialString[READBYTESMAX];
 	
 	void transmitCardData(nfcTagStruct nfcTag);
 	void transmitCardRemoval();

@@ -78,6 +78,7 @@
             this.pnlPorts = new System.Windows.Forms.Panel();
             this.comboBox_Ports = new Tonuino_RFID_Creator.ExtendedComboBox();
             this.lblPorts = new System.Windows.Forms.Label();
+            this.btnResetCard = new System.Windows.Forms.Button();
             this.pnlModes.SuspendLayout();
             this.pnlCardDetected.SuspendLayout();
             this.pnlModiCardAction.SuspendLayout();
@@ -600,11 +601,24 @@
             this.lblPorts.Text = "COM Ports:";
             this.lblPorts.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
+            // btnResetCard
+            // 
+            this.btnResetCard.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
+            this.btnResetCard.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnResetCard.Location = new System.Drawing.Point(251, 376);
+            this.btnResetCard.Name = "btnResetCard";
+            this.btnResetCard.Size = new System.Drawing.Size(158, 23);
+            this.btnResetCard.TabIndex = 47;
+            this.btnResetCard.Text = "Reset Card";
+            this.btnResetCard.UseVisualStyleBackColor = false;
+            this.btnResetCard.Click += new System.EventHandler(this.btnResetCard_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(786, 597);
+            this.Controls.Add(this.btnResetCard);
             this.Controls.Add(this.pnlPorts);
             this.Controls.Add(this.lblPorts);
             this.Controls.Add(this.pnlSeparator);
@@ -688,6 +702,7 @@
         private System.Windows.Forms.Panel pnlModeBehaviour;
         private ExtendedComboBox comboBox_ModiBehaviour;
         private System.Windows.Forms.Label lblModeBehaviour;
+        private System.Windows.Forms.Button btnResetCard;
     }
 }
 
