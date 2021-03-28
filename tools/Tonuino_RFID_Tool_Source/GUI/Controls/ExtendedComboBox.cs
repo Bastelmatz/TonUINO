@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace Tonuino_RFID_Creator
+namespace Tonuino_RFID_Tool
 {
     public class ExtendedComboBox : ComboBox
     {

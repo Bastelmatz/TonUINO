@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Tonuino_RFID_Creator
+namespace Tonuino_RFID_Tool
 {
     public class Ident<T>
     {

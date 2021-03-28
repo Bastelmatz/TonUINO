@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace Tonuino_RFID_Creator
+namespace Tonuino_RFID_Tool
 {
     static class Program
     {

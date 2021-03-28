@@ -1,7 +1,7 @@
 ﻿
 using System.Collections.Generic;
 
-namespace Tonuino_RFID_Creator
+namespace Tonuino_RFID_Tool
 {
     public enum EModiBoolValue
     {

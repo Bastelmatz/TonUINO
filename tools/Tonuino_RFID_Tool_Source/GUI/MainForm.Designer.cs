@@ -1,4 +1,4 @@
-﻿namespace Tonuino_RFID_Creator
+﻿namespace Tonuino_RFID_Tool
 {
     partial class MainForm
     {
@@ -52,7 +52,7 @@
             this.btnWriteMusicCard = new System.Windows.Forms.Button();
             this.checkExtendCard = new System.Windows.Forms.CheckBox();
             this.pnlModes = new System.Windows.Forms.Panel();
-            this.comboBox_MusicCardModes = new Tonuino_RFID_Creator.ExtendedComboBox();
+            this.comboBox_MusicCardModes = new Tonuino_RFID_Tool.ExtendedComboBox();
             this.lblComment = new System.Windows.Forms.Label();
             this.textBoxComment = new System.Windows.Forms.TextBox();
             this.lblLastCommentCaption = new System.Windows.Forms.Label();
@@ -62,13 +62,13 @@
             this.lblReadModiValue = new System.Windows.Forms.Label();
             this.pnlModiCardAction = new System.Windows.Forms.Panel();
             this.pnlModeBehaviour = new System.Windows.Forms.Panel();
-            this.comboBox_ModiBehaviour = new Tonuino_RFID_Creator.ExtendedComboBox();
+            this.comboBox_ModiBehaviour = new Tonuino_RFID_Tool.ExtendedComboBox();
             this.lblModeBehaviour = new System.Windows.Forms.Label();
             this.lblMinutes = new System.Windows.Forms.Label();
             this.lblModiValue = new System.Windows.Forms.Label();
             this.textBox_ModiValue = new System.Windows.Forms.TextBox();
             this.pnlModeCardOptions = new System.Windows.Forms.Panel();
-            this.comboBox_ModiCardOptions = new Tonuino_RFID_Creator.ExtendedComboBox();
+            this.comboBox_ModiCardOptions = new Tonuino_RFID_Tool.ExtendedComboBox();
             this.btnWriteModiCard = new System.Windows.Forms.Button();
             this.pnlMusicCardAction = new System.Windows.Forms.Panel();
             this.radio_MusicCard = new System.Windows.Forms.RadioButton();
@@ -76,7 +76,7 @@
             this.pnlCardAction = new System.Windows.Forms.Panel();
             this.pnlSeparator = new System.Windows.Forms.Panel();
             this.pnlPorts = new System.Windows.Forms.Panel();
-            this.comboBox_Ports = new Tonuino_RFID_Creator.ExtendedComboBox();
+            this.comboBox_Ports = new Tonuino_RFID_Tool.ExtendedComboBox();
             this.lblPorts = new System.Windows.Forms.Label();
             this.btnResetCard = new System.Windows.Forms.Button();
             this.pnlModes.SuspendLayout();
@@ -666,7 +666,7 @@
         private System.Windows.Forms.Label lblStartPos;
         private System.Windows.Forms.Label lblEndPosCaption;
         private System.Windows.Forms.Label lblEndPos;
-        private Tonuino_RFID_Creator.ExtendedComboBox comboBox_MusicCardModes;
+        private Tonuino_RFID_Tool.ExtendedComboBox comboBox_MusicCardModes;
         private System.Windows.Forms.Label lblFolderOnSource;
         private System.Windows.Forms.Label lblStartOnSource;
         private System.Windows.Forms.TextBox textBoxFolderOnSD;
@@ -687,7 +687,7 @@
         private System.Windows.Forms.Label lblModiValue;
         private System.Windows.Forms.TextBox textBox_ModiValue;
         private System.Windows.Forms.Panel pnlModeCardOptions;
-        private Tonuino_RFID_Creator.ExtendedComboBox comboBox_ModiCardOptions;
+        private Tonuino_RFID_Tool.ExtendedComboBox comboBox_ModiCardOptions;
         private System.Windows.Forms.Button btnWriteModiCard;
         private System.Windows.Forms.Panel pnlMusicCardAction;
         private System.Windows.Forms.RadioButton radio_MusicCard;
@@ -695,7 +695,7 @@
         private System.Windows.Forms.Panel pnlCardAction;
         private System.Windows.Forms.Panel pnlSeparator;
         private System.Windows.Forms.Panel pnlPorts;
-        private Tonuino_RFID_Creator.ExtendedComboBox comboBox_Ports;
+        private Tonuino_RFID_Tool.ExtendedComboBox comboBox_Ports;
         private System.Windows.Forms.Label lblPorts;
         private System.Windows.Forms.Label lblReadModiValueCaption;
         private System.Windows.Forms.Label lblReadModiValue;

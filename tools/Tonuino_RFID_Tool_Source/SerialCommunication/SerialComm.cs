@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Tonuino_RFID_Creator
+namespace Tonuino_RFID_Tool
 {
     public class SerialComm
     {

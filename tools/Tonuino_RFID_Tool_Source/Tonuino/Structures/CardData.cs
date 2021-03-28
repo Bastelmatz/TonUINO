@@ -1,7 +1,7 @@
 ﻿
 using System;
 
-namespace Tonuino_RFID_Creator
+namespace Tonuino_RFID_Tool
 {
     public interface IMusicCardData
     {
