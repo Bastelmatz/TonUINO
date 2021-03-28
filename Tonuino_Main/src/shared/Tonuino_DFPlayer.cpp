@@ -231,13 +231,12 @@ void TonuinoDFPlayer::trackFinished()
 	if (activeTrack == tonuinoPlayer.currentTrack())
 	{
 		tonuinoPlayer.trackFinished();
-		
+		activeTrack = 0;
 		if (tonuinoPlayer.isPlaying && musicDSLoaded)
 		{
 			nextTrack();
 		}
 	}
-	activeTrack = 0;
 }
 
 void TonuinoDFPlayer::waitForTrackToFinish() 
