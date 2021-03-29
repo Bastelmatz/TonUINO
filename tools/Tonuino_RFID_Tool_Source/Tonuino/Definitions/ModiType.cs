@@ -32,6 +32,7 @@ namespace Tonuino_RFID_Tool
         LockAll,
         LockButtons,
 
+        SetupCard,
         ResetCard,
         ResetEEPROM,
 
@@ -79,8 +80,9 @@ namespace Tonuino_RFID_Tool
                 new Ident<EModiType>(40, EModiType.LockAll, "Lock All"),
                 new Ident<EModiType>(41, EModiType.LockButtons, "Lock Buttons"),
 
-                new Ident<EModiType>(50, EModiType.ResetCard, "Reset Card"),
-                new Ident<EModiType>(51, EModiType.ResetEEPROM, "Reset EEPROM"),
+                new Ident<EModiType>(50, EModiType.SetupCard, "Setup Card"),
+                new Ident<EModiType>(51, EModiType.ResetCard, "Reset Card"),
+                new Ident<EModiType>(52, EModiType.ResetEEPROM, "Reset EEPROM"),
 
                 new Ident<EModiType>(60, EModiType.MENU_ChangeSmall, "Menu Change Small"),
                 new Ident<EModiType>(61, EModiType.MENU_ChangeLarge, "Menu Change Large"),
