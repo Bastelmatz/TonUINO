@@ -221,8 +221,9 @@ namespace Tonuino_RFID_Tool
             }
 
             string cardPrefix = isModifierCard ? "Modification" : "Music";
-            lblCardDetected.Text = "Card Data - " + (exists ? data.IsNewCard ? "New" : "Tonuino " + cardPrefix : "No") + " Card";
-            lblRFID.Text = data.RFID + " | Hex: " + data.RFIDHex;
+            lblCardDetected.Text = (exists ? data.IsNewCard ? "New" : "Tonuino " + cardPrefix : "No") + " Card";
+            lblRFID.Text = data.RFID.ToString();
+            lblHex.Text = data.RFIDHex;
 
             // Visibility
             if (!data.IsNewCard)
@@ -448,7 +449,6 @@ namespace Tonuino_RFID_Tool
         private void comboBoxCardModes_SelectedValueChanged(object sender, EventArgs e)
         {
             updateWriteDataControls();
-            btnBrowsMusic.Select();
         }
 
         private void comboBox_ModiCardOptions_SelectedIndexChanged(object sender, EventArgs e)

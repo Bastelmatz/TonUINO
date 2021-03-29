@@ -59,5 +59,15 @@ namespace Tonuino_RFID_Tool.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Icon ähnlich wie (Symbol).
+        /// </summary>
+        internal static System.Drawing.Icon Handballer {
+            get {
+                object obj = ResourceManager.GetObject("Handballer", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
     }
 }
