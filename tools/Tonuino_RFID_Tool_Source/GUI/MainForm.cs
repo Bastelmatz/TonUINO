@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -10,7 +11,10 @@ namespace Tonuino_RFID_Tool
     {
         public static MainForm Instance { get; set; }
 
-        private static bool checkPorts = false;
+        private static bool m_checkPorts = false;
+
+        private List<TextBox> m_byteBoxes = new List<TextBox>();
+        private List<Label> m_byteLabels = new List<Label>();
 
         public MainForm()
         {
@@ -35,13 +39,13 @@ namespace Tonuino_RFID_Tool
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            checkPorts = true;
+            m_checkPorts = true;
             Task.Run(() => checkPortsThread());
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            checkPorts = false;
+            m_checkPorts = false;
             SerialComm.ClosePort();
         }
 
@@ -70,7 +74,7 @@ namespace Tonuino_RFID_Tool
 
         private void initGUI()
         {
-            pnlModiCardAction.Location = pnlMusicCardAction.Location;
+            pnlModiCardAction.Location = pnlRawDataAction.Location = pnlMusicCardAction.Location;
 
             // set music card mode options
             List<MusicMode> cardModes = MusicMode.AllValidModes();
@@ -83,6 +87,50 @@ namespace Tonuino_RFID_Tool
             // set modi card bool value options
             List<ModiBoolValue> modiBoolValues = ModiBoolValue.AllValidValues();
             comboBox_ModiBehaviour.SetItems(modiBoolValues);
+
+            m_byteBoxes = new List<TextBox>()
+            {
+                boxByte01,
+                boxByte02,
+                boxByte03,
+                boxByte04,
+                boxByte05,
+                boxByte06,
+                boxByte07,
+                boxByte08,
+                boxByte09,
+                boxByte10,
+                boxByte11,
+                boxByte12,
+                boxByte13,
+                boxByte14,
+                boxByte15
+            };
+
+            m_byteLabels = new List<Label>()
+            {
+                lblByte01,
+                lblByte02,
+                lblByte03,
+                lblByte04,
+                lblByte05,
+                lblByte06,
+                lblByte07,
+                lblByte08,
+                lblByte09,
+                lblByte10,
+                lblByte11,
+                lblByte12,
+                lblByte13,
+                lblByte14,
+                lblByte15
+            };
+
+            foreach (Label byteLbl in m_byteLabels)
+            {
+                byteLbl.BackColor = Color.DimGray;
+                byteLbl.ForeColor = Color.White;
+            }
         }
 
         // *****************************
@@ -112,7 +160,7 @@ namespace Tonuino_RFID_Tool
 
         private void checkPortsThread()
         {
-            while (checkPorts)
+            while (m_checkPorts)
             {
                 SerialComm.CheckComPorts();
                 doAction(() => updatePortsList());
@@ -247,6 +295,7 @@ namespace Tonuino_RFID_Tool
         {
             pnlModiCardAction.Visible = pnlCardAction.Visible && radio_ModiCard.Checked;
             pnlMusicCardAction.Visible = pnlCardAction.Visible && radio_MusicCard.Checked;
+            pnlRawDataAction.Visible = pnlCardAction.Visible && radio_Raw.Checked;
 
             updateWriteDataControls();
         }
@@ -274,6 +323,17 @@ namespace Tonuino_RFID_Tool
                 lblMinutes.Visible = isMinutes;
 
                 pnlModeBehaviour.Visible = lblModeBehaviour.Visible = isBool;
+            }
+            if (pnlRawDataAction.Visible)
+            {
+                for (int i = 0; i < m_byteBoxes.Count; i++)
+                {
+                    if (i < RawData.ListBytes.Count)
+                    {
+                        byte singleByte = RawData.ListBytes[i];
+                        m_byteBoxes[i].Text = singleByte.ToString();
+                    }
+                }
             }
         }
 
@@ -384,6 +444,27 @@ namespace Tonuino_RFID_Tool
             return modiData;
         }
 
+        private List<byte> getRawData()
+        {
+            List<byte> listBytes = new List<byte>();
+            foreach (TextBox byteBox in m_byteBoxes)
+            {
+                listBytes.Add(getByte(byteBox));
+            }
+            return listBytes;
+        }
+
+        private void updateByteInList(TextBox textBox)
+        {
+            for (int i = 0; i < m_byteBoxes.Count; i++)
+            {
+                if (i < RawData.ListBytes.Count && m_byteBoxes[i] == textBox)
+                {
+                    RawData.SetByte(i, getByte(textBox));
+                }
+            }
+        }
+
         #endregion
 
         // *****************************
@@ -416,6 +497,12 @@ namespace Tonuino_RFID_Tool
             SerialComm.Write(cardData);
         }
 
+        private void btnWriteRawCard_Click(object sender, EventArgs e)
+        {
+            List<byte> listBytes = getRawData();
+            SerialComm.Write(listBytes);
+        }
+
         private void btnResetCard_Click(object sender, EventArgs e)
         {
             SerialComm.ResetCard();
@@ -444,6 +531,16 @@ namespace Tonuino_RFID_Tool
         private void textBoxEndOnSD_TextChanged(object sender, EventArgs e)
         {
             limitText(textBoxEndOnSD, 255);
+        }
+
+        private void boxByte_TextChanged(object sender, EventArgs e)
+        {
+            if (sender is TextBox)
+            {
+                TextBox textBox = (TextBox)sender;
+                limitText(textBox, 0, 255);
+                updateByteInList(textBox);
+            }
         }
 
         private void comboBoxCardModes_SelectedValueChanged(object sender, EventArgs e)

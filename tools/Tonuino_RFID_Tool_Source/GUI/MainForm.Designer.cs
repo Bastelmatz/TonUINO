@@ -52,6 +52,8 @@
             this.btnWriteMusicCard = new System.Windows.Forms.Button();
             this.pnlModes = new System.Windows.Forms.Panel();
             this.pnlCardDetected = new System.Windows.Forms.Panel();
+            this.lblHex = new System.Windows.Forms.Label();
+            this.lblHexCaption = new System.Windows.Forms.Label();
             this.lblReadModiValueCaption = new System.Windows.Forms.Label();
             this.lblReadModiValue = new System.Windows.Forms.Label();
             this.pnlModiCardAction = new System.Windows.Forms.Panel();
@@ -66,15 +68,45 @@
             this.radio_MusicCard = new System.Windows.Forms.RadioButton();
             this.radio_ModiCard = new System.Windows.Forms.RadioButton();
             this.pnlCardAction = new System.Windows.Forms.Panel();
+            this.radio_Raw = new System.Windows.Forms.RadioButton();
             this.pnlSeparator = new System.Windows.Forms.Panel();
             this.pnlPorts = new System.Windows.Forms.Panel();
             this.lblPorts = new System.Windows.Forms.Label();
             this.btnResetCard = new System.Windows.Forms.Button();
-            this.lblHexCaption = new System.Windows.Forms.Label();
-            this.lblHex = new System.Windows.Forms.Label();
-            this.radio_Raw = new System.Windows.Forms.RadioButton();
             this.lblRead = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.pnlRawDataAction = new System.Windows.Forms.Panel();
+            this.lblByte15 = new System.Windows.Forms.Label();
+            this.boxByte15 = new System.Windows.Forms.TextBox();
+            this.lblByte14 = new System.Windows.Forms.Label();
+            this.boxByte14 = new System.Windows.Forms.TextBox();
+            this.lblByte13 = new System.Windows.Forms.Label();
+            this.boxByte13 = new System.Windows.Forms.TextBox();
+            this.lblByte12 = new System.Windows.Forms.Label();
+            this.boxByte12 = new System.Windows.Forms.TextBox();
+            this.lblByte11 = new System.Windows.Forms.Label();
+            this.boxByte11 = new System.Windows.Forms.TextBox();
+            this.lblByte10 = new System.Windows.Forms.Label();
+            this.boxByte10 = new System.Windows.Forms.TextBox();
+            this.lblByte09 = new System.Windows.Forms.Label();
+            this.boxByte09 = new System.Windows.Forms.TextBox();
+            this.lblByte08 = new System.Windows.Forms.Label();
+            this.boxByte08 = new System.Windows.Forms.TextBox();
+            this.lblByte07 = new System.Windows.Forms.Label();
+            this.boxByte07 = new System.Windows.Forms.TextBox();
+            this.lblByte06 = new System.Windows.Forms.Label();
+            this.boxByte06 = new System.Windows.Forms.TextBox();
+            this.lblByte05 = new System.Windows.Forms.Label();
+            this.boxByte05 = new System.Windows.Forms.TextBox();
+            this.lblByte04 = new System.Windows.Forms.Label();
+            this.boxByte04 = new System.Windows.Forms.TextBox();
+            this.lblByte03 = new System.Windows.Forms.Label();
+            this.boxByte03 = new System.Windows.Forms.TextBox();
+            this.lblByte02 = new System.Windows.Forms.Label();
+            this.boxByte02 = new System.Windows.Forms.TextBox();
+            this.lblByte01 = new System.Windows.Forms.Label();
+            this.boxByte01 = new System.Windows.Forms.TextBox();
+            this.btnWriteRawCard = new System.Windows.Forms.Button();
             this.comboBox_Ports = new Tonuino_RFID_Tool.ExtendedComboBox();
             this.comboBox_MusicCardModes = new Tonuino_RFID_Tool.ExtendedComboBox();
             this.comboBox_ModiBehaviour = new Tonuino_RFID_Tool.ExtendedComboBox();
@@ -87,6 +119,7 @@
             this.pnlMusicCardAction.SuspendLayout();
             this.pnlCardAction.SuspendLayout();
             this.pnlPorts.SuspendLayout();
+            this.pnlRawDataAction.SuspendLayout();
             this.SuspendLayout();
             // 
             // lblConnectedPort
@@ -317,6 +350,24 @@
             this.pnlCardDetected.Size = new System.Drawing.Size(207, 241);
             this.pnlCardDetected.TabIndex = 36;
             // 
+            // lblHex
+            // 
+            this.lblHex.AutoSize = true;
+            this.lblHex.Location = new System.Drawing.Point(66, 23);
+            this.lblHex.Name = "lblHex";
+            this.lblHex.Size = new System.Drawing.Size(35, 13);
+            this.lblHex.TabIndex = 37;
+            this.lblHex.Text = "label4";
+            // 
+            // lblHexCaption
+            // 
+            this.lblHexCaption.Location = new System.Drawing.Point(20, 23);
+            this.lblHexCaption.Name = "lblHexCaption";
+            this.lblHexCaption.Size = new System.Drawing.Size(45, 13);
+            this.lblHexCaption.TabIndex = 36;
+            this.lblHexCaption.Text = "Hex:";
+            this.lblHexCaption.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // lblReadModiValueCaption
             // 
             this.lblReadModiValueCaption.Location = new System.Drawing.Point(4, 93);
@@ -464,6 +515,16 @@
             this.pnlCardAction.Size = new System.Drawing.Size(210, 28);
             this.pnlCardAction.TabIndex = 43;
             // 
+            // radio_Raw
+            // 
+            this.radio_Raw.AutoSize = true;
+            this.radio_Raw.Location = new System.Drawing.Point(152, 3);
+            this.radio_Raw.Name = "radio_Raw";
+            this.radio_Raw.Size = new System.Drawing.Size(47, 17);
+            this.radio_Raw.TabIndex = 43;
+            this.radio_Raw.Text = "Raw";
+            this.radio_Raw.UseVisualStyleBackColor = true;
+            // 
             // pnlSeparator
             // 
             this.pnlSeparator.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
@@ -503,34 +564,6 @@
             this.btnResetCard.UseVisualStyleBackColor = false;
             this.btnResetCard.Click += new System.EventHandler(this.btnResetCard_Click);
             // 
-            // lblHexCaption
-            // 
-            this.lblHexCaption.Location = new System.Drawing.Point(20, 23);
-            this.lblHexCaption.Name = "lblHexCaption";
-            this.lblHexCaption.Size = new System.Drawing.Size(45, 13);
-            this.lblHexCaption.TabIndex = 36;
-            this.lblHexCaption.Text = "Hex:";
-            this.lblHexCaption.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // lblHex
-            // 
-            this.lblHex.AutoSize = true;
-            this.lblHex.Location = new System.Drawing.Point(66, 23);
-            this.lblHex.Name = "lblHex";
-            this.lblHex.Size = new System.Drawing.Size(35, 13);
-            this.lblHex.TabIndex = 37;
-            this.lblHex.Text = "label4";
-            // 
-            // radio_Raw
-            // 
-            this.radio_Raw.AutoSize = true;
-            this.radio_Raw.Location = new System.Drawing.Point(152, 3);
-            this.radio_Raw.Name = "radio_Raw";
-            this.radio_Raw.Size = new System.Drawing.Size(47, 17);
-            this.radio_Raw.TabIndex = 43;
-            this.radio_Raw.Text = "Raw";
-            this.radio_Raw.UseVisualStyleBackColor = true;
-            // 
             // lblRead
             // 
             this.lblRead.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
@@ -554,6 +587,326 @@
             this.label1.TabIndex = 49;
             this.label1.Text = "WRITE";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // pnlRawDataAction
+            // 
+            this.pnlRawDataAction.Controls.Add(this.lblByte15);
+            this.pnlRawDataAction.Controls.Add(this.boxByte15);
+            this.pnlRawDataAction.Controls.Add(this.lblByte14);
+            this.pnlRawDataAction.Controls.Add(this.boxByte14);
+            this.pnlRawDataAction.Controls.Add(this.lblByte13);
+            this.pnlRawDataAction.Controls.Add(this.boxByte13);
+            this.pnlRawDataAction.Controls.Add(this.lblByte12);
+            this.pnlRawDataAction.Controls.Add(this.boxByte12);
+            this.pnlRawDataAction.Controls.Add(this.lblByte11);
+            this.pnlRawDataAction.Controls.Add(this.boxByte11);
+            this.pnlRawDataAction.Controls.Add(this.lblByte10);
+            this.pnlRawDataAction.Controls.Add(this.boxByte10);
+            this.pnlRawDataAction.Controls.Add(this.lblByte09);
+            this.pnlRawDataAction.Controls.Add(this.boxByte09);
+            this.pnlRawDataAction.Controls.Add(this.lblByte08);
+            this.pnlRawDataAction.Controls.Add(this.boxByte08);
+            this.pnlRawDataAction.Controls.Add(this.lblByte07);
+            this.pnlRawDataAction.Controls.Add(this.boxByte07);
+            this.pnlRawDataAction.Controls.Add(this.lblByte06);
+            this.pnlRawDataAction.Controls.Add(this.boxByte06);
+            this.pnlRawDataAction.Controls.Add(this.lblByte05);
+            this.pnlRawDataAction.Controls.Add(this.boxByte05);
+            this.pnlRawDataAction.Controls.Add(this.lblByte04);
+            this.pnlRawDataAction.Controls.Add(this.boxByte04);
+            this.pnlRawDataAction.Controls.Add(this.lblByte03);
+            this.pnlRawDataAction.Controls.Add(this.boxByte03);
+            this.pnlRawDataAction.Controls.Add(this.lblByte02);
+            this.pnlRawDataAction.Controls.Add(this.boxByte02);
+            this.pnlRawDataAction.Controls.Add(this.lblByte01);
+            this.pnlRawDataAction.Controls.Add(this.boxByte01);
+            this.pnlRawDataAction.Controls.Add(this.btnWriteRawCard);
+            this.pnlRawDataAction.Location = new System.Drawing.Point(573, 18);
+            this.pnlRawDataAction.Name = "pnlRawDataAction";
+            this.pnlRawDataAction.Size = new System.Drawing.Size(203, 210);
+            this.pnlRawDataAction.TabIndex = 50;
+            // 
+            // lblByte15
+            // 
+            this.lblByte15.Location = new System.Drawing.Point(155, 115);
+            this.lblByte15.Name = "lblByte15";
+            this.lblByte15.Size = new System.Drawing.Size(30, 13);
+            this.lblByte15.TabIndex = 57;
+            this.lblByte15.Text = "15";
+            this.lblByte15.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // boxByte15
+            // 
+            this.boxByte15.Location = new System.Drawing.Point(155, 129);
+            this.boxByte15.MaxLength = 3;
+            this.boxByte15.Name = "boxByte15";
+            this.boxByte15.Size = new System.Drawing.Size(30, 20);
+            this.boxByte15.TabIndex = 58;
+            this.boxByte15.TextChanged += new System.EventHandler(this.boxByte_TextChanged);
+            // 
+            // lblByte14
+            // 
+            this.lblByte14.Location = new System.Drawing.Point(119, 115);
+            this.lblByte14.Name = "lblByte14";
+            this.lblByte14.Size = new System.Drawing.Size(30, 13);
+            this.lblByte14.TabIndex = 55;
+            this.lblByte14.Text = "14";
+            this.lblByte14.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // boxByte14
+            // 
+            this.boxByte14.Location = new System.Drawing.Point(119, 129);
+            this.boxByte14.MaxLength = 3;
+            this.boxByte14.Name = "boxByte14";
+            this.boxByte14.Size = new System.Drawing.Size(30, 20);
+            this.boxByte14.TabIndex = 56;
+            this.boxByte14.TextChanged += new System.EventHandler(this.boxByte_TextChanged);
+            // 
+            // lblByte13
+            // 
+            this.lblByte13.Location = new System.Drawing.Point(83, 115);
+            this.lblByte13.Name = "lblByte13";
+            this.lblByte13.Size = new System.Drawing.Size(30, 13);
+            this.lblByte13.TabIndex = 53;
+            this.lblByte13.Text = "13";
+            this.lblByte13.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // boxByte13
+            // 
+            this.boxByte13.Location = new System.Drawing.Point(83, 129);
+            this.boxByte13.MaxLength = 3;
+            this.boxByte13.Name = "boxByte13";
+            this.boxByte13.Size = new System.Drawing.Size(30, 20);
+            this.boxByte13.TabIndex = 54;
+            this.boxByte13.TextChanged += new System.EventHandler(this.boxByte_TextChanged);
+            // 
+            // lblByte12
+            // 
+            this.lblByte12.Location = new System.Drawing.Point(47, 115);
+            this.lblByte12.Name = "lblByte12";
+            this.lblByte12.Size = new System.Drawing.Size(30, 13);
+            this.lblByte12.TabIndex = 51;
+            this.lblByte12.Text = "12";
+            this.lblByte12.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // boxByte12
+            // 
+            this.boxByte12.Location = new System.Drawing.Point(47, 129);
+            this.boxByte12.MaxLength = 3;
+            this.boxByte12.Name = "boxByte12";
+            this.boxByte12.Size = new System.Drawing.Size(30, 20);
+            this.boxByte12.TabIndex = 52;
+            this.boxByte12.TextChanged += new System.EventHandler(this.boxByte_TextChanged);
+            // 
+            // lblByte11
+            // 
+            this.lblByte11.Location = new System.Drawing.Point(11, 115);
+            this.lblByte11.Name = "lblByte11";
+            this.lblByte11.Size = new System.Drawing.Size(30, 13);
+            this.lblByte11.TabIndex = 49;
+            this.lblByte11.Text = "11";
+            this.lblByte11.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // boxByte11
+            // 
+            this.boxByte11.Location = new System.Drawing.Point(11, 129);
+            this.boxByte11.MaxLength = 3;
+            this.boxByte11.Name = "boxByte11";
+            this.boxByte11.Size = new System.Drawing.Size(30, 20);
+            this.boxByte11.TabIndex = 50;
+            this.boxByte11.TextChanged += new System.EventHandler(this.boxByte_TextChanged);
+            // 
+            // lblByte10
+            // 
+            this.lblByte10.Location = new System.Drawing.Point(154, 65);
+            this.lblByte10.Name = "lblByte10";
+            this.lblByte10.Size = new System.Drawing.Size(30, 13);
+            this.lblByte10.TabIndex = 47;
+            this.lblByte10.Text = "10";
+            this.lblByte10.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // boxByte10
+            // 
+            this.boxByte10.Location = new System.Drawing.Point(154, 79);
+            this.boxByte10.MaxLength = 3;
+            this.boxByte10.Name = "boxByte10";
+            this.boxByte10.Size = new System.Drawing.Size(30, 20);
+            this.boxByte10.TabIndex = 48;
+            this.boxByte10.TextChanged += new System.EventHandler(this.boxByte_TextChanged);
+            // 
+            // lblByte09
+            // 
+            this.lblByte09.Location = new System.Drawing.Point(119, 65);
+            this.lblByte09.Name = "lblByte09";
+            this.lblByte09.Size = new System.Drawing.Size(30, 13);
+            this.lblByte09.TabIndex = 45;
+            this.lblByte09.Text = "09";
+            this.lblByte09.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // boxByte09
+            // 
+            this.boxByte09.Location = new System.Drawing.Point(119, 79);
+            this.boxByte09.MaxLength = 3;
+            this.boxByte09.Name = "boxByte09";
+            this.boxByte09.Size = new System.Drawing.Size(30, 20);
+            this.boxByte09.TabIndex = 46;
+            this.boxByte09.TextChanged += new System.EventHandler(this.boxByte_TextChanged);
+            // 
+            // lblByte08
+            // 
+            this.lblByte08.Location = new System.Drawing.Point(83, 65);
+            this.lblByte08.Name = "lblByte08";
+            this.lblByte08.Size = new System.Drawing.Size(30, 13);
+            this.lblByte08.TabIndex = 43;
+            this.lblByte08.Text = "08";
+            this.lblByte08.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // boxByte08
+            // 
+            this.boxByte08.Location = new System.Drawing.Point(83, 79);
+            this.boxByte08.MaxLength = 3;
+            this.boxByte08.Name = "boxByte08";
+            this.boxByte08.Size = new System.Drawing.Size(30, 20);
+            this.boxByte08.TabIndex = 44;
+            this.boxByte08.TextChanged += new System.EventHandler(this.boxByte_TextChanged);
+            // 
+            // lblByte07
+            // 
+            this.lblByte07.Location = new System.Drawing.Point(47, 65);
+            this.lblByte07.Name = "lblByte07";
+            this.lblByte07.Size = new System.Drawing.Size(30, 13);
+            this.lblByte07.TabIndex = 41;
+            this.lblByte07.Text = "07";
+            this.lblByte07.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // boxByte07
+            // 
+            this.boxByte07.Location = new System.Drawing.Point(47, 79);
+            this.boxByte07.MaxLength = 3;
+            this.boxByte07.Name = "boxByte07";
+            this.boxByte07.Size = new System.Drawing.Size(30, 20);
+            this.boxByte07.TabIndex = 42;
+            this.boxByte07.TextChanged += new System.EventHandler(this.boxByte_TextChanged);
+            // 
+            // lblByte06
+            // 
+            this.lblByte06.Location = new System.Drawing.Point(11, 65);
+            this.lblByte06.Name = "lblByte06";
+            this.lblByte06.Size = new System.Drawing.Size(30, 13);
+            this.lblByte06.TabIndex = 39;
+            this.lblByte06.Text = "06";
+            this.lblByte06.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // boxByte06
+            // 
+            this.boxByte06.Location = new System.Drawing.Point(11, 79);
+            this.boxByte06.MaxLength = 3;
+            this.boxByte06.Name = "boxByte06";
+            this.boxByte06.Size = new System.Drawing.Size(30, 20);
+            this.boxByte06.TabIndex = 40;
+            this.boxByte06.TextChanged += new System.EventHandler(this.boxByte_TextChanged);
+            // 
+            // lblByte05
+            // 
+            this.lblByte05.Location = new System.Drawing.Point(154, 15);
+            this.lblByte05.Name = "lblByte05";
+            this.lblByte05.Size = new System.Drawing.Size(30, 13);
+            this.lblByte05.TabIndex = 37;
+            this.lblByte05.Text = "05";
+            this.lblByte05.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // boxByte05
+            // 
+            this.boxByte05.Location = new System.Drawing.Point(154, 29);
+            this.boxByte05.MaxLength = 3;
+            this.boxByte05.Name = "boxByte05";
+            this.boxByte05.Size = new System.Drawing.Size(30, 20);
+            this.boxByte05.TabIndex = 38;
+            this.boxByte05.TextChanged += new System.EventHandler(this.boxByte_TextChanged);
+            // 
+            // lblByte04
+            // 
+            this.lblByte04.Location = new System.Drawing.Point(119, 15);
+            this.lblByte04.Name = "lblByte04";
+            this.lblByte04.Size = new System.Drawing.Size(30, 13);
+            this.lblByte04.TabIndex = 35;
+            this.lblByte04.Text = "04";
+            this.lblByte04.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // boxByte04
+            // 
+            this.boxByte04.Location = new System.Drawing.Point(119, 29);
+            this.boxByte04.MaxLength = 3;
+            this.boxByte04.Name = "boxByte04";
+            this.boxByte04.Size = new System.Drawing.Size(30, 20);
+            this.boxByte04.TabIndex = 36;
+            this.boxByte04.TextChanged += new System.EventHandler(this.boxByte_TextChanged);
+            // 
+            // lblByte03
+            // 
+            this.lblByte03.Location = new System.Drawing.Point(83, 15);
+            this.lblByte03.Name = "lblByte03";
+            this.lblByte03.Size = new System.Drawing.Size(30, 13);
+            this.lblByte03.TabIndex = 33;
+            this.lblByte03.Text = "03";
+            this.lblByte03.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // boxByte03
+            // 
+            this.boxByte03.Location = new System.Drawing.Point(83, 29);
+            this.boxByte03.MaxLength = 3;
+            this.boxByte03.Name = "boxByte03";
+            this.boxByte03.Size = new System.Drawing.Size(30, 20);
+            this.boxByte03.TabIndex = 34;
+            this.boxByte03.TextChanged += new System.EventHandler(this.boxByte_TextChanged);
+            // 
+            // lblByte02
+            // 
+            this.lblByte02.Location = new System.Drawing.Point(47, 15);
+            this.lblByte02.Name = "lblByte02";
+            this.lblByte02.Size = new System.Drawing.Size(30, 13);
+            this.lblByte02.TabIndex = 31;
+            this.lblByte02.Text = "02";
+            this.lblByte02.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // boxByte02
+            // 
+            this.boxByte02.Location = new System.Drawing.Point(47, 29);
+            this.boxByte02.MaxLength = 3;
+            this.boxByte02.Name = "boxByte02";
+            this.boxByte02.Size = new System.Drawing.Size(30, 20);
+            this.boxByte02.TabIndex = 32;
+            this.boxByte02.TextChanged += new System.EventHandler(this.boxByte_TextChanged);
+            // 
+            // lblByte01
+            // 
+            this.lblByte01.Location = new System.Drawing.Point(11, 15);
+            this.lblByte01.Name = "lblByte01";
+            this.lblByte01.Size = new System.Drawing.Size(30, 13);
+            this.lblByte01.TabIndex = 29;
+            this.lblByte01.Text = "01";
+            this.lblByte01.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // boxByte01
+            // 
+            this.boxByte01.Location = new System.Drawing.Point(11, 29);
+            this.boxByte01.MaxLength = 3;
+            this.boxByte01.Name = "boxByte01";
+            this.boxByte01.Size = new System.Drawing.Size(30, 20);
+            this.boxByte01.TabIndex = 30;
+            this.boxByte01.TextChanged += new System.EventHandler(this.boxByte_TextChanged);
+            // 
+            // btnWriteRawCard
+            // 
+            this.btnWriteRawCard.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
+            this.btnWriteRawCard.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnWriteRawCard.Location = new System.Drawing.Point(9, 177);
+            this.btnWriteRawCard.Name = "btnWriteRawCard";
+            this.btnWriteRawCard.Size = new System.Drawing.Size(175, 23);
+            this.btnWriteRawCard.TabIndex = 24;
+            this.btnWriteRawCard.Text = "Write Raw Card";
+            this.btnWriteRawCard.UseVisualStyleBackColor = false;
+            this.btnWriteRawCard.Click += new System.EventHandler(this.btnWriteRawCard_Click);
             // 
             // comboBox_Ports
             // 
@@ -610,6 +963,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(786, 409);
+            this.Controls.Add(this.pnlRawDataAction);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.lblRead);
             this.Controls.Add(this.btnResetCard);
@@ -641,6 +995,8 @@
             this.pnlCardAction.ResumeLayout(false);
             this.pnlCardAction.PerformLayout();
             this.pnlPorts.ResumeLayout(false);
+            this.pnlRawDataAction.ResumeLayout(false);
+            this.pnlRawDataAction.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -697,6 +1053,38 @@
         private System.Windows.Forms.RadioButton radio_Raw;
         private System.Windows.Forms.Label lblRead;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Panel pnlRawDataAction;
+        private System.Windows.Forms.Label lblByte01;
+        private System.Windows.Forms.TextBox boxByte01;
+        private System.Windows.Forms.Button btnWriteRawCard;
+        private System.Windows.Forms.Label lblByte15;
+        private System.Windows.Forms.TextBox boxByte15;
+        private System.Windows.Forms.Label lblByte14;
+        private System.Windows.Forms.TextBox boxByte14;
+        private System.Windows.Forms.Label lblByte13;
+        private System.Windows.Forms.TextBox boxByte13;
+        private System.Windows.Forms.Label lblByte12;
+        private System.Windows.Forms.TextBox boxByte12;
+        private System.Windows.Forms.Label lblByte11;
+        private System.Windows.Forms.TextBox boxByte11;
+        private System.Windows.Forms.Label lblByte10;
+        private System.Windows.Forms.TextBox boxByte10;
+        private System.Windows.Forms.Label lblByte09;
+        private System.Windows.Forms.TextBox boxByte09;
+        private System.Windows.Forms.Label lblByte08;
+        private System.Windows.Forms.TextBox boxByte08;
+        private System.Windows.Forms.Label lblByte07;
+        private System.Windows.Forms.TextBox boxByte07;
+        private System.Windows.Forms.Label lblByte06;
+        private System.Windows.Forms.TextBox boxByte06;
+        private System.Windows.Forms.Label lblByte05;
+        private System.Windows.Forms.TextBox boxByte05;
+        private System.Windows.Forms.Label lblByte04;
+        private System.Windows.Forms.TextBox boxByte04;
+        private System.Windows.Forms.Label lblByte03;
+        private System.Windows.Forms.TextBox boxByte03;
+        private System.Windows.Forms.Label lblByte02;
+        private System.Windows.Forms.TextBox boxByte02;
     }
 }
 

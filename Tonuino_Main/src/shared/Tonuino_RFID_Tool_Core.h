@@ -7,6 +7,7 @@ class Tonuino_RFID_Tool_Core
 {
 	public:
 	#define READBYTESMAX 32
+	#define WRITEBYTESMAX 16
 	static char readSerialString[READBYTESMAX];
 	
 	void transmitCardData(nfcTagStruct nfcTag);
@@ -15,7 +16,7 @@ class Tonuino_RFID_Tool_Core
 	
 	private:
 	void transmitTrigger(bool startTrigger);
-	void writeCard(MusicDataset musicDS);
+	void writeCard(byte bytesToWrite[]);
 	void handleCommand();
 };
 

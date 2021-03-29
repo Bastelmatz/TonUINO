@@ -235,17 +235,21 @@ namespace Tonuino_RFID_Tool
             writeBytes(listBytes);
         }
 
+        public static void Write(List<byte> listBytes)
+        {
+            writeBytes(listBytes);
+        }
+
         public static void ResetCard()
         {
             List<byte> listBytes = new List<byte>();
-            for (int i = 0; i < MAXBYTES; i++)
+            for (int i = 0; i < CardData.MAXBYTES; i++)
             {
                 listBytes.Add(0);
             }
             writeBytes(listBytes);
         }
 
-        private const int MAXBYTES = 16;
         private const string SEPARATOR = ";";
 
         private static void writeBytes(List<byte> listBytes)
@@ -254,28 +258,38 @@ namespace Tonuino_RFID_Tool
             WriteLine(lineStr);
         }
 
+        private static List<byte> getTonuinoBytes(List<byte> appendBytes)
+        {
+            List<byte> listBytes = new List<byte>();
+            listBytes.AddRange(CardData.FirstTonuinoBytes);
+            listBytes.AddRange(appendBytes);
+            return listBytes;
+        }
+
         private static List<byte> getBytes(IMusicCardData data)
         {
             // Defined order - has to be in sync with Tonuino sketch - don't change!!
-            return new List<byte>()
+            List<byte> listBytes = new List<byte>
             {
                 data.Raw_Folder,
                 data.Raw_Mode,
                 data.Raw_Special,
                 data.Raw_Special2
             };
+            return getTonuinoBytes(listBytes);
         }
 
         private static List<byte> getBytes(IModiCardData data)
         {
             // Defined order - has to be in sync with Tonuino sketch - don't change!!
-            return new List<byte>()
+            List<byte> listBytes = new List<byte>
             {
                 0,
                 data.Raw_Mode,
                 (byte)(data.Raw_Value & 0xff),
                 (byte)((data.Raw_Value >> 8) & 0xff)
             };
+            return getTonuinoBytes(listBytes);
         }
 
         #endregion

@@ -1,5 +1,7 @@
 ﻿
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Tonuino_RFID_Tool
 {
@@ -37,8 +39,13 @@ namespace Tonuino_RFID_Tool
         public int Cookie { get; }
 
         public bool Exists => RFID != 0;
-        private static int TonuinoCookie { get; } = 322417479;
-        public bool IsNewCard => Cookie != TonuinoCookie;
+
+        public static int MAXBYTES { get; } = 16;
+
+        // magic cookie, software version
+        public static ReadOnlyCollection<byte> FirstTonuinoBytes { get; } = new List<byte> { 19, 55, 179, 71, 2 }.AsReadOnly(); 
+        private static int tonuinoCookie { get; } = 322417479; // 0x1337 0xb347 // 19|55|179|71
+        public bool IsNewCard => Cookie != tonuinoCookie;
         public string RFIDHex => RFID.ToString("X");
 
         public CardData() : this (0, 0)

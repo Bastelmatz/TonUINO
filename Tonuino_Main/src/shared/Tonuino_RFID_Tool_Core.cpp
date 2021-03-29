@@ -48,7 +48,7 @@ void Tonuino_RFID_Tool_Core::transmitCardRemoval()
 	transmitTrigger(false);
 }
 
-void Tonuino_RFID_Tool_Core::writeCard(MusicDataset musicDS)
+void Tonuino_RFID_Tool_Core::writeCard(byte bytesToWrite[])
 {
 	tonuinoRFID.setupRFID();
 	
@@ -68,20 +68,7 @@ void Tonuino_RFID_Tool_Core::writeCard(MusicDataset musicDS)
 		return;
 	}
 	
-	bool success = false;
-	if (musicDS.mode == 0 && 
-	    musicDS.folder == 0 && 
-		musicDS.special == 0 &&
-		musicDS.special2 == 0)
-	{
-		success = tonuinoRFID.resetCard();
-	}
-	else
-	{
-		success = tonuinoRFID.writeCard(musicDS);
-	}
-	
-	if (success)
+	if (tonuinoRFID.writeCard(bytesToWrite))
 	{
 		Serial.println(F("Card written!"));
 	}
@@ -97,37 +84,24 @@ void Tonuino_RFID_Tool_Core::handleCommand()
 	Serial.println(F("RFID_Tool_Command_Received"));
 	Serial.println(readSerialString);
 
-	MusicDataset receivedDS;
-	int index = 0;
+	byte receivedBytes[WRITEBYTESMAX] { 0 };
+	byte index = 0;
 	char* command = strtok(readSerialString, ";");
 	while(command != NULL) 
 	{
 		int charToInt = atoi(command);
 		byte parsedByte = (byte)charToInt;
-		switch (index)
-		{
-			case 0: receivedDS.folder = parsedByte; break;
-			case 1: receivedDS.mode = parsedByte; break;
-			case 2: receivedDS.special = parsedByte; break;
-			case 3: receivedDS.special2 = parsedByte; break;
-		}
+		receivedBytes[index] = parsedByte;
 		index++;
 		// create next part
 		command = strtok(NULL, ";");
+		if (index > WRITEBYTESMAX)
+		{
+			break;
+		}
 	}
-
-	Serial.println(receivedDS.folder);
-	Serial.println(receivedDS.mode);
-	Serial.println(receivedDS.special);
-	Serial.println(receivedDS.special2);
-
-	MusicDataset musicDS;
-	musicDS.folder = receivedDS.folder;
-	musicDS.special = receivedDS.special;
-	musicDS.special2 = receivedDS.special2;
-	musicDS.mode = receivedDS.mode;
-
-	writeCard(musicDS);
+					
+	writeCard(receivedBytes);
 }
 
 void Tonuino_RFID_Tool_Core::listen()
@@ -149,7 +123,7 @@ void Tonuino_RFID_Tool_Core::listen()
 		handleCommand();
 		for (uint8_t i = 0; i < sizeof(readSerialString); ++i)
 		{
-		  readSerialString[i] = (char)0;
+			readSerialString[i] = (char)0;
 		}
 	}
 }
