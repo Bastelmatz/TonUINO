@@ -6,6 +6,7 @@ TonuinoPlayer TonuinoDFPlayer::tonuinoPlayer;
 uint8_t TonuinoDFPlayer::pin_Busy = 0;
 uint8_t TonuinoDFPlayer::activeFolder = 0;
 uint16_t TonuinoDFPlayer::activeTrack = 0;
+uint32_t TonuinoDFPlayer::timeLastFinished = 0;
 
 uint8_t TonuinoDFPlayer::volume = 0;
 uint8_t TonuinoDFPlayer::volumeMin = 0;
@@ -18,6 +19,8 @@ bool TonuinoDFPlayer::newMusisDS = false;
 
 bool TonuinoDFPlayer::freezeDance_active = false;
 unsigned long TonuinoDFPlayer::freezeDance_nextStopAtMillis = 0;
+
+#define PLAYTRACK_DELAY 1000
 
 // ********************************************************************
 // implement a notification class, its member methods will get called
@@ -99,7 +102,7 @@ void TonuinoDFPlayer::playTrack(uint8_t folder, uint8_t track)
 	activeFolder = folder;
 	activeTrack = track;
 	mp3.playFolderTrack(folder, track);
-	delay(1000);
+	delay(PLAYTRACK_DELAY);
 }
 
 void TonuinoDFPlayer::playTrack(uint8_t track)
@@ -219,24 +222,34 @@ void TonuinoDFPlayer::trackFinished()
 	Serial.print(F(" in folder "));
 	if (activeFolder > 0)
 	{
-		Serial.println(activeFolder);
+		Serial.print(activeFolder);
 	}
 	else
 	{
-		Serial.println(F("MP3"));
+		Serial.print(F("MP3"));
 	}
-	
-	Serial.print(F("Current track "));
+	Serial.print(F(", Current track "));
 	Serial.println(tonuinoPlayer.currentTrack());
-	if (activeTrack == tonuinoPlayer.currentTrack())
+	
+	// Somehow the DFPlayer finished event is raised twice
+	// Ignore the second finish event 
+	// (every new track would have the play track delay)
+	if (millis() - timeLastFinished < PLAYTRACK_DELAY)
+	{
+		Serial.println(F("Finish event ignored!"));
+		return;
+	}
+	bool isCurrentTrack = activeTrack == tonuinoPlayer.currentTrack();
+	activeTrack = 0;
+	if (isCurrentTrack)
 	{
 		tonuinoPlayer.trackFinished();
-		activeTrack = 0;
 		if (tonuinoPlayer.isPlaying && musicDSLoaded)
 		{
 			nextTrack();
 		}
 	}
+	timeLastFinished = millis();
 }
 
 void TonuinoDFPlayer::waitForTrackToFinish() 

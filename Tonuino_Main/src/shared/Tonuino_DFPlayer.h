@@ -70,6 +70,7 @@ class TonuinoDFPlayer
 	static uint8_t pin_Busy;
 	static uint8_t activeFolder;
 	static uint16_t activeTrack;
+	static uint32_t timeLastFinished;
 	static bool newMusisDS;
 	static unsigned long freezeDance_nextStopAtMillis;
 
