@@ -52,7 +52,7 @@ TonuinoPlayer tonuinoPlayer()
 
 void loadStartFolder()
 {
-	if (swConfig.StartMusicDS.folder == 0)
+	if (swConfig.StartMusicDS.startFolder == 0)
 	{
 		lastMusicDS = tonuinoEEPROM.loadLastDatasetFromFlash();
 	}
@@ -76,7 +76,7 @@ uint8_t getLastTrack(MusicDataset musicDS)
 {
 	if (musicDS.mode == AudioBook) 
 	{
-		trackInEEPROM = tonuinoEEPROM.loadLastTrackFromFlash(musicDS.folder);
+		trackInEEPROM = tonuinoEEPROM.loadLastTrackFromFlash(musicDS.startFolder);
 		return trackInEEPROM;
 	}
 	return 0;
@@ -150,14 +150,14 @@ void checkStandbyAtMillis()
 
 void checkCurrentTrack()
 {
-	if (dfPlayer.musicDS.mode == AudioBook)
+	if (tonuinoPlayer().mode == AudioBook)
 	{
 		uint8_t currentTrack = tonuinoPlayer().currentTrack();
 		if (currentTrack > 0 && trackInEEPROM != currentTrack)
 		{
 			Serial.print(F("Save current track to EEPROM: "));
 			Serial.print(currentTrack);
-			tonuinoEEPROM.writeLastTrackToFlash(currentTrack, dfPlayer.musicDS.folder);
+			tonuinoEEPROM.writeLastTrackToFlash(currentTrack, dfPlayer.currentMusicFolder);
 		}
 	}
 }
@@ -394,7 +394,7 @@ void onNewCard()
 {
 	memcpy(&nextMC, &tonuinoRFID.readCardData, sizeof(nfcTagStruct));
 	
-	if (nextMC.cookie == cardCookie && nextMC.musicDS.folder > 0 && nextMC.musicDS.mode > 0) 
+	if (nextMC.cookie == cardCookie && nextMC.musicDS.startFolder > 0 && nextMC.musicDS.mode > 0) 
 	{
 		loadAndPlayFolder(nextMC.musicDS);
 		// Save last folder for next power up
@@ -431,7 +431,15 @@ void onCardReturn()
 	}
 	else
 	{
-		dfPlayer.nextTrack();
+		uint8_t mode = tonuinoPlayer().mode;
+		if (mode == RandomFolder_Album || mode == RandomFolder_Party)
+		{
+			loadAndPlayFolder(nextMC.musicDS);
+		}
+		else
+		{
+			dfPlayer.nextTrack();
+		}
 	}
 }
 
@@ -507,8 +515,8 @@ uint8_t voiceMenu(uint8_t numberOfOptions, int startMessage, int messageOffset,
 bool setupFolder(MusicDataset * musicDS) 
 {
 	// Ordner abfragen
-	musicDS->folder = voiceMenu(99, 301, 0, true, 0, 0);
-	uint8_t folder = musicDS->folder;
+	musicDS->startFolder = voiceMenu(99, 301, 0, true, 0, 0);
+	uint8_t folder = musicDS->startFolder;
 	if (folder == 0) return false;
 
 	// Wiedergabemodus abfragen
@@ -518,15 +526,23 @@ bool setupFolder(MusicDataset * musicDS)
 
 	uint8_t numberOptions = dfPlayer.getFolderTrackCount(folder);
 	// Einzelmodus -> Datei abfragen
-	if (mode == 4)
+	if (mode == Single)
 	{
-		musicDS->special = voiceMenu(numberOptions, 320, 0, true, folder, 0);
+		musicDS->startTrack = voiceMenu(numberOptions, 320, 0, true, folder, 0);
 	}
 	// Spezialmodus Von-Bis
-	if (mode == 7 || mode == 8 || mode == 9) 
+	if (mode == Section_AudioDrama || 
+	    mode == Section_Album || 
+		mode == Section_Party ||
+		mode == Section_Audiobook) 
 	{
-		musicDS->special = voiceMenu(numberOptions, 321, 0, true, folder, 0);
-		musicDS->special2 = voiceMenu(numberOptions, 322, 0, true, folder, musicDS->special);
+		musicDS->startTrack = voiceMenu(numberOptions, 321, 0, true, folder, 0);
+		musicDS->endTrack = voiceMenu(numberOptions, 322, 0, true, folder, musicDS->startTrack);
+	}
+	
+	if (mode == RandomFolder_Album || mode == RandomFolder_Party)
+	{
+		musicDS->endFolder = voiceMenu(99, 301, 0, true, 0, folder);
 	}
 	return true;
 }
@@ -592,7 +608,7 @@ void playShortCut(uint8_t shortCut)
 	Serial.println(F("=== playShortCut()"));
 	Serial.println(shortCut);
 	MusicDataset shortCutData = swConfig.ShortCuts[shortCut];
-	if (shortCutData.folder > 0) 
+	if (shortCutData.startFolder > 0) 
 	{
 		loadAndPlayFolder(shortCutData);
 	}
@@ -620,6 +636,8 @@ void handleModifier(EModifier modifier, uint16_t special, bool isCardRemoval)
 	Serial.println(special);
 	bool toggle = false;
 	bool bValue = false;
+	
+	// Evaluate toggle and bValue for BoolModifier
 	if (TONUINOMODIFIER::isBoolModifer(modifier))
 	{
 		EModifierBoolValue modifierBoolValue = static_cast<EModifierBoolValue>(special);
@@ -655,6 +673,7 @@ void handleModifier(EModifier modifier, uint16_t special, bool isCardRemoval)
 					 modifierBoolValue == MODI_BOOLVAL_Set_OnRemoval_Undo;
 		}
 	}
+	
 	switch (modifier)
 	{
 		case MODI_LockAll:
@@ -759,8 +778,8 @@ void handleModifier(EModifier modifier, uint16_t special, bool isCardRemoval)
 void evaluateModifierCardData(MusicDataset musicDS, bool isCardRemoval)
 {
 	EModifier modifier = static_cast<EModifier>(musicDS.mode);
-	uint8_t special = musicDS.special;
-	uint8_t special2 = musicDS.special2;
+	uint8_t special = musicDS.startTrack;
+	uint8_t special2 = musicDS.endTrack;
 	
 	uint16_t value = special2 << 8 | special;
 	handleModifier(modifier, value, isCardRemoval);

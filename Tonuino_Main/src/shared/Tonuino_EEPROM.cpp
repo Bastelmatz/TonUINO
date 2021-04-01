@@ -31,14 +31,7 @@ MusicDataset TonuinoEEPROM::loadLastDatasetFromFlash()
   Serial.println(F("Load last dataset from flash"));
   EEPROM.get(0, musicDS);
   
-  Serial.print(F("Last folder: "));
-  Serial.println(musicDS.folder);
-  Serial.print(F("Last mode: "));
-  Serial.println(musicDS.mode);
-  Serial.print(F("Last special: "));
-  Serial.println(musicDS.special);
-  Serial.print(F("Last special2: "));
-  Serial.println(musicDS.special2);
+  TONUINO_STRUCTS::print(musicDS);
   
   return musicDS;
 }

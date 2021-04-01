@@ -75,6 +75,7 @@ namespace Tonuino_RFID_Tool
         private void initGUI()
         {
             pnlModiCardAction.Location = pnlRawDataAction.Location = pnlMusicCardAction.Location;
+            lblReadModiValueCaption.Top = lblReadModiValue.Top = lblFolder.Top;
 
             // set music card mode options
             List<MusicMode> cardModes = MusicMode.AllValidModes();
@@ -238,6 +239,7 @@ namespace Tonuino_RFID_Tool
             // Text
             bool useStartEndTrack = false;
             bool useSingleTrack = false;
+            bool useEndFolder = false;
             bool isMusicCard = false;
             bool isModifierCard = false;
             bool hasModiValue = false;
@@ -246,13 +248,16 @@ namespace Tonuino_RFID_Tool
                 isMusicCard = true;
                 MusicCardData musicData = (MusicCardData)data;
                 useStartEndTrack = musicData.Mode.UseStartEndTrack;
-                useSingleTrack = musicData.Mode.UseSingleTrack;
+                useSingleTrack = musicData.Mode.UseDefinedSingleTrack;
+                useEndFolder = musicData.Mode.UseEndFolder;
 
-                setText(lblFolder, musicData.Folder);
+                setText(lblFolder, musicData.StartFolder);
                 setText(lblStartPos, musicData.StartPos);
                 setText(lblEndPos, musicData.EndPos);
+                setText(lblEndFolder, musicData.EndFolder);
                 lblMode.Text = musicData.Mode.Name;
                 lblStartPosCaption.Text = useSingleTrack ? "Track:" : "Start Track:";
+                lblFolderCaption.Text = useEndFolder ? "Start Folder:" : "Folder:";
             }
             if (data is ModiCardData)
             {
@@ -288,6 +293,7 @@ namespace Tonuino_RFID_Tool
             lblFolderCaption.Visible = lblFolder.Visible = isDefinedCard && !isModifierCard;
             lblEndPosCaption.Visible = lblEndPos.Visible = isDefinedCard && useStartEndTrack;
             lblStartPosCaption.Visible = lblStartPos.Visible = isDefinedCard && (useStartEndTrack || useSingleTrack);
+            lblEndFolderCaption.Visible = lblEndFolder.Visible = isDefinedCard && useEndFolder;
             lblReadModiValueCaption.Visible = lblReadModiValue.Visible = isModifierCard && hasModiValue;
         }
 
@@ -306,11 +312,14 @@ namespace Tonuino_RFID_Tool
             {
                 MusicMode mode = (MusicMode)comboBox_MusicCardModes.SelectedItem;
                 bool useStartEndTrack = mode == null ? false : mode.UseStartEndTrack;
-                bool useSingleTrack = mode == null ? false : mode.UseSingleTrack;
+                bool useSingleTrack = mode == null ? false : mode.UseDefinedSingleTrack;
+                bool useEndFolder = mode == null ? false : mode.UseEndFolder;
 
                 textBoxEndOnSD.Visible = lblEndOnSource.Visible = useStartEndTrack;
                 textBoxStartOnSD.Visible = lblStartOnSource.Visible = useStartEndTrack || useSingleTrack;
                 lblStartOnSource.Text = useSingleTrack ? "track" : "start track";
+                textBoxEndFolder.Visible = lblWriteEndFolder.Visible = useEndFolder;
+                lblWriteStartFolder.Text = useEndFolder ? "start folder" : "folder";
             }
             if (pnlModiCardAction.Visible)
             {
@@ -416,16 +425,18 @@ namespace Tonuino_RFID_Tool
         private IMusicCardData getMusicCardData()
         {
             MusicMode mode = (MusicMode)comboBox_MusicCardModes.SelectedItem;
-            byte folder = getByte(textBoxFolderOnSD);
+            byte startFolder = getByte(textBoxStartFolder);
             byte startTrack = getByte(textBoxStartOnSD);
             byte endTrack = getByte(textBoxEndOnSD);
+            byte endFolder = getByte(textBoxEndFolder);
 
             IMusicCardData musicData = new MusicCardDataRaw()
             {
-                Raw_Folder = folder,
+                Raw_StartFolder = startFolder,
                 Raw_Mode = mode.Ident.Index,
                 Raw_Special = startTrack,
-                Raw_Special2 = endTrack
+                Raw_Special2 = endTrack,
+                Raw_EndFolder = endFolder
             };
             return musicData;
         }
@@ -518,9 +529,16 @@ namespace Tonuino_RFID_Tool
             limitText((TextBox)sender, 0, 999);
         }
 
-        private void textBoxFolderOnSD_TextChanged(object sender, EventArgs e)
+        private void textBoxStartFolder_TextChanged(object sender, EventArgs e)
         {
-            limitText(textBoxFolderOnSD, 99);
+            limitText(textBoxStartFolder, 99);
+        }
+
+        private void textBoxEndFolder_TextChanged(object sender, EventArgs e)
+        {
+            int min = 0;
+            int.TryParse(textBoxStartFolder.Text, out min);
+            limitText(textBoxEndFolder, Math.Max(min, 1), 99);
         }
 
         private void textBoxStartOnSD_TextChanged(object sender, EventArgs e)

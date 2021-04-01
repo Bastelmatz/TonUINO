@@ -31,13 +31,16 @@ void Tonuino_RFID_Tool_Core::transmitCardData(nfcTagStruct nfcTag)
 	Serial.print(F("Cookie:"));
 	Serial.println(nfcTag.cookie);
 	Serial.print(F("Folder:"));
-	Serial.println(nfcTag.musicDS.folder);
+	Serial.println(nfcTag.musicDS.startFolder);
 	Serial.print(F("Mode:"));
 	Serial.println(nfcTag.musicDS.mode);
 	Serial.print(F("Special:"));
-	Serial.println(nfcTag.musicDS.special);
+	Serial.println(nfcTag.musicDS.startTrack);
 	Serial.print(F("Special2:"));
-	Serial.println(nfcTag.musicDS.special2);
+	Serial.println(nfcTag.musicDS.endTrack);
+	Serial.print(F("EndFolder:"));
+	Serial.println(nfcTag.musicDS.endFolder);
+	
 	transmitTrigger(false);
 }
 

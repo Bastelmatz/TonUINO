@@ -6,14 +6,17 @@ namespace Tonuino_RFID_Tool
     public enum EMusicMode
     {
         None,
-        Hoerspiel,
+        RandomSingle,
         Album,
         Party,
-        Einzel,
-        Hoerbuch,
-        SpezialVonBis_Hoerspiel,
-        SpezialVonBis_Album,
-        SpezialVonBis_Party,
+        Single,
+        Audiobook,
+        Section_RandomSingle,
+        Section_Album,
+        Section_Party,
+        Section_Audiobook,
+        RandomFolder_Album,
+        RandomFolder_Party,
     }
 
     public class MusicMode : BaseType<EMusicMode>
@@ -28,14 +31,17 @@ namespace Tonuino_RFID_Tool
             m_allocation = new List<Ident<EMusicMode>>
             {
                 new Ident<EMusicMode>(0, EMusicMode.None, ""),
-                new Ident<EMusicMode>(1, EMusicMode.Hoerspiel, "Hörspiel"),
+                new Ident<EMusicMode>(1, EMusicMode.RandomSingle, "Random Single"),
                 new Ident<EMusicMode>(2, EMusicMode.Album, "Album"),
                 new Ident<EMusicMode>(3, EMusicMode.Party, "Party"),
-                new Ident<EMusicMode>(4, EMusicMode.Einzel, "Einzeln"),
-                new Ident<EMusicMode>(5, EMusicMode.Hoerbuch, "Hörbuch"),
-                new Ident<EMusicMode>(7, EMusicMode.SpezialVonBis_Hoerspiel, "Spezial von bis - Hörspiel"),
-                new Ident<EMusicMode>(8, EMusicMode.SpezialVonBis_Album, "Spezial von bis - Album"),
-                new Ident<EMusicMode>(9, EMusicMode.SpezialVonBis_Party, "Spezial von bis - Party"),
+                new Ident<EMusicMode>(4, EMusicMode.Single, "Single"),
+                new Ident<EMusicMode>(5, EMusicMode.Audiobook, "Audiobook"),
+                new Ident<EMusicMode>(7, EMusicMode.Section_RandomSingle, "Section - Random Single"),
+                new Ident<EMusicMode>(8, EMusicMode.Section_Album, "Section - Album"),
+                new Ident<EMusicMode>(9, EMusicMode.Section_Party, "Section - Party"),
+                new Ident<EMusicMode>(10, EMusicMode.Section_Audiobook, "Section - Audiobook"),
+                new Ident<EMusicMode>(11, EMusicMode.RandomFolder_Album, "Random Folder - Album"),
+                new Ident<EMusicMode>(12, EMusicMode.RandomFolder_Party, "Random Folder - Party"),
             };
         }
 
@@ -45,15 +51,17 @@ namespace Tonuino_RFID_Tool
             {
                 switch (Ident.Value)
                 {
-                    case EMusicMode.SpezialVonBis_Album:
-                    case EMusicMode.SpezialVonBis_Hoerspiel:
-                    case EMusicMode.SpezialVonBis_Party: return true;
+                    case EMusicMode.Section_Album:
+                    case EMusicMode.Section_RandomSingle:
+                    case EMusicMode.Section_Party:
+                    case EMusicMode.Section_Audiobook: return true;
                 }
                 return false;
             }
         }
 
-        public bool UseSingleTrack => Ident.Value == EMusicMode.Einzel;
+        public bool UseDefinedSingleTrack => Ident.Value == EMusicMode.Single;
+        public bool UseEndFolder => Ident.Value == EMusicMode.RandomFolder_Album || Ident.Value == EMusicMode.RandomFolder_Party;
 
         public static List<MusicMode> AllValidModes()
         {

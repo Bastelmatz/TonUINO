@@ -4,6 +4,7 @@
 #define TONUINO_PLAYER_INCLUDED
 
 #include <SPI.h>
+#include "Tonuino_Structs.h"
 
 enum EPlayerMode
 {
@@ -12,11 +13,14 @@ enum EPlayerMode
 	Party = 3,			// Party Modus: Ordner in zufälliger Reihenfolge
 	Single = 4,			// Einzel Modus: eine Datei aus dem Ordner abspielen
 	AudioBook = 5,		// Hörbuch Modus: kompletten Ordner spielen und Fortschritt merken
-	AdminMenu = 6,
-	Section_AudioDrama = 7,	// Spezialmodus Von-Bis: Hörspiel: eine zufällige Datei aus dem Ordner
-	Section_Album = 8,		// Spezialmodus Von-Bis: Album: alle Dateien zwischen Start und Ende spielen
-	Section_Party = 9,		// Spezialmodus Von-Bis: Party Ordner in zufälliger Reihenfolge
-	Section_Audiobook = 10
+
+	Section_AudioDrama = 7,	// Spezialmodus Von-Bis: Hörspiel
+	Section_Album = 8,		// Spezialmodus Von-Bis: Album
+	Section_Party = 9,		// Spezialmodus Von-Bis: Party
+	Section_Audiobook = 10,
+	
+	RandomFolder_Album = 11, // Einen zufälligen Ordner im Album Modus wiedergeben
+	RandomFolder_Party = 12, // Einen zufälligen Ordner im Party Modus wiedergeben
 };
 
 enum ETRACKDIRECTION
@@ -50,6 +54,7 @@ class TonuinoPlayer
 	static bool singleTrack;
 	static bool listenUntilTrackEnds;
 	
+	static uint8_t mode;
 	uint8_t currentTrack();
 	uint8_t currentTrackInRange();
 	static bool currentTrackStarted;
@@ -61,11 +66,9 @@ class TonuinoPlayer
 	
 	bool goToTrack(int trackDir);
 	
-	void loadFolder(uint8_t numTracks, uint8_t folderMode, uint8_t startTrack, uint8_t endTrack, uint8_t lastTrack);
+	void loadFolder(uint8_t numTracks, MusicDataset musicDS, uint8_t lastTrack);
 	
 	private:
-	static uint8_t mode;
-	
 	static uint8_t currentTrackIndex;
 	static uint8_t firstTrack;
 	static uint8_t endTrack;

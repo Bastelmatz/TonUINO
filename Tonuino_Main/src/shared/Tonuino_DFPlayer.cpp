@@ -13,7 +13,7 @@ uint8_t TonuinoDFPlayer::volumeMin = 0;
 uint8_t TonuinoDFPlayer::volumeMax = 25;
 uint8_t TonuinoDFPlayer::volumeIncrement = 1;
 
-MusicDataset TonuinoDFPlayer::musicDS;
+uint8_t TonuinoDFPlayer::currentMusicFolder = 0;
 bool TonuinoDFPlayer::musicDSLoaded = false;
 bool TonuinoDFPlayer::newMusisDS = false;
 
@@ -109,7 +109,7 @@ void TonuinoDFPlayer::playTrack(uint8_t track)
 {
 	if (track > 0)
 	{ 
-		playTrack(musicDS.folder, track);
+		playTrack(currentMusicFolder, track);
 		tonuinoPlayer.playTitle();
 		newMusisDS = false;
 	}
@@ -123,18 +123,24 @@ void TonuinoDFPlayer::playCurrentTrack()
 
 void TonuinoDFPlayer::loadFolder(MusicDataset dataset, uint8_t lastTrack)
 {
-	musicDS = dataset;
-	uint16_t numTracks = mp3.getFolderTrackCount(musicDS.folder);
+	currentMusicFolder = dataset.startFolder;
+	uint8_t mode = dataset.mode;
+	
+	if (mode == RandomFolder_Album || mode == RandomFolder_Party)
+	{
+		currentMusicFolder = random(dataset.startFolder, dataset.endFolder + 1);
+	}
+	uint16_t numTracks = mp3.getFolderTrackCount(currentMusicFolder);
 	if (lastTrack == 0 || lastTrack > numTracks) 
 	{
 		lastTrack = 1;
 	}
 
 	Serial.print(F("Load folder "));
-	Serial.print(musicDS.folder);
+	Serial.print(currentMusicFolder);
 	Serial.print(F(" with mode "));
-	Serial.println(musicDS.mode);
-	tonuinoPlayer.loadFolder(numTracks, musicDS.mode, musicDS.special, musicDS.special2, lastTrack);
+	Serial.println(mode);
+	tonuinoPlayer.loadFolder(numTracks, dataset, lastTrack);
 	musicDSLoaded = true;
 	newMusisDS = true;
 }

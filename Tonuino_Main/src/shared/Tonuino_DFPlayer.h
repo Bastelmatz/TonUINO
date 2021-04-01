@@ -24,7 +24,7 @@ class TonuinoDFPlayer
 		static void OnPlaySourceRemoved(DfMp3_PlaySources source);
 	};
 
-	static MusicDataset musicDS;
+	static uint8_t currentMusicFolder;
 	static TonuinoPlayer tonuinoPlayer;
 	static uint8_t volume;
 	static uint8_t volumeMin;

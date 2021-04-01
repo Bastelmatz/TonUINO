@@ -153,7 +153,7 @@ namespace Tonuino_RFID_Tool
         private static CardData getCardData(List<string> textLines)
         {
             CardData data = new CardData();
-            if (textLines.Count == 6)
+            if (textLines.Count == 7)
             {
                 // Defined order - has to be in sync with Tonuino sketch!!
                 long rfid = getLong(textLines[0]); 
@@ -164,8 +164,8 @@ namespace Tonuino_RFID_Tool
                 }
                 else
                 {
-                    byte folder = getByte(textLines[2]);
-                    if (folder == 0)
+                    byte startFolder = getByte(textLines[2]);
+                    if (startFolder == 0)
                     {
                         EModiType modiType = ModiType.FromNumber(getByte(textLines[3]));
                         byte special = getByte(textLines[4]);
@@ -176,9 +176,10 @@ namespace Tonuino_RFID_Tool
                     else
                     {
                         EMusicMode mode = MusicMode.FromNumber(getByte(textLines[3]));
-                        byte start = getByte(textLines[4]);
-                        byte end = getByte(textLines[5]);
-                        data = new MusicCardData(rfid, cookie, mode, folder, start, end);
+                        byte startTrack = getByte(textLines[4]);
+                        byte endTrack = getByte(textLines[5]);
+                        byte endFolder = getByte(textLines[6]);
+                        data = new MusicCardData(rfid, cookie, mode, startFolder, startTrack, endTrack, endFolder);
                     }
                 }
             }
@@ -271,10 +272,11 @@ namespace Tonuino_RFID_Tool
             // Defined order - has to be in sync with Tonuino sketch - don't change!!
             List<byte> listBytes = new List<byte>
             {
-                data.Raw_Folder,
+                data.Raw_StartFolder,
                 data.Raw_Mode,
                 data.Raw_Special,
-                data.Raw_Special2
+                data.Raw_Special2,
+                data.Raw_EndFolder
             };
             return getTonuinoBytes(listBytes);
         }

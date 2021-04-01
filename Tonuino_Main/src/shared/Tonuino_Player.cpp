@@ -86,7 +86,7 @@ void TonuinoPlayer::shuffleQueue()
 	// Queue mischen
 	for (uint8_t i = 0; i < allTracks; i++)
 	{
-		uint8_t j = random (0, allTracks);
+		uint8_t j = random(0, allTracks);
 		uint8_t t = queue[i];
 		queue[i] = queue[j];
 		queue[j] = t;
@@ -261,27 +261,27 @@ bool TonuinoPlayer::goToTrack(int trackDirection)
 	return true;
 }
 
-void TonuinoPlayer::loadFolder(uint8_t numTracksInFolder, uint8_t folderMode, uint8_t startTrack, uint8_t finalTrack, uint8_t lastTrack) 
+void TonuinoPlayer::loadFolder(uint8_t numTracksInFolder, MusicDataset musicDS, uint8_t lastTrack) 
 {
-	mode = folderMode;
+	mode = musicDS.mode;
 	endTrack = numTracksInFolder;
 	firstTrack = 1;
 	Serial.print(numTracksInFolder);
 	Serial.println(F(" files in folder "));
 
-	bool useSection = mode == Section_AudioDrama || mode == Section_Party || mode == Section_Album;
+	bool useSection = mode == Section_AudioDrama || mode == Section_Party || mode == Section_Album || mode == Section_Audiobook;
 	singleTrack = mode == AudioDrama || mode == Section_AudioDrama || mode == Single;
-	playRandom = mode == AudioDrama || mode == Section_AudioDrama || mode == Party || mode == Section_Party;
-	useQueue = mode == Party || mode == Section_Party;
+	playRandom = mode == AudioDrama || mode == Section_AudioDrama || mode == Party || mode == Section_Party || mode == RandomFolder_Party;
+	useQueue = mode == Party || mode == Section_Party || mode == RandomFolder_Party;
 	
 	if (useSection)
 	{
 		Serial.println(F("Spezialmodus Von-Bis:"));
-		Serial.print(startTrack);
+		Serial.print(musicDS.startTrack);
 		Serial.print(F(" bis "));
-		Serial.println(finalTrack);
-		firstTrack = startTrack;
-		endTrack = finalTrack;
+		Serial.println(musicDS.endTrack);
+		firstTrack = musicDS.startTrack;
+		endTrack = musicDS.endTrack;
 	}
 
 	currentTrackIndex = firstTrack;
@@ -292,7 +292,7 @@ void TonuinoPlayer::loadFolder(uint8_t numTracksInFolder, uint8_t folderMode, ui
 		currentTrackIndex = 1;
 		shuffleQueue();
 	}
-	if (singleTrack ) 
+	if (singleTrack) 
 	{
 		if (playRandom)
 		{
@@ -301,13 +301,13 @@ void TonuinoPlayer::loadFolder(uint8_t numTracksInFolder, uint8_t folderMode, ui
 		}
 		else
 		{
-			Serial.println(F("Einzel Modus -> eine Datei aus dem Odrdner abspielen"));
-			currentTrackIndex = startTrack;
+			Serial.println(F("Einen bestimmten Titel wiedergeben"));
+			currentTrackIndex = musicDS.startTrack;
 		}
 	}
 	if (mode == AudioBook) 
 	{
-		Serial.println(F("Hörbuch Modus -> kompletten Ordner spielen und Fortschritt merken"));
+		Serial.println(F("Kompletten Ordner spielen und Fortschritt merken"));
 		currentTrackIndex = lastTrack;
 	}
 

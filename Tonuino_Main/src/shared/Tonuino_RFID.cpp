@@ -65,7 +65,7 @@ byte Tonuino_RFID_Reader::pollCard()
 	{
 	  retries = maxRetries;
 	  bool currentCardIsUL = mfrc522.PICC_GetType(mfrc522.uid.sak) == MFRC522::PICC_TYPE_MIFARE_UL;
-	  bool isModifierCard = readCardData.cookie == cardCookie && readCardData.musicDS.folder == 0;
+	  bool isModifierCard = readCardData.cookie == cardCookie && readCardData.musicDS.startFolder == 0;
 	  if (isModifierCard)
 	  {
 		hasModifierCard = true;
@@ -226,11 +226,12 @@ bool Tonuino_RFID_Reader::readCard()
 
 	readCardData.cookie = tempCookie;
 	readCardData.version = buffer[4];
-	readCardData.musicDS.folder = buffer[5];
+	readCardData.musicDS.startFolder = buffer[5];
 	readCardData.musicDS.mode = buffer[6];
-	readCardData.musicDS.special = buffer[7];
-	readCardData.musicDS.special2 = buffer[8];
-
+	readCardData.musicDS.startTrack = buffer[7];
+	readCardData.musicDS.endTrack = buffer[8];
+	readCardData.musicDS.endFolder = buffer[9];
+	
 	// store info about current card
 	memcpy(currentCardUid, mfrc522.uid.uidByte, 4);
 
@@ -250,11 +251,12 @@ bool Tonuino_RFID_Reader::writeCard(MusicDataset musicDS)
 					 (cardCookie >> 8) & 0xff,
 					 (cardCookie) & 0xff,
 					 2,   
-					 musicDS.folder,  // the folder picked by the user
-					 musicDS.mode,    // the playback mode picked by the user
-					 musicDS.special, // track or function for admin cards
-					 musicDS.special2,
-					 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+					 musicDS.startFolder,  
+					 musicDS.mode,         
+					 musicDS.startTrack,   
+					 musicDS.endTrack,
+					 musicDS.endFolder,
+					 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 					};
 	return writeCard(buffer);
 }

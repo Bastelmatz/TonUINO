@@ -8,17 +8,19 @@ namespace Tonuino_RFID_Tool
     public interface IMusicCardData
     {
         byte Raw_Mode { get; }
-        byte Raw_Folder { get; }
+        byte Raw_StartFolder { get; }
         byte Raw_Special { get; }
         byte Raw_Special2 { get; }
+        byte Raw_EndFolder { get; }
     }
 
     public class MusicCardDataRaw : IMusicCardData
     {
         public byte Raw_Mode { get; set; }
-        public byte Raw_Folder { get; set; }
+        public byte Raw_StartFolder { get; set; }
         public byte Raw_Special { get; set; }
         public byte Raw_Special2 { get; set; }
+        public byte Raw_EndFolder { get; set; }
     }
 
     public interface IModiCardData
@@ -61,22 +63,25 @@ namespace Tonuino_RFID_Tool
     public class MusicCardData : CardData, IMusicCardData
     {
         public MusicMode Mode { get; }
-        public byte Folder { get; }
+        public byte StartFolder { get; }
         public byte StartPos { get; }
         public byte EndPos { get; }
+        public byte EndFolder { get; }
 
         public byte Raw_Mode => Mode.Index;
-        public byte Raw_Folder => Folder;
+        public byte Raw_StartFolder => StartFolder;
         public byte Raw_Special => StartPos;
         public byte Raw_Special2 => EndPos;
+        public byte Raw_EndFolder => EndFolder;
 
-        public MusicCardData(long rfid, int cookie, EMusicMode mode, byte folder, byte startPos, byte endPos)
+        public MusicCardData(long rfid, int cookie, EMusicMode mode, byte folder, byte startPos, byte endPos, byte endFolder)
             : base (rfid, cookie)
         {
             Mode = new MusicMode(mode);
-            Folder = folder;
+            StartFolder = folder;
             StartPos = startPos;
             EndPos = endPos;
+            EndFolder = endFolder;
         }
     }
 
