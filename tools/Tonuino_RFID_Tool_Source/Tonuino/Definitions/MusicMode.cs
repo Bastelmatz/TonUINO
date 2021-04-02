@@ -61,7 +61,20 @@ namespace Tonuino_RFID_Tool
         }
 
         public bool UseDefinedSingleTrack => Ident.Value == EMusicMode.Single;
-        public bool UseEndFolder => Ident.Value == EMusicMode.RandomFolder_Album || Ident.Value == EMusicMode.RandomFolder_Party;
+        public bool UseEndFolder
+        {
+            get
+            {
+                switch (Ident.Value)
+                {
+                    case EMusicMode.RandomSingle:
+                    case EMusicMode.Party:
+                    case EMusicMode.RandomFolder_Album:
+                    case EMusicMode.RandomFolder_Party: return true;
+                }
+                return false;
+            }
+        }
 
         public static List<MusicMode> AllValidModes()
         {
