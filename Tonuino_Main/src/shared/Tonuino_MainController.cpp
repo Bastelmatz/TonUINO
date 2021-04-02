@@ -156,8 +156,9 @@ void checkCurrentTrack()
 		if (currentTrack > 0 && trackInEEPROM != currentTrack)
 		{
 			Serial.print(F("Save current track to EEPROM: "));
-			Serial.print(currentTrack);
+			Serial.println(currentTrack);
 			tonuinoEEPROM.writeLastTrackToFlash(currentTrack, dfPlayer.currentMusicFolder);
+			trackInEEPROM = currentTrack;
 		}
 	}
 }
