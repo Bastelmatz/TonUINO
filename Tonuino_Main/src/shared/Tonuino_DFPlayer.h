@@ -40,7 +40,6 @@ class TonuinoDFPlayer
 	void continueTitle();
 	void pauseAndStandBy();
 	void togglePlay();
-	void goToTrack(uint8_t trackDir);
 	void nextTrack();
 	void previousTrack();
 	void firstTrack();
@@ -70,17 +69,19 @@ class TonuinoDFPlayer
 	static uint8_t pin_Busy;
 	static uint8_t activeFolder;
 	static uint16_t activeTrack;
+	static uint16_t numTracksInFolder;
 	static uint32_t timeLastFinished;
 	static bool newMusisDS;
 	static MusicDataset currentMusicDS;
 	static unsigned long freezeDance_nextStopAtMillis;
 
+	void goToTrack(ETRACKDIRECTION trackDir);
 	void playCurrentTrack();
 	void playTrack(uint8_t track);
 	void setNextStopAtMillis();
-	void reloadFolder();
-	void loadFolder(uint8_t lastTrack, bool isFirstLoad);
-	uint8_t chooseFolder(MusicDataset musicDS, bool isFirstLoad);
+	void reloadFolder(ETRACKDIRECTION trackDir);
+	void loadFolder(uint8_t lastTrack, ETRACKDIRECTION trackDir);
+	void loadFolder(MusicDataset musicDS, ETRACKDIRECTION trackDir, uint8_t lastTrack);
 };
 
 #endif

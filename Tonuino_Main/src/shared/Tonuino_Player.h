@@ -25,6 +25,7 @@ enum EPlayerMode
 
 enum ETRACKDIRECTION
 {
+	TRACKDIR_None = 0,
 	TRACKDIR_Next = 1, 	
 	TRACKDIR_Previous = 2,
 	TRACKDIR_First = 3,

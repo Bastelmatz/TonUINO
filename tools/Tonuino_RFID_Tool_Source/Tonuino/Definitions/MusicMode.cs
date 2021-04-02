@@ -68,7 +68,9 @@ namespace Tonuino_RFID_Tool
                 switch (Ident.Value)
                 {
                     case EMusicMode.RandomSingle:
+                    case EMusicMode.Album:
                     case EMusicMode.Party:
+                    case EMusicMode.Audiobook:
                     case EMusicMode.RandomFolder_Album:
                     case EMusicMode.RandomFolder_Party: return true;
                 }
