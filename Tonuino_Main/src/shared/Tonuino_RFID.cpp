@@ -231,6 +231,8 @@ bool Tonuino_RFID_Reader::readCard()
 	readCardData.musicDS.startTrack = buffer[7];
 	readCardData.musicDS.endTrack = buffer[8];
 	readCardData.musicDS.endFolder = buffer[9];
+	readCardData.musicDS.recentTrack = buffer[10];
+	readCardData.musicDS.recentFolder = buffer[11];
 	
 	// store info about current card
 	memcpy(currentCardUid, mfrc522.uid.uidByte, 4);
@@ -256,7 +258,9 @@ bool Tonuino_RFID_Reader::writeCard(MusicDataset musicDS)
 					 musicDS.startTrack,   
 					 musicDS.endTrack,
 					 musicDS.endFolder,
-					 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+					 musicDS.recentTrack,
+					 musicDS.recentFolder,
+					 0x00, 0x00, 0x00, 0x00
 					};
 	return writeCard(buffer);
 }

@@ -3,7 +3,10 @@
 
 #include <EEPROM.h>
 
-static const int lastFolderSize = 4;
+static const uint8_t flashAddress_RecentMusicDS = 0;
+// Check MusicDataset struct to ensure the folder and track index/address is correct
+static const uint8_t flashAddress_RecentFolder = 5;
+static const uint8_t flashAddress_RecentTrack = 6;
 
 void TonuinoEEPROM::resetEEPROM()
 {
@@ -14,43 +17,38 @@ void TonuinoEEPROM::resetEEPROM()
   }
 }
 
-int TonuinoEEPROM::flashAddress_Track(uint8_t folder) 
-{
-  return lastFolderSize + folder;
-}
-
-void TonuinoEEPROM::writeLastDatasetToFlash(MusicDataset musicDS) 
-{
-  Serial.println(F("Write last dataset to flash"));
-  EEPROM.put(0, musicDS);
-}
-
-MusicDataset TonuinoEEPROM::loadLastDatasetFromFlash() 
+MusicDataset TonuinoEEPROM::loadFromFlash_RecentMusicDS() 
 {
   MusicDataset musicDS;
-  Serial.println(F("Load last dataset from flash"));
-  EEPROM.get(0, musicDS);
+  Serial.println(F("Load recent dataset from flash"));
+  EEPROM.get(flashAddress_RecentMusicDS, musicDS);
   
   TONUINO_STRUCTS::print(musicDS);
   
   return musicDS;
 }
 
-void TonuinoEEPROM::writeLastTrackToFlash(uint8_t track, uint8_t folder) 
+void TonuinoEEPROM::writeToFlash_RecentMusicDS(MusicDataset musicDS) 
 {
-  Serial.println(F("=== writeLastTrackToFlash()"));
-  EEPROM.update(flashAddress_Track(folder), track);
+  Serial.println(F("Write recent dataset"));
+  TONUINO_STRUCTS::print(musicDS);
+  EEPROM.put(flashAddress_RecentMusicDS, musicDS);
 }
 
-uint8_t TonuinoEEPROM::loadLastTrackFromFlash(uint8_t folder) 
+void TonuinoEEPROM::writeToFlash_RecentTrack(uint8_t track) 
 {
-  Serial.println(F("=== loadLastTrackFromFlash()"));
-  uint8_t track = EEPROM.read(flashAddress_Track(folder));
-  
-  Serial.print(F("Last track: "));
+  Serial.print(F("Write recent track: "));
   Serial.println(track);
-  return track;
+  EEPROM.update(flashAddress_RecentTrack, track);
 }
+
+void TonuinoEEPROM::writeToFlash_RecentFolder(uint8_t folder) 
+{
+  Serial.print(F("Write recent folder: "));
+  Serial.println(folder);
+  EEPROM.update(flashAddress_RecentFolder, folder);
+}
+
 
 
 

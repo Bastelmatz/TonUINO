@@ -10,14 +10,11 @@ class TonuinoEEPROM
 	public:
 	void resetEEPROM();
 	
-	void writeLastDatasetToFlash(MusicDataset dataset);
-	void writeLastTrackToFlash(uint8_t track, uint8_t folder);
-	uint8_t loadLastTrackFromFlash(uint8_t folder);
+	void writeToFlash_RecentMusicDS(MusicDataset dataset);
+	void writeToFlash_RecentTrack(uint8_t track);
+	void writeToFlash_RecentFolder(uint8_t folder);
 	
-	MusicDataset loadLastDatasetFromFlash();
-	
-	private:
-	int flashAddress_Track(uint8_t folder);
+	MusicDataset loadFromFlash_RecentMusicDS();
 };
 
 #endif

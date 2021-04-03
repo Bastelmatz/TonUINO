@@ -261,14 +261,14 @@ bool TonuinoPlayer::goToTrack(int trackDirection)
 	return true;
 }
 
-void TonuinoPlayer::loadFolder(uint8_t numTracksInFolder, MusicDataset musicDS, uint8_t lastTrack) 
+void TonuinoPlayer::loadFolder(uint8_t numTracksInFolder, MusicDataset musicDS) 
 {
 	mode = musicDS.mode;
 	endTrack = numTracksInFolder;
 	firstTrack = 1;
 	Serial.print(numTracksInFolder);
 	Serial.println(F(" files in folder "));
-
+		
 	bool useSection = mode == Section_AudioDrama || mode == Section_Party || mode == Section_Album || mode == Section_Audiobook;
 	singleTrack = mode == AudioDrama || mode == Section_AudioDrama || mode == Single;
 	playRandom = mode == AudioDrama || mode == Section_AudioDrama || mode == Party || mode == Section_Party || mode == RandomFolder_Party;
@@ -308,7 +308,11 @@ void TonuinoPlayer::loadFolder(uint8_t numTracksInFolder, MusicDataset musicDS, 
 	if (mode == AudioBook) 
 	{
 		Serial.println(F("Kompletten Ordner spielen und Fortschritt merken"));
-		currentTrackIndex = lastTrack;
+		uint8_t recentTrack = musicDS.recentTrack;
+		if (recentTrack > 0 && recentTrack < numTracksInFolder) 
+		{
+			currentTrackIndex = recentTrack;
+		}
 	}
 
 	Serial.println(currentTrackIndex);

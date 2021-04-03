@@ -18,14 +18,13 @@ void setupTonuino(TonuinoConfig config);
 
 void handlePotentiometer();
 
-uint8_t getLastTrack(MusicDataset folder);
 void loadAndPlayFolder(MusicDataset theFolder);
 void loadFolder(MusicDataset theFolder);
 bool setupFolder(MusicDataset * theFolder);
 
-void onNewCard();
+void onNewMusicCard();
 void onCardGone();
-void onCardReturn();
+void onMusicCardReturn();
 void setupCard();
 void writeCard(MusicDataset musicDS);
 void resetCard();

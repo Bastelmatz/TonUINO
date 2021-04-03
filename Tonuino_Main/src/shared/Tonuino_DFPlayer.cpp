@@ -123,7 +123,7 @@ void TonuinoDFPlayer::playCurrentTrack()
 	playTrack(track);
 }
 
-void TonuinoDFPlayer::loadFolder(MusicDataset dataset, ETRACKDIRECTION trackDir, uint8_t lastTrack)
+void TonuinoDFPlayer::loadFolder(MusicDataset dataset, ETRACKDIRECTION trackDir)
 {
 	bool isFirstLoad = trackDir == TRACKDIR_None;
 	uint8_t currentTrack = tonuinoPlayer.currentTrack();
@@ -135,7 +135,16 @@ void TonuinoDFPlayer::loadFolder(MusicDataset dataset, ETRACKDIRECTION trackDir,
 	bool changeFolderOnLimits = (mode == Album || mode == AudioBook) &&
 								 dataset.endFolder > dataset.startFolder;
 	
-	uint8_t newFolder = isFirstLoad ? dataset.startFolder : currentMusicFolder;
+	uint8_t newFolder = currentMusicFolder;
+	if (isFirstLoad)
+	{
+		newFolder = dataset.startFolder;
+		uint8_t recentFolder = dataset.recentFolder;
+		if (recentFolder > newFolder && recentFolder <= dataset.endFolder)
+		{
+			newFolder = recentFolder;
+		}
+	}
 	if ((randomFolderForNextTrack && trackDir == TRACKDIR_Next)|| 
 	    (randomFolderForFirstLoad && isFirstLoad))
 	{
@@ -172,16 +181,12 @@ void TonuinoDFPlayer::loadFolder(MusicDataset dataset, ETRACKDIRECTION trackDir,
 	{
 		currentMusicFolder = newFolder;
 		numTracksInFolder = mp3.getFolderTrackCount(currentMusicFolder);
-		if (lastTrack == 0 || lastTrack > numTracksInFolder) 
-		{
-			lastTrack = 1;
-		}
 		
 		Serial.print(F("Load folder "));
 		Serial.print(currentMusicFolder);
 		Serial.print(F(" with mode "));
 		Serial.println(currentMusicDS.mode);
-		tonuinoPlayer.loadFolder(numTracksInFolder, currentMusicDS, lastTrack);
+		tonuinoPlayer.loadFolder(numTracksInFolder, currentMusicDS);
 		musicDSLoaded = true;
 		newMusisDS = true;
 	}
@@ -197,23 +202,23 @@ void TonuinoDFPlayer::loadFolder(MusicDataset dataset, ETRACKDIRECTION trackDir,
 
 void TonuinoDFPlayer::reloadFolder(ETRACKDIRECTION trackDir)
 {
-	loadFolder(tonuinoPlayer.currentTrack(), trackDir);
+	loadFolder(trackDir);
 }
 
-void TonuinoDFPlayer::loadFolder(MusicDataset dataset, uint8_t lastTrack)
+void TonuinoDFPlayer::loadFolder(MusicDataset dataset)
 {
 	currentMusicDS = dataset;
-	loadFolder(lastTrack, TRACKDIR_None);
+	loadFolder(TRACKDIR_None);
 }
 
-void TonuinoDFPlayer::loadFolder(uint8_t lastTrack, ETRACKDIRECTION trackDir)
+void TonuinoDFPlayer::loadFolder(ETRACKDIRECTION trackDir)
 {
-	loadFolder(currentMusicDS, trackDir, lastTrack);
+	loadFolder(currentMusicDS, trackDir);
 }
 
-void TonuinoDFPlayer::loadAndPlayFolder(MusicDataset dataset, uint8_t lastTrack)
+void TonuinoDFPlayer::loadAndPlayFolder(MusicDataset dataset)
 {
-	loadFolder(dataset, lastTrack);
+	loadFolder(dataset);
 	playCurrentTrack();
 }
 

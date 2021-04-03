@@ -38,9 +38,9 @@ TonuinoRotaryEncoder rotaryEncoder;
 
 TonuinoNeopixel neopixelRing;
 
-uint8_t trackInEEPROM = 0;
-nfcTagStruct nextMC;
-MusicDataset lastMusicDS;
+uint32_t lastTimeTrackAndFolderSaved = 0;
+MusicDataset recentMusicDSinEEPROM = { 0 };
+MusicDataset recentCardMusicDS;
 
 bool allLocked = false;
 bool buttonsLocked = false;
@@ -48,18 +48,6 @@ bool buttonsLocked = false;
 TonuinoPlayer tonuinoPlayer()
 {
 	return dfPlayer.tonuinoPlayer;
-}
-
-void loadStartFolder()
-{
-	if (swConfig.StartMusicDS.startFolder == 0)
-	{
-		lastMusicDS = tonuinoEEPROM.loadLastDatasetFromFlash();
-	}
-	else
-	{
-		lastMusicDS = swConfig.StartMusicDS;
-	}
 }
 
 void setStandbyTimerValue(uint8_t timeInMin)
@@ -72,26 +60,27 @@ void setSleepTimerValue(uint8_t timeInMin)
 	tonuinoPlayer().sleepTimer.timeInMin = timeInMin;
 }
 
-uint8_t getLastTrack(MusicDataset musicDS)
+MusicDataset loadStartMusicDS()
 {
-	if (musicDS.mode == AudioBook) 
+	if (swConfig.StartMusicDS.startFolder == 0)
 	{
-		trackInEEPROM = tonuinoEEPROM.loadLastTrackFromFlash(musicDS.startFolder);
-		return trackInEEPROM;
+		recentMusicDSinEEPROM = tonuinoEEPROM.loadFromFlash_RecentMusicDS();
+		return recentMusicDSinEEPROM;
 	}
-	return 0;
+	else
+	{
+		return swConfig.StartMusicDS;
+	}
 }
 
 void loadFolder(MusicDataset musicDS)
 {
-    uint8_t lastTrack = getLastTrack(musicDS);
-	dfPlayer.loadFolder(musicDS, lastTrack);
+	dfPlayer.loadFolder(musicDS);
 }
 
 void loadAndPlayFolder(MusicDataset musicDS)
 {
-	uint8_t lastTrack = getLastTrack(musicDS);
-	dfPlayer.loadAndPlayFolder(musicDS, lastTrack);
+	dfPlayer.loadAndPlayFolder(musicDS);
 }
 
 void activateFreezeDance(bool active)
@@ -148,18 +137,45 @@ void checkStandbyAtMillis()
 	}
 }
 
-void checkCurrentTrack()
+void saveCurrentTrackAndFolder()
 {
-	if (tonuinoPlayer().mode == AudioBook)
+	uint8_t mode = tonuinoPlayer().mode;
+	if (mode == AudioBook || mode == Section_Audiobook)
 	{
-		uint8_t currentTrack = tonuinoPlayer().currentTrack();
-		if (currentTrack > 0 && trackInEEPROM != currentTrack)
+		// Don't save every track/folder change when manually moving through playlist 
+		// Apply change only every 10th second
+		if (millis() - lastTimeTrackAndFolderSaved < 10000)
 		{
-			Serial.print(F("Save current track to EEPROM: "));
-			Serial.println(currentTrack);
-			tonuinoEEPROM.writeLastTrackToFlash(currentTrack, dfPlayer.currentMusicFolder);
-			trackInEEPROM = currentTrack;
+			return;
 		}
+		uint8_t currentTrack = tonuinoPlayer().currentTrack();
+		uint8_t currentFolder = dfPlayer.currentMusicFolder;
+		
+		// Save to EEPROM		
+		if (currentTrack > 0 && recentMusicDSinEEPROM.recentTrack != currentTrack)
+		{
+			tonuinoEEPROM.writeToFlash_RecentTrack(currentTrack);
+			recentMusicDSinEEPROM.recentTrack = currentTrack;
+		}
+		if (currentFolder > 0 && recentMusicDSinEEPROM.recentFolder != currentFolder)
+		{
+			tonuinoEEPROM.writeToFlash_RecentFolder(currentFolder);
+			recentMusicDSinEEPROM.recentFolder = currentFolder;
+		}
+		
+		// Save to RFID card
+		if (tonuinoRFID.hasMusicCard)
+		{		
+			if ((recentCardMusicDS.recentFolder != currentFolder && currentFolder > 0) ||
+				(recentCardMusicDS.recentTrack != currentTrack && currentTrack > 0))
+			{
+				Serial.print(F("Write recent folder and track to card"));
+				recentCardMusicDS.recentFolder = currentFolder;
+				recentCardMusicDS.recentTrack = currentTrack;
+				tonuinoRFID.writeCard(recentCardMusicDS);
+			}
+		}
+		lastTimeTrackAndFolderSaved = millis();
 	}
 }
 
@@ -262,9 +278,9 @@ void setupTonuino(TonuinoConfig config)
 	// give DFPlayer some time
 	delay(1000);
 	
-	// load last folder 
-	loadStartFolder();
-	loadFolder(lastMusicDS);
+	// load defined or recent folder 
+	MusicDataset startMusicDS = loadStartMusicDS();
+	loadFolder(startMusicDS);
 }
 
 void handleRotaryEncoder()
@@ -328,9 +344,9 @@ void handleCardReader()
 	}
 	switch (pollCardResult)
 	{
-		case MUSICCARD_NEW: onNewCard(); break;
+		case MUSICCARD_NEW: onNewMusicCard(); break;
 		case ALLCARDS_GONE: onCardGone(); break;
-		case MUSICCARD_IS_BACK:	onCardReturn(); break;
+		case MUSICCARD_IS_BACK:	onMusicCardReturn(); break;
 	}
 }
 
@@ -379,7 +395,7 @@ void loopTonuino()
 {
 	checkSleepAtMillis();
     checkStandbyAtMillis();
-	checkCurrentTrack();
+	saveCurrentTrackAndFolder();
     dfPlayer.loop();
 	checkPlayState();
 	
@@ -391,19 +407,23 @@ void loopTonuino()
 	handleNeopixels();
 }
 
-void onNewCard()
+void onNewMusicCard()
 {
-	memcpy(&nextMC, &tonuinoRFID.readCardData, sizeof(nfcTagStruct));
-	
-	if (nextMC.cookie == cardCookie && nextMC.musicDS.startFolder > 0 && nextMC.musicDS.mode > 0) 
+	if (tonuinoRFID.readCardData.cookie == cardCookie)
 	{
-		loadAndPlayFolder(nextMC.musicDS);
-		// Save last folder for next power up
-		tonuinoEEPROM.writeLastDatasetToFlash(nextMC.musicDS);
+		MusicDataset nextMusicDS = tonuinoRFID.readCardData.musicDS;
+		if (nextMusicDS.startFolder > 0 && nextMusicDS.mode > 0) 
+		{
+			memcpy(&recentCardMusicDS, &nextMusicDS, sizeof(MusicDataset));
+			loadAndPlayFolder(recentCardMusicDS);
+			// Save recent music for next power up
+			tonuinoEEPROM.writeToFlash_RecentMusicDS(recentCardMusicDS);
+			recentMusicDSinEEPROM = recentCardMusicDS;
+		}
 	}
-	// Neue Karte konfigurieren
-	else if (nextMC.cookie != cardCookie) 
+	else
 	{
+		// Neue Karte konfigurieren
 		setupCard();
 	}
 }
@@ -424,7 +444,7 @@ void onCardGone()
 	}
 }
 
-void onCardReturn()
+void onMusicCardReturn()
 {
 	if (swConfig.StopPlayOnCardRemoval || !dfPlayer.isPlaying())
 	{
@@ -435,7 +455,7 @@ void onCardReturn()
 		uint8_t mode = tonuinoPlayer().mode;
 		if (mode == RandomFolder_Album || mode == RandomFolder_Party)
 		{
-			loadAndPlayFolder(nextMC.musicDS);
+			loadAndPlayFolder(recentCardMusicDS);
 		}
 		else
 		{

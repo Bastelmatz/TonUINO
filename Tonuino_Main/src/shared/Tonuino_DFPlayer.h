@@ -35,8 +35,8 @@ class TonuinoDFPlayer
 			
 	void setup(uint8_t pinBusy);
 	bool isPlaying();
-	void loadFolder(MusicDataset dataset, uint8_t lastTrack);
-	void loadAndPlayFolder(MusicDataset dataset, uint8_t lastTrack);
+	void loadFolder(MusicDataset dataset);
+	void loadAndPlayFolder(MusicDataset dataset);
 	void continueTitle();
 	void pauseAndStandBy();
 	void togglePlay();
@@ -80,8 +80,8 @@ class TonuinoDFPlayer
 	void playTrack(uint8_t track);
 	void setNextStopAtMillis();
 	void reloadFolder(ETRACKDIRECTION trackDir);
-	void loadFolder(uint8_t lastTrack, ETRACKDIRECTION trackDir);
-	void loadFolder(MusicDataset musicDS, ETRACKDIRECTION trackDir, uint8_t lastTrack);
+	void loadFolder(ETRACKDIRECTION trackDir);
+	void loadFolder(MusicDataset musicDS, ETRACKDIRECTION trackDir);
 };
 
 #endif

@@ -9,11 +9,16 @@ static const uint32_t cardCookie = 322417479; // 0x1337 0xb347 magic cookie to i
 
 struct MusicDataset 
 {
+	// Attention!
+	// - The variables order is used by EEPROM for write&read recent music dataset
+	// - Changing the order will result in miss-allocation (when reading data that was stored with previous order)
 	uint8_t mode;
 	uint8_t startFolder;
 	uint8_t startTrack;
 	uint8_t endFolder;
 	uint8_t endTrack;
+	uint8_t recentFolder;
+	uint8_t recentTrack;
 };
 
 // this object stores nfc tag data
@@ -38,6 +43,10 @@ struct TONUINO_STRUCTS
 		Serial.println(musicDS.endFolder);
 		Serial.print(F("End track: "));
 		Serial.println(musicDS.endTrack);
+		Serial.print(F("Recent folder: "));
+		Serial.println(musicDS.recentFolder);
+		Serial.print(F("Recent track: "));
+		Serial.println(musicDS.recentTrack);
 	}
 };
 

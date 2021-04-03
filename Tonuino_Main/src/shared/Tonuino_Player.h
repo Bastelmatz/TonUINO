@@ -67,7 +67,7 @@ class TonuinoPlayer
 	
 	bool goToTrack(int trackDir);
 	
-	void loadFolder(uint8_t numTracks, MusicDataset musicDS, uint8_t lastTrack);
+	void loadFolder(uint8_t numTracks, MusicDataset musicDS);
 	
 	private:
 	static uint8_t currentTrackIndex;
