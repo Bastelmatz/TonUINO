@@ -78,6 +78,19 @@ namespace Tonuino_RFID_Tool
             }
         }
 
+        public bool UseRecentTrackAndFolder
+        {
+            get
+            {
+                switch (Ident.Value)
+                {
+                    case EMusicMode.Audiobook:
+                    case EMusicMode.Section_Audiobook: return true;
+                }
+                return false;
+            }
+        }
+
         public static List<MusicMode> AllValidModes()
         {
             List<EMusicMode> enumList = getEnumList();

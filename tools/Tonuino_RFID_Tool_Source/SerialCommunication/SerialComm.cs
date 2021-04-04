@@ -153,7 +153,7 @@ namespace Tonuino_RFID_Tool
         private static CardData getCardData(List<string> textLines)
         {
             CardData data = new CardData();
-            if (textLines.Count == 7)
+            if (textLines.Count == 9)
             {
                 // Defined order - has to be in sync with Tonuino sketch!!
                 long rfid = getLong(textLines[0]); 
@@ -179,7 +179,9 @@ namespace Tonuino_RFID_Tool
                         byte startTrack = getByte(textLines[4]);
                         byte endTrack = getByte(textLines[5]);
                         byte endFolder = getByte(textLines[6]);
-                        data = new MusicCardData(rfid, cookie, mode, startFolder, startTrack, endTrack, endFolder);
+                        byte recentTrack = getByte(textLines[7]);
+                        byte recentFolder = getByte(textLines[8]);
+                        data = new MusicCardData(rfid, cookie, mode, startFolder, startTrack, endTrack, endFolder, recentTrack, recentFolder);
                     }
                 }
             }

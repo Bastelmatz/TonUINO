@@ -240,6 +240,7 @@ namespace Tonuino_RFID_Tool
             bool useStartEndTrack = false;
             bool useSingleTrack = false;
             bool useEndFolder = false;
+            bool useRecentTrackAndFolder = false;
             bool isMusicCard = false;
             bool isModifierCard = false;
             bool hasModiValue = false;
@@ -247,15 +248,19 @@ namespace Tonuino_RFID_Tool
             {
                 isMusicCard = true;
                 MusicCardData musicData = (MusicCardData)data;
-                useStartEndTrack = musicData.Mode.UseStartEndTrack;
-                useSingleTrack = musicData.Mode.UseDefinedSingleTrack;
-                useEndFolder = musicData.Mode.UseEndFolder;
+                MusicMode mode = musicData.Mode;
+                useStartEndTrack = mode.UseStartEndTrack;
+                useSingleTrack = mode.UseDefinedSingleTrack;
+                useEndFolder = mode.UseEndFolder;
+                useRecentTrackAndFolder = mode.UseRecentTrackAndFolder;
 
                 setText(lblFolder, musicData.StartFolder);
                 setText(lblStartPos, musicData.StartPos);
                 setText(lblEndPos, musicData.EndPos);
                 setText(lblEndFolder, musicData.EndFolder);
-                lblMode.Text = musicData.Mode.Name;
+                setText(lblRecentFolder, musicData.RecentFolder);
+                setText(lblRecentTrack, musicData.RecentTrack);
+                lblMode.Text = mode.Name;
                 lblStartPosCaption.Text = useSingleTrack ? "Track:" : "Start Track:";
                 lblFolderCaption.Text = useEndFolder ? "Start Folder:" : "Folder:";
             }
@@ -290,11 +295,13 @@ namespace Tonuino_RFID_Tool
 
             bool isDefinedCard = isMusicCard || isModifierCard;
             lblModeCaption.Visible = lblMode.Visible = isDefinedCard;
-            lblFolderCaption.Visible = lblFolder.Visible = isDefinedCard && !isModifierCard;
+            lblFolderCaption.Visible = lblFolder.Visible = isMusicCard;
             lblEndPosCaption.Visible = lblEndPos.Visible = isDefinedCard && useStartEndTrack;
             lblStartPosCaption.Visible = lblStartPos.Visible = isDefinedCard && (useStartEndTrack || useSingleTrack);
             lblEndFolderCaption.Visible = lblEndFolder.Visible = isDefinedCard && useEndFolder;
             lblReadModiValueCaption.Visible = lblReadModiValue.Visible = isModifierCard && hasModiValue;
+            lblRecentTrackCaption.Visible = lblRecentTrack.Visible = isMusicCard && useRecentTrackAndFolder;
+            lblRecentFolderCaption.Visible = lblRecentFolder.Visible = isMusicCard && useRecentTrackAndFolder;
         }
 
         private void updateCardActionVisibility()

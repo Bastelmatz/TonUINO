@@ -115,6 +115,10 @@
             this.comboBox_MusicCardModes = new Tonuino_RFID_Tool.ExtendedComboBox();
             this.comboBox_ModiBehaviour = new Tonuino_RFID_Tool.ExtendedComboBox();
             this.comboBox_ModiCardOptions = new Tonuino_RFID_Tool.ExtendedComboBox();
+            this.lblRecentFolderCaption = new System.Windows.Forms.Label();
+            this.lblRecentFolder = new System.Windows.Forms.Label();
+            this.lblRecentTrackCaption = new System.Windows.Forms.Label();
+            this.lblRecentTrack = new System.Windows.Forms.Label();
             this.pnlModes.SuspendLayout();
             this.pnlCardDetected.SuspendLayout();
             this.pnlModiCardAction.SuspendLayout();
@@ -208,7 +212,7 @@
             // 
             this.lblFolderCaption.Location = new System.Drawing.Point(3, 96);
             this.lblFolderCaption.Name = "lblFolderCaption";
-            this.lblFolderCaption.Size = new System.Drawing.Size(64, 13);
+            this.lblFolderCaption.Size = new System.Drawing.Size(80, 13);
             this.lblFolderCaption.TabIndex = 10;
             this.lblFolderCaption.Text = "Folder:";
             this.lblFolderCaption.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -216,7 +220,7 @@
             // lblFolder
             // 
             this.lblFolder.AutoSize = true;
-            this.lblFolder.Location = new System.Drawing.Point(66, 96);
+            this.lblFolder.Location = new System.Drawing.Point(90, 96);
             this.lblFolder.Name = "lblFolder";
             this.lblFolder.Size = new System.Drawing.Size(35, 13);
             this.lblFolder.TabIndex = 11;
@@ -226,7 +230,7 @@
             // 
             this.lblStartPosCaption.Location = new System.Drawing.Point(3, 121);
             this.lblStartPosCaption.Name = "lblStartPosCaption";
-            this.lblStartPosCaption.Size = new System.Drawing.Size(64, 13);
+            this.lblStartPosCaption.Size = new System.Drawing.Size(80, 13);
             this.lblStartPosCaption.TabIndex = 12;
             this.lblStartPosCaption.Text = "Start Track:";
             this.lblStartPosCaption.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -234,7 +238,7 @@
             // lblStartPos
             // 
             this.lblStartPos.AutoSize = true;
-            this.lblStartPos.Location = new System.Drawing.Point(66, 121);
+            this.lblStartPos.Location = new System.Drawing.Point(90, 121);
             this.lblStartPos.Name = "lblStartPos";
             this.lblStartPos.Size = new System.Drawing.Size(41, 13);
             this.lblStartPos.TabIndex = 13;
@@ -244,7 +248,7 @@
             // 
             this.lblEndPosCaption.Location = new System.Drawing.Point(3, 147);
             this.lblEndPosCaption.Name = "lblEndPosCaption";
-            this.lblEndPosCaption.Size = new System.Drawing.Size(64, 13);
+            this.lblEndPosCaption.Size = new System.Drawing.Size(80, 13);
             this.lblEndPosCaption.TabIndex = 14;
             this.lblEndPosCaption.Text = "End Track:";
             this.lblEndPosCaption.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -252,7 +256,7 @@
             // lblEndPos
             // 
             this.lblEndPos.AutoSize = true;
-            this.lblEndPos.Location = new System.Drawing.Point(66, 147);
+            this.lblEndPos.Location = new System.Drawing.Point(90, 147);
             this.lblEndPos.Name = "lblEndPos";
             this.lblEndPos.Size = new System.Drawing.Size(41, 13);
             this.lblEndPos.TabIndex = 15;
@@ -335,6 +339,10 @@
             // 
             // pnlCardDetected
             // 
+            this.pnlCardDetected.Controls.Add(this.lblRecentTrackCaption);
+            this.pnlCardDetected.Controls.Add(this.lblRecentTrack);
+            this.pnlCardDetected.Controls.Add(this.lblRecentFolderCaption);
+            this.pnlCardDetected.Controls.Add(this.lblRecentFolder);
             this.pnlCardDetected.Controls.Add(this.lblEndFolderCaption);
             this.pnlCardDetected.Controls.Add(this.lblEndFolder);
             this.pnlCardDetected.Controls.Add(this.lblHex);
@@ -360,7 +368,7 @@
             // 
             this.lblEndFolderCaption.Location = new System.Drawing.Point(3, 170);
             this.lblEndFolderCaption.Name = "lblEndFolderCaption";
-            this.lblEndFolderCaption.Size = new System.Drawing.Size(64, 13);
+            this.lblEndFolderCaption.Size = new System.Drawing.Size(80, 13);
             this.lblEndFolderCaption.TabIndex = 38;
             this.lblEndFolderCaption.Text = "End Folder:";
             this.lblEndFolderCaption.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -368,7 +376,7 @@
             // lblEndFolder
             // 
             this.lblEndFolder.AutoSize = true;
-            this.lblEndFolder.Location = new System.Drawing.Point(66, 170);
+            this.lblEndFolder.Location = new System.Drawing.Point(90, 170);
             this.lblEndFolder.Name = "lblEndFolder";
             this.lblEndFolder.Size = new System.Drawing.Size(41, 13);
             this.lblEndFolder.TabIndex = 39;
@@ -396,7 +404,7 @@
             // 
             this.lblReadModiValueCaption.Location = new System.Drawing.Point(4, 74);
             this.lblReadModiValueCaption.Name = "lblReadModiValueCaption";
-            this.lblReadModiValueCaption.Size = new System.Drawing.Size(64, 13);
+            this.lblReadModiValueCaption.Size = new System.Drawing.Size(80, 13);
             this.lblReadModiValueCaption.TabIndex = 34;
             this.lblReadModiValueCaption.Text = "Value:";
             this.lblReadModiValueCaption.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -404,7 +412,7 @@
             // lblReadModiValue
             // 
             this.lblReadModiValue.AutoSize = true;
-            this.lblReadModiValue.Location = new System.Drawing.Point(66, 74);
+            this.lblReadModiValue.Location = new System.Drawing.Point(90, 74);
             this.lblReadModiValue.Name = "lblReadModiValue";
             this.lblReadModiValue.Size = new System.Drawing.Size(41, 13);
             this.lblReadModiValue.TabIndex = 35;
@@ -1002,6 +1010,42 @@
             this.comboBox_ModiCardOptions.TabIndex = 16;
             this.comboBox_ModiCardOptions.SelectedIndexChanged += new System.EventHandler(this.comboBox_ModiCardOptions_SelectedIndexChanged);
             // 
+            // lblRecentFolderCaption
+            // 
+            this.lblRecentFolderCaption.Location = new System.Drawing.Point(3, 193);
+            this.lblRecentFolderCaption.Name = "lblRecentFolderCaption";
+            this.lblRecentFolderCaption.Size = new System.Drawing.Size(81, 13);
+            this.lblRecentFolderCaption.TabIndex = 40;
+            this.lblRecentFolderCaption.Text = "Recent Folder:";
+            this.lblRecentFolderCaption.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // lblRecentFolder
+            // 
+            this.lblRecentFolder.AutoSize = true;
+            this.lblRecentFolder.Location = new System.Drawing.Point(90, 193);
+            this.lblRecentFolder.Name = "lblRecentFolder";
+            this.lblRecentFolder.Size = new System.Drawing.Size(41, 13);
+            this.lblRecentFolder.TabIndex = 41;
+            this.lblRecentFolder.Text = "label12";
+            // 
+            // lblRecentTrackCaption
+            // 
+            this.lblRecentTrackCaption.Location = new System.Drawing.Point(3, 216);
+            this.lblRecentTrackCaption.Name = "lblRecentTrackCaption";
+            this.lblRecentTrackCaption.Size = new System.Drawing.Size(81, 13);
+            this.lblRecentTrackCaption.TabIndex = 42;
+            this.lblRecentTrackCaption.Text = "Recent Track:";
+            this.lblRecentTrackCaption.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // lblRecentTrack
+            // 
+            this.lblRecentTrack.AutoSize = true;
+            this.lblRecentTrack.Location = new System.Drawing.Point(90, 216);
+            this.lblRecentTrack.Name = "lblRecentTrack";
+            this.lblRecentTrack.Size = new System.Drawing.Size(41, 13);
+            this.lblRecentTrack.TabIndex = 43;
+            this.lblRecentTrack.Text = "label12";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1133,6 +1177,10 @@
         private System.Windows.Forms.Label lblEndFolder;
         private System.Windows.Forms.Label lblWriteEndFolder;
         private System.Windows.Forms.TextBox textBoxEndFolder;
+        private System.Windows.Forms.Label lblRecentTrackCaption;
+        private System.Windows.Forms.Label lblRecentTrack;
+        private System.Windows.Forms.Label lblRecentFolderCaption;
+        private System.Windows.Forms.Label lblRecentFolder;
     }
 }
 

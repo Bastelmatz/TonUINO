@@ -40,6 +40,10 @@ void Tonuino_RFID_Tool_Core::transmitCardData(nfcTagStruct nfcTag)
 	Serial.println(nfcTag.musicDS.endTrack);
 	Serial.print(F("EndFolder:"));
 	Serial.println(nfcTag.musicDS.endFolder);
+	Serial.print(F("RecentTrack:"));
+	Serial.println(nfcTag.musicDS.recentTrack);
+	Serial.print(F("RecentFolder:"));
+	Serial.println(nfcTag.musicDS.recentFolder);
 	
 	transmitTrigger(false);
 }
