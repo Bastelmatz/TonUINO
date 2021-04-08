@@ -398,22 +398,32 @@ void loopTonuino()
 
 void onNewMusicCard()
 {
-	if (tonuinoRFID.readCardData.cookie == cardCookie)
-	{
-		MusicDataset nextMusicDS = tonuinoRFID.readCardData.musicDS;
-		if (nextMusicDS.startFolder > 0 && nextMusicDS.mode > 0) 
-		{
-			memcpy(&recentCardMusicDS, &nextMusicDS, sizeof(MusicDataset));
-			loadAndPlayFolder(recentCardMusicDS);
-			// Save recent music for next power up
-			tonuinoEEPROM.writeToFlash_RecentMusicDS(recentCardMusicDS);
-			recentMusicDSinEEPROM = recentCardMusicDS;
-		}
-	}
-	else
+	if (tonuinoRFID.readCardData.cookie != cardCookie)
 	{
 		// Neue Karte konfigurieren
 		setupCard();
+		return;
+	}
+
+	MusicDataset nextMusicDS = tonuinoRFID.readCardData.musicDS;
+	uint8_t mode = nextMusicDS.mode;
+	if (nextMusicDS.startFolder > 0 && mode > 0) 
+	{
+		{
+			memcpy(&recentCardMusicDS, &nextMusicDS, sizeof(MusicDataset));
+			loadAndPlayFolder(recentCardMusicDS);
+		}
+		
+		// Save recent music for next power up
+		if (mode == Album || mode == Section_Album ||
+			mode == Party || mode == Section_Party ||
+			mode == AudioBook || mode == Section_Audiobook ||
+			mode == RandomFolder_Album || 
+			mode == RandomFolder_Party)
+		{
+			tonuinoEEPROM.writeToFlash_RecentMusicDS(recentCardMusicDS);
+			recentMusicDSinEEPROM = recentCardMusicDS;
+		}
 	}
 }
 
