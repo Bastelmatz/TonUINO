@@ -180,6 +180,7 @@ void TonuinoDFPlayer::loadFolder(MusicDataset dataset, ETRACKDIRECTION trackDir)
 	if (doLoad)
 	{
 		currentMusicFolder = newFolder;
+		currentMusicDS = dataset;
 		numTracksInFolder = mp3.getFolderTrackCount(currentMusicFolder);
 		
 		Serial.print(F("Load folder "));
@@ -207,8 +208,7 @@ void TonuinoDFPlayer::reloadFolder(ETRACKDIRECTION trackDir)
 
 void TonuinoDFPlayer::loadFolder(MusicDataset dataset)
 {
-	currentMusicDS = dataset;
-	loadFolder(TRACKDIR_None);
+	loadFolder(dataset, TRACKDIR_None);
 }
 
 void TonuinoDFPlayer::loadFolder(ETRACKDIRECTION trackDir)
@@ -437,6 +437,8 @@ void TonuinoDFPlayer::setFreezeDance(bool active)
 	freezeDance_active = active;
 	if (active)
 	{
+		playAdvertisementAndWait(300);
+		delay(500);
 		setNextStopAtMillis();
 	}
 }

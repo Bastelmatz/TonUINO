@@ -83,17 +83,6 @@ void loadAndPlayFolder(MusicDataset musicDS)
 	dfPlayer.loadAndPlayFolder(musicDS);
 }
 
-void activateFreezeDance(bool active)
-{
-	if (dfPlayer.isPlaying()) 
-	{
-		delay(1000);
-		dfPlayer.playAdvertisementAndWait(300);
-		delay(500);
-	}
-	dfPlayer.setFreezeDance(active);
-}
-
 void turnOff()
 {
 	if (!hwConfig.PowerOff)
@@ -749,7 +738,7 @@ void handleModifier(EModifier modifier, uint16_t special, bool isCardRemoval)
 		}
 		case MODI_Player_FreezeDance:
 		{
-			dfPlayer.freezeDance_active = toggle ? !dfPlayer.freezeDance_active : bValue; break;
+			dfPlayer.setFreezeDance(toggle ? !dfPlayer.freezeDance_active : bValue); break;
 		}
 		case MODI_TrackContinue:
 		{
