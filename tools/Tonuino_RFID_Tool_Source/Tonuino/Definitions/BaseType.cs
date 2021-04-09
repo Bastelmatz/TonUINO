@@ -11,6 +11,8 @@ namespace Tonuino_RFID_Tool
         public T Value { get; }
         public string NameString { get; }
 
+        public string FullName => Index + " - " + NameString;
+
         public Ident(byte index, T value, string name)
         {
             Index = index;
@@ -62,13 +64,25 @@ namespace Tonuino_RFID_Tool
             return m_allocation[0].Value;
         }
 
-        public byte Index => Ident.Index;
+        public static string FullNameFromNumber(byte number)
+        {
+            foreach (Ident<T> ident in m_allocation)
+            {
+                if (ident.Index == number)
+                {
+                    return ident.FullName;
+                }
+            }
+            return m_allocation[0].FullName;
+        }
 
+        public byte Index => Ident.Index;
         public string Name => Ident.NameString;
+        public string FullName => Ident.FullName;
 
         public override string ToString()
         {
-            return Index + " - " + Name;
+            return FullName;
         }
 
         public static bool operator ==(BaseType<T> obj1, BaseType<T> obj2)

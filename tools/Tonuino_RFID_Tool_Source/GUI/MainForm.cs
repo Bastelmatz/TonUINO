@@ -268,13 +268,18 @@ namespace Tonuino_RFID_Tool
             {
                 isModifierCard = true;
                 ModiCardData modiData = (ModiCardData)data;
-                hasModiValue = modiData.ModiType.RequiresValue;
+                ModiType modiType = modiData.ModiType;
+                hasModiValue = modiType.RequiresValue;
 
-                lblMode.Text = modiData.ModiType.Name;
+                lblMode.Text = modiType.Name;
                 lblReadModiValue.Text = modiData.Value.ToString();
-                if (modiData.ModiType.IsMinutesValue)
+                if (modiType.IsMinutesValue)
                 {
                     lblReadModiValue.Text += " min";
+                }
+                if (modiType.IsBool)
+                {
+                    lblReadModiValue.Text =  ModiBoolValue.FullNameFromNumber((byte)modiData.Value);
                 }
             }
 
