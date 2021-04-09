@@ -22,6 +22,11 @@ bool TonuinoDFPlayer::newMusisDS = false;
 bool TonuinoDFPlayer::freezeDance_active = false;
 unsigned long TonuinoDFPlayer::freezeDance_nextStopAtMillis = 0;
 
+bool TonuinoDFPlayer::memoryMode_active = false;
+bool TonuinoDFPlayer::playCompareTrack = false;
+
+bool TonuinoDFPlayer::randomQuiz_active = false;
+
 #define PLAYTRACK_DELAY 1000
 
 // ********************************************************************
@@ -123,6 +128,51 @@ void TonuinoDFPlayer::playCurrentTrack()
 	playTrack(track);
 }
 
+void TonuinoDFPlayer::compareTrack(MusicDataset compareMusicDS, bool isNewCard)
+{
+	uint8_t mode = compareMusicDS.mode;
+	uint8_t currentTrack = tonuinoPlayer.currentTrack();
+	bool match = currentTrack == compareMusicDS.startTrack && (currentMusicFolder == compareMusicDS.startFolder || currentMusicFolder == compareMusicDS.endFolder);
+	bool useCompareTrack = playCompareTrack && (!memoryMode_active || isNewCard); // repeat first track on card return with active memory mode 
+		
+	if (isNewCard)
+	{
+		if (!playCompareTrack)
+		{
+			loadAndPlayFolder(compareMusicDS);
+			playCompareTrack = true;
+			return;
+		}
+		if (memoryMode_active)
+		{
+			// - play match evaluation track (1) before actual compare track (2)
+			// - both tracks (1+2) should be played and the first one should be awaited to finish
+			// - as the evaluation track is fix and of short length, it doesn't block the loop as long as the compare track could
+			playMP3AndWait(match ? 935 : 934);
+		}
+	}
+
+	if (mode == Single)
+	{
+		playCurrentTrack();
+	}
+	if (mode == UniDirectionalPair)
+	{
+		uint8_t folder = useCompareTrack ? compareMusicDS.endFolder : compareMusicDS.startFolder;
+		playTrack(folder, compareMusicDS.startTrack);
+	}
+	if (mode == BiDirectionalPair)
+	{
+		uint8_t oppositeFolder = currentMusicFolder == compareMusicDS.startFolder ? compareMusicDS.endFolder : compareMusicDS.startFolder;
+		uint8_t folder = useCompareTrack ? oppositeFolder : currentMusicFolder;
+		playTrack(folder, compareMusicDS.startTrack);
+	}
+	if (useCompareTrack || !memoryMode_active)
+	{
+		playCompareTrack = !playCompareTrack;
+	}
+}
+
 void TonuinoDFPlayer::loadFolder(MusicDataset dataset, ETRACKDIRECTION trackDir)
 {
 	bool isFirstLoad = trackDir == TRACKDIR_None;
@@ -143,6 +193,10 @@ void TonuinoDFPlayer::loadFolder(MusicDataset dataset, ETRACKDIRECTION trackDir)
 		if (recentFolder > newFolder && recentFolder <= dataset.endFolder)
 		{
 			newFolder = recentFolder;
+		}
+		if (mode == BiDirectionalPair && random(0, 2) == 0)
+		{
+			newFolder = dataset.endFolder;
 		}
 	}
 	if ((randomFolderForNextTrack && trackDir == TRACKDIR_Next)|| 
@@ -208,6 +262,7 @@ void TonuinoDFPlayer::reloadFolder(ETRACKDIRECTION trackDir)
 
 void TonuinoDFPlayer::loadFolder(MusicDataset dataset)
 {
+	playCompareTrack = false;
 	loadFolder(dataset, TRACKDIR_None);
 }
 
@@ -441,6 +496,12 @@ void TonuinoDFPlayer::setFreezeDance(bool active)
 		delay(500);
 		setNextStopAtMillis();
 	}
+}
+
+void TonuinoDFPlayer::setMemoryMode(bool active)
+{
+	memoryMode_active = active;
+	playAdvertisementAndWait(active ? 261 : 260);
 }
 
 void TonuinoDFPlayer::loop()

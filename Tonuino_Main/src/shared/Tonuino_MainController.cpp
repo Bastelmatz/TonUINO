@@ -409,8 +409,14 @@ void onNewMusicCard()
 	uint8_t mode = nextMusicDS.mode;
 	if (nextMusicDS.startFolder > 0 && mode > 0) 
 	{
+		memcpy(&recentCardMusicDS, &nextMusicDS, sizeof(MusicDataset));
+		
+		if (dfPlayer.memoryMode_active || mode == UniDirectionalPair || mode == BiDirectionalPair)
 		{
-			memcpy(&recentCardMusicDS, &nextMusicDS, sizeof(MusicDataset));
+			dfPlayer.compareTrack(recentCardMusicDS, true);
+		}
+		else
+		{
 			loadAndPlayFolder(recentCardMusicDS);
 		}
 		
@@ -429,38 +435,45 @@ void onNewMusicCard()
 
 void onCardGone()
 {
+	MusicDataset lastCardMusicDS = tonuinoRFID.readCardData.musicDS;
 	if (tonuinoRFID.lastCardWasModifierCard)
 	{
-		evaluateModifierCardData(tonuinoRFID.readCardData.musicDS, true);
+		evaluateModifierCardData(lastCardMusicDS, true);
+		return;
 	}
-	else
+	// on music card gone
+	uint8_t mode = lastCardMusicDS.mode;
+	if (!dfPlayer.memoryMode_active && (mode == UniDirectionalPair || mode == BiDirectionalPair))
 	{
-		// on music card gone
-		if (swConfig.StopPlayOnCardRemoval)
-		{
-			dfPlayer.pauseAndStandBy();
-		}
+		// resolve pair (play second track on card removal)
+		dfPlayer.compareTrack(recentCardMusicDS, false);
+		return;
+	}
+	if (swConfig.StopPlayOnCardRemoval)
+	{
+		dfPlayer.pauseAndStandBy();
 	}
 }
 
 void onMusicCardReturn()
 {
+	uint8_t mode = recentCardMusicDS.mode;
+	if (dfPlayer.memoryMode_active || mode == UniDirectionalPair || mode == BiDirectionalPair)
+	{
+		dfPlayer.compareTrack(recentCardMusicDS, false);
+		return;
+	}
 	if (swConfig.StopPlayOnCardRemoval || !dfPlayer.isPlaying())
 	{
 		dfPlayer.continueTitle();
+		return;
 	}
-	else
+	if (mode == RandomFolder_Album || mode == RandomFolder_Party)
 	{
-		uint8_t mode = tonuinoPlayer().mode;
-		if (mode == RandomFolder_Album || mode == RandomFolder_Party)
-		{
-			loadAndPlayFolder(recentCardMusicDS);
-		}
-		else
-		{
-			dfPlayer.nextTrack();
-		}
+		loadAndPlayFolder(recentCardMusicDS);
+		return;
 	}
+	dfPlayer.nextTrack();
 }
 
 uint8_t voiceMenu(uint8_t numberOfOptions, int startMessage, int messageOffset,
@@ -650,13 +663,8 @@ void handleModifier(EModifier modifier, uint16_t special, bool isCardRemoval)
 		return;
 	}
 	
-	Serial.print(F("Handle modifier: "));
-	Serial.print(modifier);
-	Serial.print(F(" - value: "));
-	Serial.println(special);
 	bool toggle = false;
 	bool bValue = false;
-	
 	// Evaluate toggle and bValue for BoolModifier
 	if (TONUINOMODIFIER::isBoolModifer(modifier))
 	{
@@ -694,6 +702,10 @@ void handleModifier(EModifier modifier, uint16_t special, bool isCardRemoval)
 		}
 	}
 	
+	Serial.print(F("Handle modifier: "));
+	Serial.print(modifier);
+	Serial.print(F(" - value: "));
+	Serial.println(special);
 	switch (modifier)
 	{
 		case MODI_LockAll:
@@ -749,6 +761,14 @@ void handleModifier(EModifier modifier, uint16_t special, bool isCardRemoval)
 		case MODI_Player_FreezeDance:
 		{
 			dfPlayer.setFreezeDance(toggle ? !dfPlayer.freezeDance_active : bValue); break;
+		}
+		case MODI_Player_Memory:
+		{
+			dfPlayer.setMemoryMode(toggle ? !dfPlayer.memoryMode_active : bValue); break;
+		}
+		case MODI_Player_RandomQuiz:
+		{
+			dfPlayer.randomQuiz_active = toggle ? !dfPlayer.randomQuiz_active : bValue; break;
 		}
 		case MODI_TrackContinue:
 		{

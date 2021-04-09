@@ -32,6 +32,8 @@ class TonuinoDFPlayer
 	static uint8_t volumeIncrement;
 	static bool musicDSLoaded;
 	static bool freezeDance_active;
+	static bool memoryMode_active;
+	static bool randomQuiz_active;
 			
 	void setup(uint8_t pinBusy);
 	bool isPlaying();
@@ -55,7 +57,8 @@ class TonuinoDFPlayer
 	void setVolume(uint8_t vol);
 	void setEqualizer(DfMp3_Eq eq);
 	void trackFinished();
-		
+	void compareTrack(MusicDataset compareMusicDS, bool isNewCard);
+	
 	void start();
 	void loop();
 	void pause();
@@ -64,7 +67,8 @@ class TonuinoDFPlayer
 	uint16_t getFolderTrackCount(uint16_t folder);
 	
 	void setFreezeDance(bool active);
-
+	void setMemoryMode(bool active);
+	
 	private:
 	static uint8_t pin_Busy;
 	static uint8_t activeFolder;
@@ -74,7 +78,8 @@ class TonuinoDFPlayer
 	static bool newMusisDS;
 	static MusicDataset currentMusicDS;
 	static unsigned long freezeDance_nextStopAtMillis;
-
+	static bool playCompareTrack;
+	
 	void goToTrack(ETRACKDIRECTION trackDir);
 	void playCurrentTrack();
 	void playTrack(uint8_t track);

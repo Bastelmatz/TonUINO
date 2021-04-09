@@ -27,7 +27,10 @@ namespace Tonuino_RFID_Tool
         Player_RepeatAll,
         Player_ListenToEnd,
         Player_StopOnCardRemoval,
+
         Player_FreezeDance,
+        Player_MemoryMode,
+        Player_RandomQuiz,
 
         LockAll,
         LockButtons,
@@ -75,19 +78,22 @@ namespace Tonuino_RFID_Tool
                 new Ident<EModiType>(32, EModiType.Player_RepeatAll, "Repeat All Tracks"),
                 new Ident<EModiType>(33, EModiType.Player_ListenToEnd, "Listen To End"),
                 new Ident<EModiType>(34, EModiType.Player_StopOnCardRemoval, "Stop On Card Removal"),
-                new Ident<EModiType>(35, EModiType.Player_FreezeDance, "Freeze Dance"),
 
-                new Ident<EModiType>(40, EModiType.LockAll, "Lock All"),
-                new Ident<EModiType>(41, EModiType.LockButtons, "Lock Buttons"),
+                new Ident<EModiType>(40, EModiType.Player_FreezeDance, "Freeze Dance"),
+                new Ident<EModiType>(41, EModiType.Player_MemoryMode, "Memory Mode"),
+                new Ident<EModiType>(42, EModiType.Player_RandomQuiz, "Random Quiz"),
 
-                new Ident<EModiType>(50, EModiType.SetupCard, "Setup Card"),
-                new Ident<EModiType>(51, EModiType.ResetCard, "Reset Card"),
-                new Ident<EModiType>(52, EModiType.ResetEEPROM, "Reset EEPROM"),
+                new Ident<EModiType>(50, EModiType.LockAll, "Lock All"),
+                new Ident<EModiType>(51, EModiType.LockButtons, "Lock Buttons"),
 
-                new Ident<EModiType>(60, EModiType.MENU_ChangeSmall, "Menu Change Small"),
-                new Ident<EModiType>(61, EModiType.MENU_ChangeLarge, "Menu Change Large"),
-                new Ident<EModiType>(62, EModiType.MENU_Choose, "Menu Choose"),
-                new Ident<EModiType>(63, EModiType.MENU_Cancel, "Menu Cancel"),
+                new Ident<EModiType>(60, EModiType.SetupCard, "Setup Card"),
+                new Ident<EModiType>(61, EModiType.ResetCard, "Reset Card"),
+                new Ident<EModiType>(62, EModiType.ResetEEPROM, "Reset EEPROM"),
+
+                new Ident<EModiType>(70, EModiType.MENU_ChangeSmall, "Menu Change Small"),
+                new Ident<EModiType>(71, EModiType.MENU_ChangeLarge, "Menu Change Large"),
+                new Ident<EModiType>(72, EModiType.MENU_Choose, "Menu Choose"),
+                new Ident<EModiType>(73, EModiType.MENU_Cancel, "Menu Cancel"),
             };
         }
 
@@ -107,6 +113,8 @@ namespace Tonuino_RFID_Tool
                     case EModiType.Player_ListenToEnd:
                     case EModiType.Player_StopOnCardRemoval:
                     case EModiType.Player_FreezeDance:
+                    case EModiType.Player_MemoryMode:
+                    case EModiType.Player_RandomQuiz:
                     case EModiType.LockAll:
                     case EModiType.LockButtons: return true;
                 }

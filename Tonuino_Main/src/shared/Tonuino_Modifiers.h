@@ -27,19 +27,22 @@ enum EModifier
 	MODI_Player_RepeatAll = 32,
 	MODI_Player_ListenToEnd = 33,
 	MODI_Player_StopOnCardRemoval = 34,
-	MODI_Player_FreezeDance = 35,
 	
-	MODI_LockAll = 40,
-	MODI_LockButtons = 41,
+	MODI_Player_FreezeDance = 40,
+	MODI_Player_Memory = 41,
+	MODI_Player_RandomQuiz = 42,
 	
-	MODI_SetupCard = 50,
-	MODI_ResetCard = 51,
-	MODI_ResetEEPROM = 52,
+	MODI_LockAll = 50,
+	MODI_LockButtons = 51,
 	
-	MODI_MENU_ChangeSmall = 60,
-	MODI_MENU_ChangeLarge = 61,
-	MODI_MENU_Choose = 62,
-	MODI_MENU_Cancel = 63,
+	MODI_SetupCard = 60,
+	MODI_ResetCard = 61,
+	MODI_ResetEEPROM = 62,
+	
+	MODI_MENU_ChangeSmall = 70,
+	MODI_MENU_ChangeLarge = 71,
+	MODI_MENU_Choose = 72,
+	MODI_MENU_Cancel = 73,
 };
 
 enum EModifierBoolValue
@@ -72,6 +75,8 @@ class TONUINOMODIFIER
 			case MODI_Player_ListenToEnd:
 			case MODI_Player_StopOnCardRemoval:
 			case MODI_Player_FreezeDance:
+			case MODI_Player_Memory:
+			case MODI_Player_RandomQuiz:
 			case MODI_LockAll:
 			case MODI_LockButtons: return true;
 		}

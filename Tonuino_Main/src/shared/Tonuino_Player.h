@@ -17,10 +17,13 @@ enum EPlayerMode
 	Section_AudioDrama = 7,	// Spezialmodus Von-Bis: Hörspiel
 	Section_Album = 8,		// Spezialmodus Von-Bis: Album
 	Section_Party = 9,		// Spezialmodus Von-Bis: Party
-	Section_Audiobook = 10,
+	Section_Audiobook = 10, // Spezialmodus Von-Bis: Hörbuch
 	
-	RandomFolder_Album = 11, // Einen zufälligen Ordner im Album Modus wiedergeben
-	RandomFolder_Party = 12, // Einen zufälligen Ordner im Party Modus wiedergeben
+	RandomFolder_Album = 20, // Einen zufälligen Ordner im Album Modus wiedergeben
+	RandomFolder_Party = 21, // Einen zufälligen Ordner im Party Modus wiedergeben
+	
+	UniDirectionalPair = 30, // Frage-Antwort Paar
+	BiDirectionalPair = 31,  // TitelA-TitelB Paar
 };
 
 enum ETRACKDIRECTION

@@ -270,7 +270,7 @@ void TonuinoPlayer::loadFolder(uint8_t numTracksInFolder, MusicDataset musicDS)
 	Serial.println(F(" files in folder "));
 		
 	bool useSection = mode == Section_AudioDrama || mode == Section_Party || mode == Section_Album || mode == Section_Audiobook;
-	singleTrack = mode == AudioDrama || mode == Section_AudioDrama || mode == Single;
+	singleTrack = mode == AudioDrama || mode == Section_AudioDrama || mode == Single || mode == UniDirectionalPair || mode == BiDirectionalPair;
 	playRandom = mode == AudioDrama || mode == Section_AudioDrama || mode == Party || mode == Section_Party || mode == RandomFolder_Party;
 	useQueue = mode == Party || mode == Section_Party || mode == RandomFolder_Party;
 	

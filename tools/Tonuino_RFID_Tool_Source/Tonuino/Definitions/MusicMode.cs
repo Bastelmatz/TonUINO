@@ -17,6 +17,8 @@ namespace Tonuino_RFID_Tool
         Section_Audiobook,
         RandomFolder_Album,
         RandomFolder_Party,
+        UniDirectionalPair,
+        BiDirectionalPair,
     }
 
     public class MusicMode : BaseType<EMusicMode>
@@ -40,8 +42,10 @@ namespace Tonuino_RFID_Tool
                 new Ident<EMusicMode>(8, EMusicMode.Section_Album, "Section - Album"),
                 new Ident<EMusicMode>(9, EMusicMode.Section_Party, "Section - Party"),
                 new Ident<EMusicMode>(10, EMusicMode.Section_Audiobook, "Section - Audiobook"),
-                new Ident<EMusicMode>(11, EMusicMode.RandomFolder_Album, "Random Folder - Album"),
-                new Ident<EMusicMode>(12, EMusicMode.RandomFolder_Party, "Random Folder - Party"),
+                new Ident<EMusicMode>(20, EMusicMode.RandomFolder_Album, "Random Folder - Album"),
+                new Ident<EMusicMode>(21, EMusicMode.RandomFolder_Party, "Random Folder - Party"),
+                new Ident<EMusicMode>(30, EMusicMode.UniDirectionalPair, "Uni-Directional Pair"),
+                new Ident<EMusicMode>(31, EMusicMode.BiDirectionalPair, "Bi-Directional Pair"),
             };
         }
 
@@ -60,7 +64,20 @@ namespace Tonuino_RFID_Tool
             }
         }
 
-        public bool UseDefinedSingleTrack => Ident.Value == EMusicMode.Single;
+        public bool UseDefinedSingleTrack
+        {
+            get
+            {
+                switch (Ident.Value)
+                {
+                    case EMusicMode.Single:
+                    case EMusicMode.UniDirectionalPair:
+                    case EMusicMode.BiDirectionalPair: return true;
+                }
+                return false;
+            }
+        }
+
         public bool UseEndFolder
         {
             get
@@ -72,7 +89,9 @@ namespace Tonuino_RFID_Tool
                     case EMusicMode.Party:
                     case EMusicMode.Audiobook:
                     case EMusicMode.RandomFolder_Album:
-                    case EMusicMode.RandomFolder_Party: return true;
+                    case EMusicMode.RandomFolder_Party:
+                    case EMusicMode.UniDirectionalPair:
+                    case EMusicMode.BiDirectionalPair: return true;
                 }
                 return false;
             }
