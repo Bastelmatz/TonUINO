@@ -10,6 +10,14 @@
 #include <SoftwareSerial.h>
 #include <SPI.h>
 
+enum ECOMPARERESULT
+{
+	COMPARE_NOTSUPPORTED = 0,
+	COMPARE_NO = 1,
+	COMPARE_MATCH = 2, 	
+	COMPARE_WRONG = 3,
+};
+
 class TonuinoDFPlayer
 {
 	public:
@@ -39,6 +47,7 @@ class TonuinoDFPlayer
 	bool isPlaying();
 	void loadFolder(MusicDataset dataset);
 	void loadAndPlayFolder(MusicDataset dataset);
+	ECOMPARERESULT playOrCompareTrack(MusicDataset compareMusicDS, bool isNewCard, bool isCardGone, bool stopOnCardRemoval);
 	void continueTitle();
 	void pauseAndStandBy();
 	void togglePlay();
@@ -57,7 +66,6 @@ class TonuinoDFPlayer
 	void setVolume(uint8_t vol);
 	void setEqualizer(DfMp3_Eq eq);
 	void trackFinished();
-	void compareTrack(MusicDataset compareMusicDS, bool isNewCard);
 	
 	void start();
 	void loop();

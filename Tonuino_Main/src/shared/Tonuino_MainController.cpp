@@ -411,13 +411,10 @@ void onNewMusicCard()
 	{
 		memcpy(&recentCardMusicDS, &nextMusicDS, sizeof(MusicDataset));
 		
-		if (dfPlayer.memoryMode_active || mode == UniDirectionalPair || mode == BiDirectionalPair)
+		ECOMPARERESULT compareResult = dfPlayer.playOrCompareTrack(recentCardMusicDS, true, false, swConfig.StopPlayOnCardRemoval);
+		if (compareResult != COMPARE_NOTSUPPORTED)
 		{
-			dfPlayer.compareTrack(recentCardMusicDS, true);
-		}
-		else
-		{
-			loadAndPlayFolder(recentCardMusicDS);
+			// optional to do: visualize result, e.g. turn LED on/off or change color
 		}
 		
 		// Save recent music for next power up
@@ -442,38 +439,12 @@ void onCardGone()
 		return;
 	}
 	// on music card gone
-	uint8_t mode = lastCardMusicDS.mode;
-	if (!dfPlayer.memoryMode_active && (mode == UniDirectionalPair || mode == BiDirectionalPair))
-	{
-		// resolve pair (play second track on card removal)
-		dfPlayer.compareTrack(recentCardMusicDS, false);
-		return;
-	}
-	if (swConfig.StopPlayOnCardRemoval)
-	{
-		dfPlayer.pauseAndStandBy();
-	}
+	dfPlayer.playOrCompareTrack(recentCardMusicDS, false, true, swConfig.StopPlayOnCardRemoval);
 }
 
 void onMusicCardReturn()
 {
-	uint8_t mode = recentCardMusicDS.mode;
-	if (dfPlayer.memoryMode_active || mode == UniDirectionalPair || mode == BiDirectionalPair)
-	{
-		dfPlayer.compareTrack(recentCardMusicDS, false);
-		return;
-	}
-	if (swConfig.StopPlayOnCardRemoval || !dfPlayer.isPlaying())
-	{
-		dfPlayer.continueTitle();
-		return;
-	}
-	if (mode == RandomFolder_Album || mode == RandomFolder_Party)
-	{
-		loadAndPlayFolder(recentCardMusicDS);
-		return;
-	}
-	dfPlayer.nextTrack();
+	dfPlayer.playOrCompareTrack(recentCardMusicDS, false, false, swConfig.StopPlayOnCardRemoval);
 }
 
 uint8_t voiceMenu(uint8_t numberOfOptions, int startMessage, int messageOffset,

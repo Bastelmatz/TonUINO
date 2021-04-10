@@ -128,20 +128,58 @@ void TonuinoDFPlayer::playCurrentTrack()
 	playTrack(track);
 }
 
-void TonuinoDFPlayer::compareTrack(MusicDataset compareMusicDS, bool isNewCard)
+ECOMPARERESULT TonuinoDFPlayer::playOrCompareTrack(MusicDataset compareMusicDS, bool isNewCard, bool isCardGone, bool stopOnCardRemoval)
 {
 	uint8_t mode = compareMusicDS.mode;
 	uint8_t currentTrack = tonuinoPlayer.currentTrack();
 	bool match = currentTrack == compareMusicDS.startTrack && (currentMusicFolder == compareMusicDS.startFolder || currentMusicFolder == compareMusicDS.endFolder);
 	bool useCompareTrack = playCompareTrack && (!memoryMode_active || isNewCard); // repeat first track on card return with active memory mode 
-		
+	bool isCardReturn = !isNewCard && !isCardGone;
+	
+	if (isCardGone)
+	{
+		// resolve pair (play second track on card removal)
+		if (memoryMode_active || (mode != UniDirectionalPair && mode != BiDirectionalPair))
+		{
+			if (stopOnCardRemoval)
+			{
+				pauseAndStandBy();
+			}
+			return COMPARE_NOTSUPPORTED;
+		}
+	}
+	if (isCardReturn)
+	{
+		if (mode == RandomFolder_Album || mode == RandomFolder_Party)
+		{
+			loadAndPlayFolder(compareMusicDS);
+			return COMPARE_NO;
+		}
+		if (!memoryMode_active && mode != UniDirectionalPair && mode != BiDirectionalPair)
+		{
+			if (stopOnCardRemoval || !isPlaying())
+			{
+				continueTitle();
+			}
+			else
+			{
+				nextTrack();
+			}
+			return COMPARE_NO;
+		}
+	}
 	if (isNewCard)
 	{
+		if (!memoryMode_active && mode != UniDirectionalPair && mode != BiDirectionalPair)
+		{
+			loadAndPlayFolder(compareMusicDS);
+			return COMPARE_NO;
+		}
 		if (!playCompareTrack)
 		{
 			loadAndPlayFolder(compareMusicDS);
 			playCompareTrack = true;
-			return;
+			return COMPARE_NO;
 		}
 		if (memoryMode_active)
 		{
@@ -171,6 +209,7 @@ void TonuinoDFPlayer::compareTrack(MusicDataset compareMusicDS, bool isNewCard)
 	{
 		playCompareTrack = !playCompareTrack;
 	}
+	return useCompareTrack && memoryMode_active ? (match ? COMPARE_MATCH : COMPARE_WRONG) : COMPARE_NO;
 }
 
 void TonuinoDFPlayer::loadFolder(MusicDataset dataset, ETRACKDIRECTION trackDir)
