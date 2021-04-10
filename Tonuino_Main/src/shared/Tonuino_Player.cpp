@@ -268,10 +268,15 @@ void TonuinoPlayer::loadFolder(uint8_t numTracksInFolder, MusicDataset musicDS)
 	firstTrack = 1;
 	Serial.print(numTracksInFolder);
 	Serial.println(F(" files in folder "));
-		
-	bool useSection = mode == Section_AudioDrama || mode == Section_Party || mode == Section_Album || mode == Section_Audiobook;
-	singleTrack = mode == AudioDrama || mode == Section_AudioDrama || mode == Single || mode == UniDirectionalPair || mode == BiDirectionalPair;
-	playRandom = mode == AudioDrama || mode == Section_AudioDrama || mode == Party || mode == Section_Party || mode == RandomFolder_Party;
+	
+	bool isRandomSectionPair = mode == Section_RandomUniDirectionalPair || mode == Section_RandomBiDirectionalPair;
+	bool isAnyRandomPair = isRandomSectionPair || mode == RandomUniDirectionalPair || mode == RandomBiDirectionalPair;
+	bool useSection = mode == Section_AudioDrama || mode == Section_Party || mode == Section_Album || mode == Section_Audiobook || isRandomSectionPair;
+	singleTrack = mode == AudioDrama || mode == Section_AudioDrama || mode == Single || 
+				  mode == UniDirectionalPair || mode == BiDirectionalPair || isAnyRandomPair;
+	playRandom = mode == AudioDrama || mode == Section_AudioDrama || 
+				 mode == Party || mode == Section_Party || mode == RandomFolder_Party || 
+				 isAnyRandomPair;
 	useQueue = mode == Party || mode == Section_Party || mode == RandomFolder_Party;
 	
 	if (useSection)

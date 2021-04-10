@@ -252,6 +252,7 @@ namespace Tonuino_RFID_Tool
                 useStartEndTrack = mode.UseStartEndTrack;
                 useSingleTrack = mode.UseDefinedSingleTrack;
                 useEndFolder = mode.UseEndFolder;
+                bool useCompareFolder = mode.UseCompareFolder;
                 useRecentTrackAndFolder = mode.UseRecentTrackAndFolder;
 
                 setText(lblFolder, musicData.StartFolder);
@@ -261,8 +262,9 @@ namespace Tonuino_RFID_Tool
                 setText(lblRecentFolder, musicData.RecentFolder);
                 setText(lblRecentTrack, musicData.RecentTrack);
                 lblMode.Text = mode.Name;
-                lblStartPosCaption.Text = useSingleTrack ? "Track:" : "Start Track:";
-                lblFolderCaption.Text = useEndFolder ? "Start Folder:" : "Folder:";
+                lblStartPosCaption.Text = (useSingleTrack ? "" : "Start ") + "Track:";
+                lblFolderCaption.Text = (useEndFolder ? "Start " : "") + "Folder:";
+                lblEndFolderCaption.Text = (useCompareFolder ? "Compare" : "End") + " Folder:";
             }
             if (data is ModiCardData)
             {
@@ -326,12 +328,14 @@ namespace Tonuino_RFID_Tool
                 bool useStartEndTrack = mode == null ? false : mode.UseStartEndTrack;
                 bool useSingleTrack = mode == null ? false : mode.UseDefinedSingleTrack;
                 bool useEndFolder = mode == null ? false : mode.UseEndFolder;
+                bool useCompareFolder = mode == null ? false : mode.UseCompareFolder;
 
                 textBoxEndOnSD.Visible = lblEndOnSource.Visible = useStartEndTrack;
                 textBoxStartOnSD.Visible = lblStartOnSource.Visible = useStartEndTrack || useSingleTrack;
-                lblStartOnSource.Text = useSingleTrack ? "track" : "start track";
+                lblStartOnSource.Text = (useSingleTrack ? "" : "start ") + "track";
                 textBoxEndFolder.Visible = lblWriteEndFolder.Visible = useEndFolder;
-                lblWriteStartFolder.Text = useEndFolder ? "start folder" : "folder";
+                lblWriteStartFolder.Text = (useEndFolder ? "start " : "") + "folder";
+                lblWriteEndFolder.Text = (useCompareFolder ? "compare" : "end") + " folder";
             }
             if (pnlModiCardAction.Visible)
             {

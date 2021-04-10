@@ -24,6 +24,11 @@ enum EPlayerMode
 	
 	UniDirectionalPair = 30, // Frage-Antwort Paar
 	BiDirectionalPair = 31,  // TitelA-TitelB Paar
+	
+	RandomUniDirectionalPair = 35, // Zufälliges Frage-Antwort Paar
+	RandomBiDirectionalPair = 36,  // Zufälliges TitelA-TitelB Paar
+	Section_RandomUniDirectionalPair = 37, // Spezialmodus Von-Bis: Zufälliges Frage-Antwort Paar
+	Section_RandomBiDirectionalPair = 38,  // Spezialmodus Von-Bis: Zufälliges TitelA-TitelB Paar
 };
 
 enum ETRACKDIRECTION

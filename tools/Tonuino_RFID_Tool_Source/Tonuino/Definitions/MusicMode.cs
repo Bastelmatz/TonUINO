@@ -19,6 +19,10 @@ namespace Tonuino_RFID_Tool
         RandomFolder_Party,
         UniDirectionalPair,
         BiDirectionalPair,
+        RandomUniDirectionalPair,
+        RandomBiDirectionalPair,
+        Section_RandomUniDirectionalPair,
+        Section_RandomBiDirectionalPair
     }
 
     public class MusicMode : BaseType<EMusicMode>
@@ -46,6 +50,10 @@ namespace Tonuino_RFID_Tool
                 new Ident<EMusicMode>(21, EMusicMode.RandomFolder_Party, "Random Folder - Party"),
                 new Ident<EMusicMode>(30, EMusicMode.UniDirectionalPair, "Uni-Directional Pair"),
                 new Ident<EMusicMode>(31, EMusicMode.BiDirectionalPair, "Bi-Directional Pair"),
+                new Ident<EMusicMode>(35, EMusicMode.RandomUniDirectionalPair, "Random Uni-Directional Pair"),
+                new Ident<EMusicMode>(36, EMusicMode.RandomBiDirectionalPair, "Random Bi-Directional Pair"),
+                new Ident<EMusicMode>(37, EMusicMode.Section_RandomUniDirectionalPair, "Section - Random Uni-Directional Pair"),
+                new Ident<EMusicMode>(38, EMusicMode.Section_RandomBiDirectionalPair, "Section - Random Bi-Directional Pair"),
             };
         }
 
@@ -58,7 +66,9 @@ namespace Tonuino_RFID_Tool
                     case EMusicMode.Section_Album:
                     case EMusicMode.Section_RandomSingle:
                     case EMusicMode.Section_Party:
-                    case EMusicMode.Section_Audiobook: return true;
+                    case EMusicMode.Section_Audiobook:
+                    case EMusicMode.Section_RandomUniDirectionalPair:
+                    case EMusicMode.Section_RandomBiDirectionalPair: return true;
                 }
                 return false;
             }
@@ -78,6 +88,23 @@ namespace Tonuino_RFID_Tool
             }
         }
 
+        public bool UseCompareFolder
+        {
+            get
+            {
+                switch (Ident.Value)
+                {
+                    case EMusicMode.UniDirectionalPair:
+                    case EMusicMode.BiDirectionalPair:
+                    case EMusicMode.RandomUniDirectionalPair:
+                    case EMusicMode.RandomBiDirectionalPair:
+                    case EMusicMode.Section_RandomUniDirectionalPair:
+                    case EMusicMode.Section_RandomBiDirectionalPair: return true;
+                }
+                return false;
+            }
+        }
+
         public bool UseEndFolder
         {
             get
@@ -89,9 +116,11 @@ namespace Tonuino_RFID_Tool
                     case EMusicMode.Party:
                     case EMusicMode.Audiobook:
                     case EMusicMode.RandomFolder_Album:
-                    case EMusicMode.RandomFolder_Party:
-                    case EMusicMode.UniDirectionalPair:
-                    case EMusicMode.BiDirectionalPair: return true;
+                    case EMusicMode.RandomFolder_Party: return true;
+                }
+                if (UseCompareFolder)
+                {
+                    return true;
                 }
                 return false;
             }
