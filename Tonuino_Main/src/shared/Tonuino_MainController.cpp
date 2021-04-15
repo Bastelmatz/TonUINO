@@ -420,6 +420,7 @@ void onNewMusicCard()
 		// Save recent music for next power up
 		if (mode == Album || mode == Section_Album ||
 			mode == Party || mode == Section_Party ||
+			mode == AudioDrama || mode == Section_AudioDrama ||
 			mode == AudioBook || mode == Section_Audiobook ||
 			mode == RandomFolder_Album || 
 			mode == RandomFolder_Party)
