@@ -122,7 +122,8 @@ ModifierDataset TonuinoButtons::getMenuModification(uint8_t currentValue, uint8_
 	ModifierDataset modiDS;
 	modiDS.modi = MODI_None;
 	modiDS.value = 0;
-
+	uint8_t largeChange = numberOptions > 255 ? 50 : 10;
+	
 	if (buttonState == BUTTONPRESSED_LONG_StartStop) 
 	{
 		modiDS.modi = MODI_MENU_Cancel;
@@ -136,7 +137,7 @@ ModifierDataset TonuinoButtons::getMenuModification(uint8_t currentValue, uint8_
 	if (buttonState == BUTTONPRESSED_LONG_Next) 
 	{
 		modiDS.modi = MODI_MENU_ChangeLarge;
-		modiDS.value = min(currentValue + 10, numberOptions);
+		modiDS.value = min(currentValue + largeChange, numberOptions);
 	} 
 	if (buttonState == BUTTONCLICK_Next) 
 	{
@@ -146,7 +147,7 @@ ModifierDataset TonuinoButtons::getMenuModification(uint8_t currentValue, uint8_
 	if (buttonState == BUTTONPRESSED_LONG_Previous) 
 	{
 		modiDS.modi = MODI_MENU_ChangeLarge;
-		modiDS.value = max(currentValue - 10, 1);
+		modiDS.value = max(currentValue - largeChange, 1);
 	} 
 	if (buttonState == BUTTONCLICK_Previous) 
 	{

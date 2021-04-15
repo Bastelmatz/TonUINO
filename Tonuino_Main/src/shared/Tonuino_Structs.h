@@ -14,11 +14,11 @@ struct MusicDataset
 	// - Changing the order will result in miss-allocation (when reading data that was stored with previous order)
 	uint8_t mode;
 	uint8_t startFolder;
-	uint8_t startTrack;
+	uint16_t startTrack;
 	uint8_t endFolder;
-	uint8_t endTrack;
+	uint16_t endTrack;
 	uint8_t recentFolder;
-	uint8_t recentTrack;
+	uint16_t recentTrack;
 };
 
 // this object stores nfc tag data

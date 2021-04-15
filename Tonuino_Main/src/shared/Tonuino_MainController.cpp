@@ -137,7 +137,7 @@ void saveCurrentTrackAndFolder()
 		{
 			return;
 		}
-		uint8_t currentTrack = tonuinoPlayer().currentTrack();
+		uint16_t currentTrack = tonuinoPlayer().currentTrack();
 		uint8_t currentFolder = dfPlayer.currentMusicFolder;
 		
 		// Save to EEPROM		
@@ -447,7 +447,7 @@ void onMusicCardReturn()
 	dfPlayer.playOrCompareTrack(recentCardMusicDS, false, false, swConfig.StopPlayOnCardRemoval);
 }
 
-uint8_t voiceMenu(uint8_t numberOfOptions, int startMessage, int messageOffset,
+uint8_t voiceMenu(uint16_t numberOfOptions, int startMessage, int messageOffset,
                   bool preview, int previewFromFolder, int defaultValue) 
 {
 	uint8_t returnValue = defaultValue;
@@ -528,7 +528,7 @@ bool setupFolder(MusicDataset * musicDS)
 	uint8_t mode = musicDS->mode;
 	if (mode == 0) return false;
 
-	uint8_t numberOptions = dfPlayer.getFolderTrackCount(folder);
+	uint16_t numberOptions = dfPlayer.getFolderTrackCount(folder);
 	// Einzelmodus -> Datei abfragen
 	if (mode == Single)
 	{
@@ -771,7 +771,7 @@ void handleModifier(EModifier modifier, uint16_t special, bool isCardRemoval)
 		}
 		case MODI_TrackNumber:
 		{
-			uint8_t advertTrack = tonuinoPlayer().currentTrackInRange();
+			uint16_t advertTrack = tonuinoPlayer().currentTrackInRange();
 			dfPlayer.playAdvertisementAndWait(advertTrack);
 			break;
 		}

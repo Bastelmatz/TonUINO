@@ -176,10 +176,10 @@ namespace Tonuino_RFID_Tool
                     else
                     {
                         EMusicMode mode = MusicMode.FromNumber(getByte(textLines[3]));
-                        byte startTrack = getByte(textLines[4]);
-                        byte endTrack = getByte(textLines[5]);
+                        ushort startTrack = getShort(textLines[4]);
+                        ushort endTrack = getShort(textLines[5]);
                         byte endFolder = getByte(textLines[6]);
-                        byte recentTrack = getByte(textLines[7]);
+                        ushort recentTrack = getShort(textLines[7]);
                         byte recentFolder = getByte(textLines[8]);
                         data = new MusicCardData(rfid, cookie, mode, startFolder, startTrack, endTrack, endFolder, recentTrack, recentFolder);
                     }
@@ -191,6 +191,11 @@ namespace Tonuino_RFID_Tool
         private static byte getByte(string text)
         {
             return (byte)getLong(text);
+        }
+
+        private static ushort getShort(string text)
+        {
+            return (ushort)getLong(text);
         }
 
         private static int getInt(string text)
@@ -276,9 +281,14 @@ namespace Tonuino_RFID_Tool
             {
                 data.Raw_StartFolder,
                 data.Raw_Mode,
-                data.Raw_Special,
-                data.Raw_Special2,
-                data.Raw_EndFolder
+                (byte)(data.Raw_Special & 0xff),
+                (byte)(data.Raw_Special2 & 0xff),
+                data.Raw_EndFolder,
+                (byte)(data.Raw_RecentTrack & 0xff),
+                data.Raw_RecentFolder,
+                (byte)(data.Raw_Special >> 8),
+                (byte)(data.Raw_Special2 >> 8),
+                (byte)(data.Raw_RecentTrack >> 8),
             };
             return getTonuinoBytes(listBytes);
         }

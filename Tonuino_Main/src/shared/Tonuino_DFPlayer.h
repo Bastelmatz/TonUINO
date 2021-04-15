@@ -18,6 +18,8 @@ enum ECOMPARERESULT
 	COMPARE_WRONG = 3,
 };
 
+static const uint8_t FOLDERCODE_ADVERTISEMENT = 100;
+
 class TonuinoDFPlayer
 {
 	public:
@@ -71,7 +73,7 @@ class TonuinoDFPlayer
 	void loop();
 	void pause();
 	void sleep();
-	void playTrack(uint8_t folder, uint8_t track);
+	void playTrack(uint8_t folder, uint16_t track);
 	uint16_t getFolderTrackCount(uint16_t folder);
 	
 	void setFreezeDance(bool active);
@@ -90,7 +92,7 @@ class TonuinoDFPlayer
 	
 	void goToTrack(ETRACKDIRECTION trackDir);
 	void playCurrentTrack();
-	void playTrack(uint8_t track);
+	void playTrack(uint16_t track);
 	void setNextStopAtMillis();
 	void reloadFolder(ETRACKDIRECTION trackDir);
 	void loadFolder(ETRACKDIRECTION trackDir);

@@ -64,8 +64,8 @@ class TonuinoPlayer
 	static bool listenUntilTrackEnds;
 	
 	static uint8_t mode;
-	uint8_t currentTrack();
-	uint8_t currentTrackInRange();
+	uint16_t currentTrack();
+	uint16_t currentTrackInRange();
 	static bool currentTrackStarted;
 		
 	void playTitle();
@@ -73,19 +73,19 @@ class TonuinoPlayer
 	void pauseAndStandBy();
 	void trackFinished();
 	
-	bool goToTrack(int trackDir);
+	bool goToTrack(ETRACKDIRECTION trackDir);
 	
-	void loadFolder(uint8_t numTracks, MusicDataset musicDS);
+	void loadFolder(uint16_t numTracks, MusicDataset musicDS);
 	
 	private:
-	static uint8_t currentTrackIndex;
-	static uint8_t firstTrack;
-	static uint8_t endTrack;
+	static uint16_t currentTrackIndex;
+	static uint16_t firstTrack;
+	static uint16_t endTrack;
 	static bool currentTrackFinished;
 	
-	static uint8_t queue[255];
+	static uint16_t queue[255];
 
-	uint8_t allTracksCount();
+	uint16_t allTracksCount();
 	static bool reShuffleOnEnd;
 	
 	void showTimerInfo();

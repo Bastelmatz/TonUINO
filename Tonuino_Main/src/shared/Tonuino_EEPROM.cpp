@@ -5,8 +5,8 @@
 
 static const uint8_t flashAddress_RecentMusicDS = 0;
 // Check MusicDataset struct to ensure the folder and track index/address is correct
-static const uint8_t flashAddress_RecentFolder = 5;
-static const uint8_t flashAddress_RecentTrack = 6;
+static const uint8_t flashAddress_RecentFolder = 7;
+static const uint8_t flashAddress_RecentTrack = 8;
 
 void TonuinoEEPROM::resetEEPROM()
 {
@@ -35,7 +35,7 @@ void TonuinoEEPROM::writeToFlash_RecentMusicDS(MusicDataset musicDS)
   EEPROM.put(flashAddress_RecentMusicDS, musicDS);
 }
 
-void TonuinoEEPROM::writeToFlash_RecentTrack(uint8_t track) 
+void TonuinoEEPROM::writeToFlash_RecentTrack(uint16_t track) 
 {
   Serial.print(F("Write recent track: "));
   Serial.println(track);

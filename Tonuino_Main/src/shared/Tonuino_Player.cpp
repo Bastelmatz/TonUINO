@@ -7,12 +7,12 @@ bool TonuinoPlayer::currentTrackFinished = false;
 
 uint8_t TonuinoPlayer::mode = 0;
 
-uint8_t TonuinoPlayer::currentTrackIndex = 0;
-uint8_t TonuinoPlayer::firstTrack = 0;
-uint8_t TonuinoPlayer::endTrack = 0;
-uint8_t TonuinoPlayer::queue[255];
+uint16_t TonuinoPlayer::currentTrackIndex = 0;
+uint16_t TonuinoPlayer::firstTrack = 0;
+uint16_t TonuinoPlayer::endTrack = 0;
+uint16_t TonuinoPlayer::queue[255];
 
-uint8_t TonuinoPlayer::allTracksCount()
+uint16_t TonuinoPlayer::allTracksCount()
 {
 	return endTrack - firstTrack + 1;
 }
@@ -56,7 +56,7 @@ bool TonuinoPlayer::listenUntilTrackEnds = false;
 
 // *********************************
 
-uint8_t TonuinoPlayer::currentTrack()
+uint16_t TonuinoPlayer::currentTrack()
 {
 	if (useQueue) 
 	{
@@ -65,29 +65,29 @@ uint8_t TonuinoPlayer::currentTrack()
 	return currentTrackIndex;
 }
 
-uint8_t TonuinoPlayer::currentTrackInRange()
+uint16_t TonuinoPlayer::currentTrackInRange()
 {
 	return currentTrack() - firstTrack + 1;
 }
 
 void TonuinoPlayer::shuffleQueue() 
 {
-	uint8_t allTracks = allTracksCount();
+	uint16_t allTracks = allTracksCount();
 	// Queue für die Zufallswiedergabe erstellen
-	for (uint8_t x = 0; x < allTracks; x++)
+	for (uint16_t x = 0; x < allTracks; x++)
 	{
 		queue[x] = x + firstTrack;
 	}
 	// Rest mit 0 auffüllen
-	for (uint8_t x = allTracks; x < sizeof(queue); x++)
+	for (uint16_t x = allTracks; x < sizeof(queue); x++)
 	{
 		queue[x] = 0;
 	}
 	// Queue mischen
-	for (uint8_t i = 0; i < allTracks; i++)
+	for (uint16_t i = 0; i < allTracks; i++)
 	{
-		uint8_t j = random(0, allTracks);
-		uint8_t t = queue[i];
+		uint16_t j = random(0, allTracks);
+		uint16_t t = queue[i];
 		queue[i] = queue[j];
 		queue[j] = t;
 	}
@@ -153,7 +153,7 @@ void TonuinoPlayer::trackFinished()
 	}
 }
 
-bool TonuinoPlayer::goToTrack(int trackDirection) 
+bool TonuinoPlayer::goToTrack(ETRACKDIRECTION trackDirection) 
 {
 	if (currentTrackStarted && !currentTrackFinished && listenUntilTrackEnds)
 	{
@@ -261,7 +261,7 @@ bool TonuinoPlayer::goToTrack(int trackDirection)
 	return true;
 }
 
-void TonuinoPlayer::loadFolder(uint8_t numTracksInFolder, MusicDataset musicDS) 
+void TonuinoPlayer::loadFolder(uint16_t numTracksInFolder, MusicDataset musicDS) 
 {
 	mode = musicDS.mode;
 	endTrack = numTracksInFolder;
@@ -313,7 +313,7 @@ void TonuinoPlayer::loadFolder(uint8_t numTracksInFolder, MusicDataset musicDS)
 	if (mode == AudioBook) 
 	{
 		Serial.println(F("Kompletten Ordner spielen und Fortschritt merken"));
-		uint8_t recentTrack = musicDS.recentTrack;
+		uint16_t recentTrack = musicDS.recentTrack;
 		if (recentTrack > 0 && recentTrack < numTracksInFolder) 
 		{
 			currentTrackIndex = recentTrack;
