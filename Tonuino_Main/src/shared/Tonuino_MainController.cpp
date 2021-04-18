@@ -790,9 +790,6 @@ void handleModifier(EModifier modifier, uint16_t special, bool isCardRemoval)
 void evaluateModifierCardData(MusicDataset musicDS, bool isCardRemoval)
 {
 	EModifier modifier = static_cast<EModifier>(musicDS.mode);
-	uint8_t special = musicDS.startTrack;
-	uint8_t special2 = musicDS.endTrack;
-	
-	uint16_t value = special2 << 8 | special;
+	uint16_t value = musicDS.startTrack;
 	handleModifier(modifier, value, isCardRemoval);
 }

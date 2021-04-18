@@ -301,6 +301,10 @@ namespace Tonuino_RFID_Tool
                 0,
                 data.Raw_Mode,
                 (byte)(data.Raw_Value & 0xff),
+                0, // end track low byte
+                0, // end folder
+                0, // recent track low byte
+                0, // recent folder
                 (byte)((data.Raw_Value >> 8) & 0xff)
             };
             return getTonuinoBytes(listBytes);
