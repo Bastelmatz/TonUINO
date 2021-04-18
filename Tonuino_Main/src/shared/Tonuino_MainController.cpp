@@ -75,12 +75,12 @@ MusicDataset loadStartMusicDS()
 
 void loadFolder(MusicDataset musicDS)
 {
-	dfPlayer.loadFolder(musicDS);
+	dfPlayer.loadFolder(&musicDS);
 }
 
 void loadAndPlayFolder(MusicDataset musicDS)
 {
-	dfPlayer.loadAndPlayFolder(musicDS);
+	dfPlayer.loadAndPlayFolder(&musicDS);
 }
 
 void turnOff()
@@ -411,7 +411,7 @@ void onNewMusicCard()
 	{
 		memcpy(&recentCardMusicDS, &nextMusicDS, sizeof(MusicDataset));
 		
-		ECOMPARERESULT compareResult = dfPlayer.playOrCompareTrack(recentCardMusicDS, true, false, swConfig.StopPlayOnCardRemoval);
+		ECOMPARERESULT compareResult = dfPlayer.playOrCompareTrack(&recentCardMusicDS, true, false, swConfig.StopPlayOnCardRemoval);
 		if (compareResult != COMPARE_NOTSUPPORTED)
 		{
 			// optional to do: visualize result, e.g. turn LED on/off or change color
@@ -443,12 +443,12 @@ void onCardGone()
 		return;
 	}
 	// on music card gone
-	dfPlayer.playOrCompareTrack(recentCardMusicDS, false, true, swConfig.StopPlayOnCardRemoval);
+	dfPlayer.playOrCompareTrack(&recentCardMusicDS, false, true, swConfig.StopPlayOnCardRemoval);
 }
 
 void onMusicCardReturn()
 {
-	dfPlayer.playOrCompareTrack(recentCardMusicDS, false, false, swConfig.StopPlayOnCardRemoval);
+	dfPlayer.playOrCompareTrack(&recentCardMusicDS, false, false, swConfig.StopPlayOnCardRemoval);
 }
 
 uint8_t voiceMenu(uint16_t numberOfOptions, int startMessage, int messageOffset,

@@ -148,12 +148,12 @@ void TonuinoDFPlayer::playCurrentTrack()
 	playTrack(track);
 }
 
-ECOMPARERESULT TonuinoDFPlayer::playOrCompareTrack(MusicDataset compareMusicDS, bool isNewCard, bool isCardGone, bool stopOnCardRemoval)
+ECOMPARERESULT TonuinoDFPlayer::playOrCompareTrack(MusicDataset * compareMusicDS, bool isNewCard, bool isCardGone, bool stopOnCardRemoval)
 {
-	uint8_t mode = compareMusicDS.mode;
+	uint8_t mode = compareMusicDS->mode;
 	uint16_t currentTrack = tonuinoPlayer.currentTrack();
 	bool activeMemoryOrQuiz = memoryMode_active || quizMode_active;
-	bool match = currentTrack == compareMusicDS.startTrack && (currentMusicFolder == compareMusicDS.startFolder || currentMusicFolder == compareMusicDS.endFolder);
+	bool match = currentTrack == compareMusicDS->startTrack && (currentMusicFolder == compareMusicDS->startFolder || currentMusicFolder == compareMusicDS->endFolder);
 	bool useCompareTrack = playCompareTrack && (!memoryMode_active || isNewCard); // repeat first track on card return with active memory mode 
 	bool isCardReturn = !isNewCard && !isCardGone;
 	bool isFixPair = mode == UniDirectionalPair || mode == BiDirectionalPair;
@@ -247,80 +247,80 @@ ECOMPARERESULT TonuinoDFPlayer::playOrCompareTrack(MusicDataset compareMusicDS, 
 	return useCompareTrack && activeMemoryOrQuiz ? (match ? COMPARE_MATCH : COMPARE_WRONG) : COMPARE_NO;
 }
 
-void TonuinoDFPlayer::tryPlayCompareTrack(bool useCompareTrack, MusicDataset compareMusicDS)
+void TonuinoDFPlayer::tryPlayCompareTrack(bool useCompareTrack, MusicDataset * compareMusicDS)
 {
 	uint16_t currentTrack = tonuinoPlayer.currentTrack();
-	uint8_t mode = compareMusicDS.mode;
+	uint8_t mode = compareMusicDS->mode;
 	if (mode == Single)
 	{
 		playCurrentTrack();
 	}
 	if (mode == UniDirectionalPair || mode == RandomUniDirectionalPair || mode == Section_RandomUniDirectionalPair)
 	{
-		uint8_t folder = useCompareTrack ? compareMusicDS.endFolder : compareMusicDS.startFolder;
+		uint8_t folder = useCompareTrack ? compareMusicDS->endFolder : compareMusicDS->startFolder;
 		playTrack(folder, currentTrack);
 	}
 	if (mode == BiDirectionalPair || mode == RandomBiDirectionalPair || mode == Section_RandomBiDirectionalPair)
 	{
-		uint8_t oppositeFolder = currentMusicFolder == compareMusicDS.startFolder ? compareMusicDS.endFolder : compareMusicDS.startFolder;
+		uint8_t oppositeFolder = currentMusicFolder == compareMusicDS->startFolder ? compareMusicDS->endFolder : compareMusicDS->startFolder;
 		uint8_t folder = useCompareTrack ? oppositeFolder : currentMusicFolder;
 		playTrack(folder, currentTrack);
 	}
 }
 
-void TonuinoDFPlayer::loadFolder(MusicDataset dataset, ETRACKDIRECTION trackDir)
+void TonuinoDFPlayer::loadFolder(MusicDataset * dataset, ETRACKDIRECTION trackDir)
 {
 	bool isFirstLoad = trackDir == TRACKDIR_None;
 	uint16_t currentTrack = tonuinoPlayer.currentTrack();
-	uint8_t mode = dataset.mode;
+	uint8_t mode = dataset->mode;
 	bool randomFolderForNextTrack = (mode == AudioDrama || mode == Party) &&
-									dataset.endFolder > dataset.startFolder;
+									dataset->endFolder > dataset->startFolder;
 	bool randomFolderForFirstLoad = mode == RandomFolder_Album || 
 									mode == RandomFolder_Party;
 	bool changeFolderOnLimits = (mode == Album || mode == AudioBook) &&
-								 dataset.endFolder > dataset.startFolder;
+								 dataset->endFolder > dataset->startFolder;
 	bool isBiDirectionalPair = mode == BiDirectionalPair || mode == RandomBiDirectionalPair || mode == Section_RandomBiDirectionalPair;
 	
 	uint8_t newFolder = currentMusicFolder;
 	if (isFirstLoad)
 	{
-		newFolder = dataset.startFolder;
-		uint8_t recentFolder = dataset.recentFolder;
-		if (recentFolder > newFolder && recentFolder <= dataset.endFolder)
+		newFolder = dataset->startFolder;
+		uint8_t recentFolder = dataset->recentFolder;
+		if (recentFolder > newFolder && recentFolder <= dataset->endFolder)
 		{
 			newFolder = recentFolder;
 		}
 	}
 	if (isBiDirectionalPair)
 	{
-		newFolder = random(0, 2) == 0 ? dataset.startFolder : dataset.endFolder;
+		newFolder = random(0, 2) == 0 ? dataset->startFolder : dataset->endFolder;
 	}
 	if ((randomFolderForNextTrack && trackDir == TRACKDIR_Next)|| 
 	    (randomFolderForFirstLoad && isFirstLoad))
 	{
-		newFolder = random(dataset.startFolder, dataset.endFolder + 1);
+		newFolder = random(dataset->startFolder, dataset->endFolder + 1);
 	}
 	ETRACKDIRECTION newTrackDir = TRACKDIR_None;
 	if (changeFolderOnLimits)
 	{
 		if (trackDir == TRACKDIR_Next && currentTrack == numTracksInFolder)
 		{
-			newFolder = newFolder < dataset.endFolder ? newFolder + 1 : dataset.startFolder;
+			newFolder = newFolder < dataset->endFolder ? newFolder + 1 : dataset->startFolder;
 			newTrackDir = TRACKDIR_First;
 		}
 		if (trackDir == TRACKDIR_Previous && currentTrack == 1)
 		{
-			newFolder = newFolder > dataset.startFolder ? newFolder - 1 : dataset.endFolder;
+			newFolder = newFolder > dataset->startFolder ? newFolder - 1 : dataset->endFolder;
 			newTrackDir = TRACKDIR_Last;
 		}
 		if (trackDir == TRACKDIR_First)
 		{
-			newFolder = dataset.startFolder;
+			newFolder = dataset->startFolder;
 			newTrackDir = TRACKDIR_First;
 		}
 		if (trackDir == TRACKDIR_Last)
 		{
-			newFolder = dataset.endFolder;
+			newFolder = dataset->endFolder;
 			newTrackDir = TRACKDIR_Last;
 		}
 	}
@@ -329,7 +329,7 @@ void TonuinoDFPlayer::loadFolder(MusicDataset dataset, ETRACKDIRECTION trackDir)
 	if (doLoad)
 	{
 		currentMusicFolder = newFolder;
-		currentMusicDS = dataset;
+		currentMusicDS = *dataset;
 		numTracksInFolder = mp3.getFolderTrackCount(currentMusicFolder);
 		
 		Serial.print(F("Load folder "));
@@ -351,7 +351,7 @@ void TonuinoDFPlayer::reloadFolder(ETRACKDIRECTION trackDir)
 	loadFolder(trackDir);
 }
 
-void TonuinoDFPlayer::loadFolder(MusicDataset dataset)
+void TonuinoDFPlayer::loadFolder(MusicDataset * dataset)
 {
 	playCompareTrack = false;
 	loadFolder(dataset, TRACKDIR_None);
@@ -359,10 +359,10 @@ void TonuinoDFPlayer::loadFolder(MusicDataset dataset)
 
 void TonuinoDFPlayer::loadFolder(ETRACKDIRECTION trackDir)
 {
-	loadFolder(currentMusicDS, trackDir);
+	loadFolder(&currentMusicDS, trackDir);
 }
 
-void TonuinoDFPlayer::loadAndPlayFolder(MusicDataset dataset)
+void TonuinoDFPlayer::loadAndPlayFolder(MusicDataset * dataset)
 {
 	loadFolder(dataset);
 	playCurrentTrack();
@@ -407,7 +407,7 @@ void TonuinoDFPlayer::goToTrack(ETRACKDIRECTION trackDir)
 {
 	if (playCompareTrack && quizMode_active)
 	{
-		tryPlayCompareTrack(true, currentMusicDS);
+		tryPlayCompareTrack(true, &currentMusicDS);
 		playCompareTrack = false;
 		return;
 	}

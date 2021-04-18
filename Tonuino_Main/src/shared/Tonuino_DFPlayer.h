@@ -47,10 +47,9 @@ class TonuinoDFPlayer
 			
 	void setup(uint8_t pinBusy);
 	bool isPlaying();
-	void loadFolder(MusicDataset dataset);
-	void loadAndPlayFolder(MusicDataset dataset);
-	ECOMPARERESULT playOrCompareTrack(MusicDataset compareMusicDS, bool isNewCard, bool isCardGone, bool stopOnCardRemoval);
-	void tryPlayCompareTrack(bool useCompareTrack, MusicDataset compareMusicDS);
+	void loadFolder(MusicDataset * dataset);
+	void loadAndPlayFolder(MusicDataset * dataset);
+	ECOMPARERESULT playOrCompareTrack(MusicDataset * compareMusicDS, bool isNewCard, bool isCardGone, bool stopOnCardRemoval);
 	void continueTitle();
 	void pauseAndStandBy();
 	void togglePlay();
@@ -98,7 +97,8 @@ class TonuinoDFPlayer
 	void setNextStopAtMillis();
 	void reloadFolder(ETRACKDIRECTION trackDir);
 	void loadFolder(ETRACKDIRECTION trackDir);
-	void loadFolder(MusicDataset musicDS, ETRACKDIRECTION trackDir);
+	void loadFolder(MusicDataset * musicDS, ETRACKDIRECTION trackDir);
+	void tryPlayCompareTrack(bool useCompareTrack, MusicDataset * compareMusicDS);
 };
 
 #endif
