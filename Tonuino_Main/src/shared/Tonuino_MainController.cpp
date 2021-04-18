@@ -425,8 +425,11 @@ void onNewMusicCard()
 			mode == RandomFolder_Album || 
 			mode == RandomFolder_Party)
 		{
-			tonuinoEEPROM.writeToFlash_RecentMusicDS(recentCardMusicDS);
-			recentMusicDSinEEPROM = recentCardMusicDS;
+			if (!dfPlayer.quizMode_active && !dfPlayer.memoryMode_active)
+			{
+				tonuinoEEPROM.writeToFlash_RecentMusicDS(recentCardMusicDS);
+				recentMusicDSinEEPROM = recentCardMusicDS;
+			}
 		}
 	}
 }
@@ -738,9 +741,9 @@ void handleModifier(EModifier modifier, uint16_t special, bool isCardRemoval)
 		{
 			dfPlayer.setMemoryMode(toggle ? !dfPlayer.memoryMode_active : bValue); break;
 		}
-		case MODI_Player_RandomQuiz:
+		case MODI_Player_Quiz:
 		{
-			dfPlayer.randomQuiz_active = toggle ? !dfPlayer.randomQuiz_active : bValue; break;
+			dfPlayer.setQuizMode(toggle ? !dfPlayer.quizMode_active : bValue); break;
 		}
 		case MODI_TrackContinue:
 		{

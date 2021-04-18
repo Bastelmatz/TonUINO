@@ -30,7 +30,7 @@ enum EModifier
 	
 	MODI_Player_FreezeDance = 40,
 	MODI_Player_Memory = 41,
-	MODI_Player_RandomQuiz = 42,
+	MODI_Player_Quiz = 42,
 	
 	MODI_LockAll = 50,
 	MODI_LockButtons = 51,
@@ -76,7 +76,7 @@ class TONUINOMODIFIER
 			case MODI_Player_StopOnCardRemoval:
 			case MODI_Player_FreezeDance:
 			case MODI_Player_Memory:
-			case MODI_Player_RandomQuiz:
+			case MODI_Player_Quiz:
 			case MODI_LockAll:
 			case MODI_LockButtons: return true;
 		}

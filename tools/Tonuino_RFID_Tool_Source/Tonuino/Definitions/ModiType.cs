@@ -30,7 +30,7 @@ namespace Tonuino_RFID_Tool
 
         Player_FreezeDance,
         Player_MemoryMode,
-        Player_RandomQuiz,
+        Player_QuizMode,
 
         LockAll,
         LockButtons,
@@ -81,7 +81,7 @@ namespace Tonuino_RFID_Tool
 
                 new Ident<EModiType>(40, EModiType.Player_FreezeDance, "Freeze Dance"),
                 new Ident<EModiType>(41, EModiType.Player_MemoryMode, "Memory Mode"),
-                new Ident<EModiType>(42, EModiType.Player_RandomQuiz, "Random Quiz"),
+                new Ident<EModiType>(42, EModiType.Player_QuizMode, "Quiz Mode"),
 
                 new Ident<EModiType>(50, EModiType.LockAll, "Lock All"),
                 new Ident<EModiType>(51, EModiType.LockButtons, "Lock Buttons"),
@@ -114,7 +114,7 @@ namespace Tonuino_RFID_Tool
                     case EModiType.Player_StopOnCardRemoval:
                     case EModiType.Player_FreezeDance:
                     case EModiType.Player_MemoryMode:
-                    case EModiType.Player_RandomQuiz:
+                    case EModiType.Player_QuizMode:
                     case EModiType.LockAll:
                     case EModiType.LockButtons: return true;
                 }

@@ -43,13 +43,14 @@ class TonuinoDFPlayer
 	static bool musicDSLoaded;
 	static bool freezeDance_active;
 	static bool memoryMode_active;
-	static bool randomQuiz_active;
+	static bool quizMode_active;
 			
 	void setup(uint8_t pinBusy);
 	bool isPlaying();
 	void loadFolder(MusicDataset dataset);
 	void loadAndPlayFolder(MusicDataset dataset);
 	ECOMPARERESULT playOrCompareTrack(MusicDataset compareMusicDS, bool isNewCard, bool isCardGone, bool stopOnCardRemoval);
+	void tryPlayCompareTrack(bool useCompareTrack, MusicDataset compareMusicDS);
 	void continueTitle();
 	void pauseAndStandBy();
 	void togglePlay();
@@ -78,6 +79,7 @@ class TonuinoDFPlayer
 	
 	void setFreezeDance(bool active);
 	void setMemoryMode(bool active);
+	void setQuizMode(bool active);
 	
 	private:
 	static uint8_t pin_Busy;
