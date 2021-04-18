@@ -273,29 +273,28 @@ void TonuinoDFPlayer::loadFolder(MusicDataset dataset, ETRACKDIRECTION trackDir)
 	{
 		newFolder = random(dataset.startFolder, dataset.endFolder + 1);
 	}
-	bool setToFirstTrack = false;
-	bool setToLastTrack = false;
+	ETRACKDIRECTION newTrackDir = TRACKDIR_None;
 	if (changeFolderOnLimits)
 	{
 		if (trackDir == TRACKDIR_Next && currentTrack == numTracksInFolder)
 		{
 			newFolder = newFolder < dataset.endFolder ? newFolder + 1 : dataset.startFolder;
-			setToFirstTrack = true;
+			newTrackDir = TRACKDIR_First;
 		}
 		if (trackDir == TRACKDIR_Previous && currentTrack == 1)
 		{
 			newFolder = newFolder > dataset.startFolder ? newFolder - 1 : dataset.endFolder;
-			setToLastTrack = true;
+			newTrackDir = TRACKDIR_Last;
 		}
 		if (trackDir == TRACKDIR_First)
 		{
 			newFolder = dataset.startFolder;
-			setToFirstTrack = true;
+			newTrackDir = TRACKDIR_First;
 		}
 		if (trackDir == TRACKDIR_Last)
 		{
 			newFolder = dataset.endFolder;
-			setToLastTrack = true;
+			newTrackDir = TRACKDIR_Last;
 		}
 	}
 	
@@ -314,13 +313,9 @@ void TonuinoDFPlayer::loadFolder(MusicDataset dataset, ETRACKDIRECTION trackDir)
 		musicDSLoaded = true;
 		newMusisDS = true;
 	}
-	if (setToFirstTrack)
+	if (newTrackDir != TRACKDIR_None)
 	{
-		tonuinoPlayer.goToTrack(TRACKDIR_First);
-	}
-	if (setToLastTrack)
-	{
-		tonuinoPlayer.goToTrack(TRACKDIR_Last);
+		tonuinoPlayer.goToTrack(newTrackDir);
 	}
 }
 
