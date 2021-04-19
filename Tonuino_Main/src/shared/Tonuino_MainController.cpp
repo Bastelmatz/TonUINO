@@ -202,7 +202,7 @@ void setupTonuino(TonuinoConfig config)
 	Serial.println(F("|_   _|___ ___|  |  |     |   | |     |"));
 	Serial.println(F("  | | | . |   |  |  |-   -| | | |  |  |"));
 	Serial.println(F("  |_| |___|_|_|_____|_____|_|___|_____|\n"));
-	Serial.println(F("TonUINO MIRA Version 1.0.0"));
+	Serial.println(F("TonUINO MIRA Version 1.1.0"));
 	Serial.println(F("created by Bastelmatz."));
 
 	// DFPlayer Mini initialisieren

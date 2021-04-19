@@ -1,49 +1,81 @@
-# TonUINO
-Die DIY Musikbox (nicht nur) für Kinder
+# TonUINO Mira
+RFID-Musikbox mit Arduino Nano und DFPlayer
 
 # Content
 
+## Support for large folder
+- Folder 1-15 can have upto 3000 tracks
+- Track names must have 4 digits at the start for tracks > 255 (0256.mp3 to 3000.mp3)
+- Tracks <= 255 keep the 3 digit number (001.mp3 to 255.mp3), in all folders
+	- Therefore track 1-255 are interchangable among the folders without renaming
+	- Extended track variable sizes to 2 bytes (backward compatible on RFID cards)
+
+## Support for Advertisement folder for music cards 
+-> Set Folder to 100
+- Therefore, advertisement music cards with single mode can be used for memory
+	-> Listen to your favourite Tonuino songs while playing memory
+
 ## New "Pair" music modes
-	- Uni-directional pair (e.g. for question-answer pairs)
-		- Play first track on card detection
-		- Play second track on card removal
-	- Bi-directional pair (e.g. for vocabularies)
-		- Play random track on card detection
-		- Play other track on card removal
-	-> both pair modes:
-		- Tracks must have same number, but in different folders
-		- Recommendation: 
-			- folder A for first tracks (e.g. questions)
-			- folder B for second tracks (e.g. answers)
+- play defined titles in 2 folders (A and B)
+- Uni-directional pair (e.g. for question-answer pairs)
+	- Play track in folder A on card detection
+	- Play track in folder B on card removal
+- Bi-directional pair (e.g. for vocabularies)
+	- Play track on card detection, either in folder A or B
+	- Play track on card removal in opposite folder (A, if B was played first and viceversa)
+-> both pair modes:
+	- Tracks must have same number, but in different folders
+	- Recommendation: 
+		- folder A for first tracks (e.g. questions)
+		- folder B for second tracks (e.g. answers)
+
+## New "Random[]Pair" music modes
+- Random uni-directional and bi-directional pair
+	- Play 1 RANDOM track from complete folder on card detection
+	- Play same track from opposite folder on card removal
+- Order of the folders is determined by uni- or bi-directional type (same as normal "pair" modes)
+- The "section" variants define start and end track
+	-> defines track range within folder instead of complete folder
 			
 ## Memory mode
-	- Turn on/off with modifier
-	- Requires 2 (or more) identical cards 
-		- identical = with same track number and start resp. end folder
-	- Supports cards with music modes: SingleTrack, UniDirectionalPair, BiDirectionalPair
-	- Automatic evaluation of second card with different RFID/UID 
-		- play sound for "right" or "wrong" match
-	- Repeats first track on return of the same card
-	- Pair-mode cards play no track on card removal
+- Turn on/off with modifier
+- Requires 2 (or more) identical cards 
+	- identical = with same track number and start resp. end folder
+- Supports cards with music modes: SingleTrack, UniDirectionalPair, BiDirectionalPair
+- Automatic evaluation of second card with different RFID/UID 
+	- Play sound for "right" or "wrong" match
+- Repeats first track on return of the same card
+- Pair-mode cards play no track on card removal
+
+## Quiz mode
+- Turn on/off with modifier
+- Requires 1 Random-Uni/Bi-Directional-Pair or AudiDrama card for definition of the folder and track range (step 1)
+- Requires multiple non-random Uni/Bi-Directional-Pair or SingleTrack cards (step 2)
+	- number of cards >= amount of files defined by RandomPair/Audiodrama card on step 1
+- Play new "question" on next button press or return of the RandomPair/Audiodrama card from step 1
+- Play evaluation when card from step 2 is put on the RFID reader
+	- Play sound for "right" or "wrong" match
+	- Multiple retries with other cards are possible until the "right" match
+	- Solution on next button press: Play the track in compare folder, if there was no "right" match
 	
 ## New "RandomFolder" music modes
-	- Random folder - album
-		-> Plays all tracks in a random folder in order
-	- Random folder - party
-		-> Plays all tracks in a random folder in random order
-	- Random folder selection:
-		- On every card detection (incl. return of same card)
-		- Range is defined by start and end folder number
+- Random folder - album
+	-> Plays all tracks in a random folder in order
+- Random folder - party
+	-> Plays all tracks in a random folder in random order
+- Random folder selection:
+	- On every card detection (incl. return of same card)
+	- Range is defined by start and end folder number
 		
 ## End-Folder
-	- Extends range for music selection in combination with start folder
-	- Supports cards with music modes: 
-		- Album, Audiobook	
-			-> jumps to first track in next folder on next track action
-			-> jumps to last track in previous folder on previous track action
-			-> jumps to first track in first folder on first track action
-			-> jumps to last track in last folder for last track action
-		- Party, AudioDrama -> jumps to random folder on next track action
+- Extends range for music selection in combination with start folder
+- Supports cards with music modes: 
+	- Album, Audiobook	
+		-> jumps to first track in next folder on next track action
+		-> jumps to last track in previous folder on previous track action
+		-> jumps to first track in first folder on first track action
+		-> jumps to last track in last folder for last track action
+	- Party, AudioDrama -> jumps to random folder on next track action
 
 ## Music Modes - Definitions
 
@@ -64,12 +96,17 @@ Die DIY Musikbox (nicht nur) für Kinder
 	UniDirectionalPair = 30
 	BiDirectionalPair = 31
 	
+	RandomUniDirectionalPair = 35
+	RandomBiDirectionalPair = 36
+	Section_RandomUniDirectionalPair = 37
+	Section_RandomBiDirectionalPair = 38
+		
 ## Modifiers
 	- Can be used on cards or triggered by buttons (or something else)
 	- So-called BoolValue-Modifiers can trigger on card removal, these are:
 		- MODI_TrackContinue
 		- MODI_Player_Random, MODI_Player_RepeatSingle, MODI_Player_RepeatAll, MODI_Player_ListenToEnd, MODI_Player_StopOnCardRemoval
-		- MODI_Player_FreezeDance, MODI_Player_Memory, MODI_Player_RandomQuiz
+		- MODI_Player_FreezeDance, MODI_Player_Memory, MODI_Player_Quiz
 		- MODI_LockAll, MODI_LockButtons
 
 ## BoolValue - Definitions
@@ -86,7 +123,6 @@ Die DIY Musikbox (nicht nur) für Kinder
 	MODI_BOOLVAL_Undo_OnRemoval_Set = 21
 	MODI_BOOLVAL_Toggle_OnRemoval_Toggle = 22
 
-	
 ## Modifiers - Definitions
 
 	MODI_TrackContinue = 1
@@ -113,7 +149,7 @@ Die DIY Musikbox (nicht nur) für Kinder
 	
 	MODI_Player_FreezeDance = 40
 	MODI_Player_Memory = 41
-	MODI_Player_RandomQuiz = 42
+	MODI_Player_Quiz = 42
 	
 	MODI_LockAll = 50
 	MODI_LockButtons = 51
@@ -127,13 +163,54 @@ Die DIY Musikbox (nicht nur) für Kinder
 	MODI_MENU_Choose = 72
 	MODI_MENU_Cancel = 73
 	
-	
+############################################################
 
+# Use Cases
+
+## Memory
+- Single player, cooperative or competitive multiplayer (e.g. who collects more pairs)
+- Using new Memory mode/modifier
+- Multiple, visual identically cards, the more the better!?
+	- Single tracks with SingleTrack cards
+	- Question-Answer with uni-directional pairs
+	- Title A - Title B with bi-directional pairs
+	
+## "Think & Say" Quiz with Pair Cards
+- Single player, cooperative or competitive multiplayer (e.g. who says the correct(?) answer first?)
+- "Answer" should be announced verbal ("Think & Say") or written down ("Think & Write") before card is removed and corret answer is played
+- With Uni/Bi-Directional-Pair Cards
+	- multiple cards -> 1 defined "question" can/must be selected
+- With Random-Uni/Bi-Directional-Pair Cards -> RECOMMENDED
+	- random question(s) with only 1 card in total
+	- E.g. use Uni-Directional-Pairs for "How sounds the cat?" - "Meeow"
+	- E.g. use Bi-Directional-Pairs to train vocabularies
+	
+## "Think & Search" Quiz
+- Single player, cooperative or competitive multiplayer (e.g. who finds the correct(?) answer first?)
+- Using new Quiz mode/modifier
+- Multiple, visual identifiable cards
+	- Single tracks with SingleTrack cards
+	- Question-Answer with uni-directional pairs
+	- Title A - Title B with bi-directional pairs
+
+## Uni/Bi-Directional-Pair Cards with 3 in 1 functionality
+1) Think & Say Quiz
+2) Memory (requires 2 or more cards with same data, visually identically)
+3) Think & Search Quiz (cards must be visually identifiable)
+-> therefore, "identical cards" (for memory) and "unique topping" (for quiz) must be combinable (e.g. plugable or adhering)
+
+############################################################
+	
 # Change Log
 
-## Version Mira 1.1 (09.04.2021)
+## Version Mira 1.1 (19.04.2021)
+- Add support for large folders (1-15) with upto 3000 songs (requires 4 digit track number pattern: 0256.mp3 to 3000.mp3)
+	- Extended track variable sizes to 2 bytes (backward compatible on RFID cards)
+- Add support for Advertisement folder for music cards -> Set Folder to 100
+- Add new music modes for random uni- and bi-directional pairs
 - Add new music modes for uni- and bi-directional pairs
 - Add memory mode
+- Add quiz mode
 - Add support for end-folder
 - Save recent track and folder for cards with any audiobook mode on RFID card instead of EEPROM
 - Save recent music dataset to EEPROM (to start on next power-up without card)
