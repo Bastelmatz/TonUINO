@@ -98,7 +98,7 @@ class TonuinoDFPlayer
 	void reloadFolder(ETRACKDIRECTION trackDir);
 	void loadFolder(ETRACKDIRECTION trackDir);
 	void loadFolder(MusicDataset * musicDS, ETRACKDIRECTION trackDir);
-	void tryPlayCompareTrack(bool useCompareTrack, MusicDataset * compareMusicDS);
+	void tryPlayCompareTrack(MusicDataset * compareMusicDS, bool useCompareFolder, bool useMatchingTrack);
 };
 
 #endif
