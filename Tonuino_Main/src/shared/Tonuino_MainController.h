@@ -18,17 +18,17 @@ void setupTonuino(TonuinoConfig config);
 
 void handlePotentiometer();
 
-void loadAndPlayFolder(MusicDataset theFolder);
-void loadFolder(MusicDataset theFolder);
-bool setupFolder(MusicDataset * theFolder);
+void loadAndPlayFolder(MusicDataset * musicDS);
+void loadFolder(MusicDataset * musicDS);
+bool setupFolder(MusicDataset * musicDS);
 
 void onNewMusicCard();
 void onCardGone();
 void onMusicCardReturn();
 void setupCard();
-void writeCard(MusicDataset musicDS);
+void writeCard(MusicDataset * musicDS);
 void resetCard();
 
-void evaluateModifierCardData(MusicDataset musicDS, bool isCardRemoval);
+void evaluateModifierCardData(MusicDataset * musicDS, bool isCardRemoval);
 void handleModifier(EModifier modifier, uint16_t special);
 void handleModifier(EModifier modifier, uint16_t special, bool isCardRemoval);

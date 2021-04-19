@@ -31,7 +31,7 @@ void checkCardReader()
   if (pollCardResult == MODIFIERCARD_NEW || pollCardResult == MUSICCARD_NEW || pollCardResult == MUSICCARD_IS_BACK)
   {
   	// transmit data over serial for Tonuino RFID Tool
-  	tonuinoRFIDTool.transmitCardData(tonuinoRFID.readCardData);
+  	tonuinoRFIDTool.transmitCardData(&tonuinoRFID.readCardData);
   }
   switch (pollCardResult)
   {

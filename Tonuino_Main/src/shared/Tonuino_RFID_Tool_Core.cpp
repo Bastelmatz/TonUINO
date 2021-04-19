@@ -18,7 +18,7 @@ void Tonuino_RFID_Tool_Core::transmitTrigger(bool startTrigger)
 	}
 }
 
-void Tonuino_RFID_Tool_Core::transmitCardData(nfcTagStruct nfcTag)
+void Tonuino_RFID_Tool_Core::transmitCardData(nfcTagStruct * nfcTag)
 {
 	// this information is required for Tonuino RFID Tool
 	// the formatting and order of the transmitted data is defined and must be in sync with the tool
@@ -29,21 +29,21 @@ void Tonuino_RFID_Tool_Core::transmitCardData(nfcTagStruct nfcTag)
 	dump_byte_array(tonuinoRFID.currentCardUid, sizeof(tonuinoRFID.currentCardUid));
 	Serial.println();
 	Serial.print(F("Cookie:"));
-	Serial.println(nfcTag.cookie);
+	Serial.println(nfcTag->cookie);
 	Serial.print(F("Folder:"));
-	Serial.println(nfcTag.musicDS.startFolder);
+	Serial.println(nfcTag->musicDS.startFolder);
 	Serial.print(F("Mode:"));
-	Serial.println(nfcTag.musicDS.mode);
+	Serial.println(nfcTag->musicDS.mode);
 	Serial.print(F("Special:"));
-	Serial.println(nfcTag.musicDS.startTrack);
+	Serial.println(nfcTag->musicDS.startTrack);
 	Serial.print(F("Special2:"));
-	Serial.println(nfcTag.musicDS.endTrack);
+	Serial.println(nfcTag->musicDS.endTrack);
 	Serial.print(F("EndFolder:"));
-	Serial.println(nfcTag.musicDS.endFolder);
+	Serial.println(nfcTag->musicDS.endFolder);
 	Serial.print(F("RecentTrack:"));
-	Serial.println(nfcTag.musicDS.recentTrack);
+	Serial.println(nfcTag->musicDS.recentTrack);
 	Serial.print(F("RecentFolder:"));
-	Serial.println(nfcTag.musicDS.recentFolder);
+	Serial.println(nfcTag->musicDS.recentFolder);
 	
 	transmitTrigger(false);
 }

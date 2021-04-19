@@ -73,14 +73,14 @@ MusicDataset loadStartMusicDS()
 	}
 }
 
-void loadFolder(MusicDataset musicDS)
+void loadFolder(MusicDataset * musicDS)
 {
-	dfPlayer.loadFolder(&musicDS);
+	dfPlayer.loadFolder(musicDS);
 }
 
-void loadAndPlayFolder(MusicDataset musicDS)
+void loadAndPlayFolder(MusicDataset * musicDS)
 {
-	dfPlayer.loadAndPlayFolder(&musicDS);
+	dfPlayer.loadAndPlayFolder(musicDS);
 }
 
 void turnOff()
@@ -161,7 +161,7 @@ void saveCurrentTrackAndFolder()
 				Serial.print(F("Write recent folder and track to card"));
 				recentCardMusicDS.recentFolder = currentFolder;
 				recentCardMusicDS.recentTrack = currentTrack;
-				tonuinoRFID.writeCard(recentCardMusicDS);
+				tonuinoRFID.writeCard(&recentCardMusicDS);
 			}
 		}
 		lastTimeTrackAndFolderSaved = millis();
@@ -269,7 +269,7 @@ void setupTonuino(TonuinoConfig config)
 	
 	// load defined or recent folder 
 	MusicDataset startMusicDS = loadStartMusicDS();
-	loadFolder(startMusicDS);
+	loadFolder(&startMusicDS);
 }
 
 void handleRotaryEncoder()
@@ -325,7 +325,7 @@ void handleCardReader()
 	byte pollCardResult = tonuinoRFID.tryPollCard();
 	if (pollCardResult == MODIFIERCARD_NEW)
 	{
-		evaluateModifierCardData(tonuinoRFID.readCardData.musicDS, false);
+		evaluateModifierCardData(&tonuinoRFID.readCardData.musicDS, false);
 	}
 	if (allLocked)
 	{
@@ -439,7 +439,7 @@ void onCardGone()
 	MusicDataset lastCardMusicDS = tonuinoRFID.readCardData.musicDS;
 	if (tonuinoRFID.lastCardWasModifierCard)
 	{
-		evaluateModifierCardData(lastCardMusicDS, true);
+		evaluateModifierCardData(&lastCardMusicDS, true);
 		return;
 	}
 	// on music card gone
@@ -582,13 +582,13 @@ void setupCard()
 		// Karte ist konfiguriert -> speichern
 		dfPlayer.pause();
 		do { } while (dfPlayer.isPlaying());
-		writeCard(newMusicDS);
+		writeCard(&newMusicDS);
 	}
 	tonuinoRFID.haltAndStop();
 	delay(1000);
 }
 
-void writeCard(MusicDataset musicDS) 
+void writeCard(MusicDataset * musicDS) 
 {
 	bool statusOK = tonuinoRFID.writeCard(musicDS);
 	dfPlayer.playMp3Track(statusOK ? 400 : 401);
@@ -618,7 +618,7 @@ void playShortCut(uint8_t shortCut)
 	MusicDataset shortCutData = swConfig.ShortCuts[shortCut];
 	if (shortCutData.startFolder > 0) 
 	{
-		loadAndPlayFolder(shortCutData);
+		loadAndPlayFolder(&shortCutData);
 	}
 	else
 	{
@@ -790,9 +790,9 @@ void handleModifier(EModifier modifier, uint16_t special, bool isCardRemoval)
 	}
 }
 
-void evaluateModifierCardData(MusicDataset musicDS, bool isCardRemoval)
+void evaluateModifierCardData(MusicDataset * musicDS, bool isCardRemoval)
 {
-	EModifier modifier = static_cast<EModifier>(musicDS.mode);
-	uint16_t value = musicDS.startTrack;
+	EModifier modifier = static_cast<EModifier>(musicDS->mode);
+	uint16_t value = musicDS->startTrack;
 	handleModifier(modifier, value, isCardRemoval);
 }

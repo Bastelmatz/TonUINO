@@ -75,7 +75,7 @@ class TonuinoPlayer
 	
 	bool goToTrack(ETRACKDIRECTION trackDir);
 	
-	void loadFolder(uint16_t numTracks, MusicDataset musicDS);
+	void loadFolder(uint16_t numTracks, MusicDataset * musicDS);
 	
 	private:
 	static uint16_t currentTrackIndex;

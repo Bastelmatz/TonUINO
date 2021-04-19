@@ -23,7 +23,7 @@ MusicDataset TonuinoEEPROM::loadFromFlash_RecentMusicDS()
   Serial.println(F("Load recent dataset from flash"));
   EEPROM.get(flashAddress_RecentMusicDS, musicDS);
   
-  TONUINO_STRUCTS::print(musicDS);
+  TONUINO_STRUCTS::print(&musicDS);
   
   return musicDS;
 }
@@ -31,7 +31,7 @@ MusicDataset TonuinoEEPROM::loadFromFlash_RecentMusicDS()
 void TonuinoEEPROM::writeToFlash_RecentMusicDS(MusicDataset musicDS) 
 {
   Serial.println(F("Write recent dataset"));
-  TONUINO_STRUCTS::print(musicDS);
+  TONUINO_STRUCTS::print(&musicDS);
   EEPROM.put(flashAddress_RecentMusicDS, musicDS);
 }
 

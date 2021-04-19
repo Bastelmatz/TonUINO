@@ -261,9 +261,9 @@ bool TonuinoPlayer::goToTrack(ETRACKDIRECTION trackDirection)
 	return true;
 }
 
-void TonuinoPlayer::loadFolder(uint16_t numTracksInFolder, MusicDataset musicDS) 
+void TonuinoPlayer::loadFolder(uint16_t numTracksInFolder, MusicDataset * musicDS) 
 {
-	mode = musicDS.mode;
+	mode = musicDS->mode;
 	endTrack = numTracksInFolder;
 	firstTrack = 1;
 	Serial.print(numTracksInFolder);
@@ -282,11 +282,11 @@ void TonuinoPlayer::loadFolder(uint16_t numTracksInFolder, MusicDataset musicDS)
 	if (useSection)
 	{
 		Serial.println(F("Spezialmodus Von-Bis:"));
-		Serial.print(musicDS.startTrack);
+		Serial.print(musicDS->startTrack);
 		Serial.print(F(" bis "));
-		Serial.println(musicDS.endTrack);
-		firstTrack = musicDS.startTrack;
-		endTrack = musicDS.endTrack;
+		Serial.println(musicDS->endTrack);
+		firstTrack = musicDS->startTrack;
+		endTrack = musicDS->endTrack;
 	}
 
 	currentTrackIndex = firstTrack;
@@ -307,13 +307,13 @@ void TonuinoPlayer::loadFolder(uint16_t numTracksInFolder, MusicDataset musicDS)
 		else
 		{
 			Serial.println(F("Einen bestimmten Titel wiedergeben"));
-			currentTrackIndex = musicDS.startTrack;
+			currentTrackIndex = musicDS->startTrack;
 		}
 	}
 	if (mode == AudioBook) 
 	{
 		Serial.println(F("Kompletten Ordner spielen und Fortschritt merken"));
-		uint16_t recentTrack = musicDS.recentTrack;
+		uint16_t recentTrack = musicDS->recentTrack;
 		if (recentTrack > 0 && recentTrack < numTracksInFolder) 
 		{
 			currentTrackIndex = recentTrack;

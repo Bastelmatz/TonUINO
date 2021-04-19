@@ -31,22 +31,22 @@ struct nfcTagStruct
 
 struct TONUINO_STRUCTS
 {
-	static void print(MusicDataset musicDS)
+	static void print(MusicDataset * musicDS)
 	{
 		Serial.print(F("Mode: "));
-		Serial.println(musicDS.mode);
+		Serial.println(musicDS->mode);
 		Serial.print(F("Start folder: "));
-		Serial.println(musicDS.startFolder);
+		Serial.println(musicDS->startFolder);
 		Serial.print(F("Start track: "));
-		Serial.println(musicDS.startTrack);
+		Serial.println(musicDS->startTrack);
 		Serial.print(F("End folder: "));
-		Serial.println(musicDS.endFolder);
+		Serial.println(musicDS->endFolder);
 		Serial.print(F("End track: "));
-		Serial.println(musicDS.endTrack);
+		Serial.println(musicDS->endTrack);
 		Serial.print(F("Recent folder: "));
-		Serial.println(musicDS.recentFolder);
+		Serial.println(musicDS->recentFolder);
 		Serial.print(F("Recent track: "));
-		Serial.println(musicDS.recentTrack);
+		Serial.println(musicDS->recentTrack);
 	}
 };
 

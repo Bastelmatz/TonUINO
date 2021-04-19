@@ -246,23 +246,23 @@ bool Tonuino_RFID_Reader::resetCard()
 	return writeCard(buffer);
 } 
 
-bool Tonuino_RFID_Reader::writeCard(MusicDataset musicDS) 
+bool Tonuino_RFID_Reader::writeCard(MusicDataset * musicDS) 
 {
 	byte buffer[16] = {(cardCookie >> 24) & 0xff,
 					 (cardCookie >> 16) & 0xff,
 					 (cardCookie >> 8) & 0xff,
 					 (cardCookie) & 0xff,
 					 2,   
-					 musicDS.startFolder,  
-					 musicDS.mode,         
-					 static_cast<byte>(musicDS.startTrack & 0xff),   
-					 static_cast<byte>(musicDS.endTrack & 0xff),
-					 musicDS.endFolder,
-					 static_cast<byte>(musicDS.recentTrack & 0xff),
-					 musicDS.recentFolder,
-					 static_cast<byte>((musicDS.startTrack >> 8) & 0xff),
-					 static_cast<byte>((musicDS.endTrack >> 8) & 0xff),
-					 static_cast<byte>((musicDS.recentTrack >> 8) & 0xff),
+					 musicDS->startFolder,  
+					 musicDS->mode,         
+					 static_cast<byte>(musicDS->startTrack & 0xff),   
+					 static_cast<byte>(musicDS->endTrack & 0xff),
+					 musicDS->endFolder,
+					 static_cast<byte>(musicDS->recentTrack & 0xff),
+					 musicDS->recentFolder,
+					 static_cast<byte>((musicDS->startTrack >> 8) & 0xff),
+					 static_cast<byte>((musicDS->endTrack >> 8) & 0xff),
+					 static_cast<byte>((musicDS->recentTrack >> 8) & 0xff),
 					 0x00
 					};
 	return writeCard(buffer);

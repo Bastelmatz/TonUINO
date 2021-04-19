@@ -345,7 +345,7 @@ void TonuinoDFPlayer::loadFolder(MusicDataset * dataset, ETRACKDIRECTION trackDi
 		Serial.print(currentMusicFolder);
 		Serial.print(F(" with mode "));
 		Serial.println(currentMusicDS.mode);
-		tonuinoPlayer.loadFolder(numTracksInFolder, currentMusicDS);
+		tonuinoPlayer.loadFolder(numTracksInFolder, &currentMusicDS);
 		musicDSLoaded = true;
 		newMusisDS = true;
 	}
