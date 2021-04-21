@@ -217,10 +217,7 @@ ECOMPARERESULT TonuinoDFPlayer::playOrCompareTrack(MusicDataset * compareMusicDS
 		if (!activeMemoryOrQuiz)
 		{
 			loadAndPlayFolder(compareMusicDS);
-			if (isAnyPair)
-			{
-				playCompareTrack = true;
-			}
+			playCompareTrack = isAnyPair;
 			return COMPARE_NO;
 		}
 		if (!playCompareTrack)
@@ -241,21 +238,16 @@ ECOMPARERESULT TonuinoDFPlayer::playOrCompareTrack(MusicDataset * compareMusicDS
 		// - as the evaluation track is fix and of short length, it doesn't block the loop as long as the compare track could
 		playMP3AndWait(match ? 935 : 934);
 	}
-	tryPlayCompareTrack(compareMusicDS, useCompareFolder, false);
-	if (useCompareFolder || !activeMemoryOrQuiz)
-	{
-		if (!quizMode_active || match) // for quiz: stay in compare mode until rigth answer was shown (match)
-		{
-			playCompareTrack = !playCompareTrack;
-		}
-	}
+	tryPlayCompareTrack(compareMusicDS, useCompareFolder, match);
 	return useCompareFolder && activeMemoryOrQuiz ? (match ? COMPARE_MATCH : COMPARE_WRONG) : COMPARE_NO;
 }
 
 void TonuinoDFPlayer::tryPlayCompareTrack(MusicDataset * compareMusicDS, bool useCompareFolder, bool useMatchingTrack)
 {
+	bool activeMemoryOrQuiz = memoryMode_active || quizMode_active;
+	
 	uint16_t track = tonuinoPlayer.currentTrack();
-	if (!useMatchingTrack && (quizMode_active || memoryMode_active))
+	if (!useMatchingTrack && activeMemoryOrQuiz)
 	{
 		track = compareMusicDS->startTrack;
 	}
@@ -274,6 +266,14 @@ void TonuinoDFPlayer::tryPlayCompareTrack(MusicDataset * compareMusicDS, bool us
 		uint8_t oppositeFolder = currentMusicFolder == compareMusicDS->startFolder ? compareMusicDS->endFolder : compareMusicDS->startFolder;
 		uint8_t folder = useCompareFolder ? oppositeFolder : currentMusicFolder;
 		playTrack(folder, track);
+	}
+	
+	if (useCompareFolder || !activeMemoryOrQuiz)
+	{
+		if (!quizMode_active || useMatchingTrack) // for quiz: stay in compare mode until rigth answer was shown (match)
+		{
+			playCompareTrack = !playCompareTrack;
+		}
 	}
 }
 
@@ -414,11 +414,14 @@ void TonuinoDFPlayer::togglePlay()
 
 void TonuinoDFPlayer::goToTrack(ETRACKDIRECTION trackDir)
 {
-	if (playCompareTrack && quizMode_active)
+	if (playCompareTrack)
 	{
-		tryPlayCompareTrack(&currentMusicDS, true, true);
+		if (quizMode_active)
+		{
+			tryPlayCompareTrack(&currentMusicDS, true, true);
+			return;
+		}
 		playCompareTrack = false;
-		return;
 	}
 	if (tonuinoPlayer.goToTrack(trackDir))
 	{
@@ -612,12 +615,14 @@ void TonuinoDFPlayer::setMemoryMode(bool active)
 {
 	memoryMode_active = active;
 	playAdvertisementAndWait(active ? 261 : 260);
+	playCompareTrack = false;
 }
 
 void TonuinoDFPlayer::setQuizMode(bool active)
 {
 	quizMode_active = active;
 	playAdvertisementAndWait(active ? 261 : 260);
+	playCompareTrack = false;
 }
 
 void TonuinoDFPlayer::loop()
