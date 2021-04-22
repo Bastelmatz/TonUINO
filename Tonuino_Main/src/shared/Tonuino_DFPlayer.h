@@ -5,8 +5,8 @@
 
 #include "Tonuino_Structs.h"
 #include "Tonuino_Player.h"
+#include "Tonuino_DFMiniMp3.h"
 
-#include <DFMiniMp3.h>
 #include <SoftwareSerial.h>
 #include <SPI.h>
 

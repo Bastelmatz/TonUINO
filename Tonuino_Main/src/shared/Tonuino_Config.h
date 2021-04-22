@@ -1,7 +1,7 @@
 
 #include <SPI.h>
-#include <DFMiniMp3.h>
 
+#include "Tonuino_DFMiniMp3.h"
 #include "Tonuino_Structs.h"
 
 // prevent multiple definitions
