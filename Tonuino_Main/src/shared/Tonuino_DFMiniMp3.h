@@ -408,6 +408,11 @@ private:
 
     void sendPacket(uint8_t command, uint16_t arg = 0, uint16_t sendSpaceNeeded = c_msSendSpace)
     {
+		Serial.print("Send DFPlayer command: ");
+		Serial.print(command);
+		Serial.print(" with argument ");
+		Serial.println(arg);
+		
         uint8_t out[DfMp3_Packet_SIZE] = { 0x7E,
             0xFF,
             06,
@@ -487,6 +492,11 @@ private:
         *command = in[DfMp3_Packet_Command];
         *argument = ((in[DfMp3_Packet_HiByteArgument] << 8) | in[DfMp3_Packet_LowByteArgument]);
 
+		Serial.print("Receive DFPlayer command: ");
+		Serial.print(*command);
+		Serial.print(" with argument ");
+		Serial.println(*argument);
+		
         return true;
     }
 
