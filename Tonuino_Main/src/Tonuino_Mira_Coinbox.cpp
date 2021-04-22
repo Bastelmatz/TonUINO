@@ -24,9 +24,10 @@ TonuinoConfig getConfigMira()
 	config.HW.RotaryEncoder = true;
 	config.HW.NeopixelRing = true;
 	
-	config.SW.StartMusicDS.folder = 10;
+	config.SW.StartMusicDS.startFolder = 10;
 	config.SW.StartMusicDS.mode = 1;
 	config.SW.VolumeIncrement = 2;
+	config.SW.VolumeInit = 14;
 	
 	return config;
 }

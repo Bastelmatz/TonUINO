@@ -14,11 +14,11 @@ uint16_t TonuinoPlayer::endTrack = 0;
 // Array size can be reduced (e.g. to 100) to free dynamic memory.
 // As queue is only used for random play and reshuffled at the end, 
 //  ... it shouldn't be noticable for the user that not all tracks are played once before repetition
-uint16_t TonuinoPlayer::queue[255];
+uint16_t TonuinoPlayer::queue[queueSize];
 
 uint16_t TonuinoPlayer::queueLimit()
 {
-	return allTracksCount() > sizeof(queue) ? sizeof(queue) : allTracksCount();
+	return allTracksCount() > queueSize ? queueSize : allTracksCount();
 }
 uint16_t TonuinoPlayer::allTracksCount()
 {
@@ -70,7 +70,7 @@ void TonuinoPlayer::setRandomPlay(bool bValue)
 		// track index conversion
 		if (bValue) // convert track index to index in random queue
 		{
-			for (uint8_t x = 0; x < sizeof(queue); x++)
+			for (uint8_t x = 0; x < queueSize; x++)
 			{
 				if (queue[x] = currentTrackIndex)
 				{
@@ -103,6 +103,7 @@ uint16_t TonuinoPlayer::currentTrackInRange()
 
 void TonuinoPlayer::shuffleQueue() 
 {
+	Serial.println(F("Shuffle queue"));
 	uint16_t allTracks = allTracksCount();
 	uint16_t limitHigh = queueLimit();
 	// Queue für die Zufallswiedergabe erstellen
@@ -111,7 +112,7 @@ void TonuinoPlayer::shuffleQueue()
 		queue[x] = x + firstTrack;
 	}
 	// Rest mit 0 auffüllen
-	for (uint16_t x = allTracks; x < sizeof(queue); x++)
+	for (uint16_t x = allTracks; x < queueSize; x++)
 	{
 		queue[x] = 0;
 	}
@@ -221,7 +222,6 @@ bool TonuinoPlayer::goToTrack(ETRACKDIRECTION trackDirection)
 			currentTrackIndex = limitLow;
 			if (useQueue)
 			{
-				Serial.println(F("Ende der Queue -> mische neu"));
 				shuffleQueue();
 			}
 		}
