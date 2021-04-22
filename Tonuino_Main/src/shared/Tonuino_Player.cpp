@@ -10,8 +10,16 @@ uint8_t TonuinoPlayer::mode = 0;
 uint16_t TonuinoPlayer::currentTrackIndex = 0;
 uint16_t TonuinoPlayer::firstTrack = 0;
 uint16_t TonuinoPlayer::endTrack = 0;
+
+// Array size can be reduced (e.g. to 100) to free dynamic memory.
+// As queue is only used for random play and reshuffled at the end, 
+//  ... it shouldn't be noticable for the user that not all tracks are played once before repetition
 uint16_t TonuinoPlayer::queue[255];
 
+uint16_t TonuinoPlayer::queueLimit()
+{
+	return allTracksCount() > sizeof(queue) ? sizeof(queue) : allTracksCount();
+}
 uint16_t TonuinoPlayer::allTracksCount()
 {
 	return endTrack - firstTrack + 1;
@@ -49,16 +57,39 @@ TonuinoTimer TonuinoPlayer::sleepTimer;
 bool TonuinoPlayer::useQueue = false;
 bool TonuinoPlayer::playRandom = false;
 bool TonuinoPlayer::singleTrack = false;
-
-bool TonuinoPlayer::reShuffleOnEnd = true;
+bool TonuinoPlayer::fixSingleTrack = false;
 bool TonuinoPlayer::singleRepetition = false;
 bool TonuinoPlayer::listenUntilTrackEnds = false;
 
 // *********************************
 
+void TonuinoPlayer::setRandomPlay(bool bValue)
+{
+	if (useQueue)
+	{
+		// track index conversion
+		if (bValue) // convert track index to index in random queue
+		{
+			for (uint8_t x = 0; x < sizeof(queue); x++)
+			{
+				if (queue[x] = currentTrackIndex)
+				{
+					currentTrackIndex = x;
+					break;
+				}
+			}
+		}
+		else // convert index in random queue to track index
+		{
+			currentTrackIndex = queue[currentTrackIndex - 1];
+		}
+	}
+	playRandom = bValue;
+}
+
 uint16_t TonuinoPlayer::currentTrack()
 {
-	if (useQueue) 
+	if (useQueue && playRandom) 
 	{
 		return queue[currentTrackIndex - 1];
 	}
@@ -73,8 +104,9 @@ uint16_t TonuinoPlayer::currentTrackInRange()
 void TonuinoPlayer::shuffleQueue() 
 {
 	uint16_t allTracks = allTracksCount();
+	uint16_t limitHigh = queueLimit();
 	// Queue für die Zufallswiedergabe erstellen
-	for (uint16_t x = 0; x < allTracks; x++)
+	for (uint16_t x = 0; x < limitHigh; x++)
 	{
 		queue[x] = x + firstTrack;
 	}
@@ -84,9 +116,9 @@ void TonuinoPlayer::shuffleQueue()
 		queue[x] = 0;
 	}
 	// Queue mischen
-	for (uint16_t i = 0; i < allTracks; i++)
+	for (uint16_t i = 0; i < limitHigh; i++)
 	{
-		uint16_t j = random(0, allTracks);
+		uint16_t j = random(0, limitHigh);
 		uint16_t t = queue[i];
 		queue[i] = queue[j];
 		queue[j] = t;
@@ -168,94 +200,51 @@ bool TonuinoPlayer::goToTrack(ETRACKDIRECTION trackDirection)
 	bool last = trackDirection == TRACKDIR_Last;
 	
 	// repeat current track
-	if (singleRepetition)
+	if (singleRepetition || fixSingleTrack)
 	{
 		return true;
 	}
 	
-	if (singleTrack) 
+	bool useQueueIndex = useQueue && playRandom;
+	uint16_t limitLow = useQueueIndex ? 1 : firstTrack;
+	uint16_t limitHigh = useQueueIndex ? queueLimit() : endTrack;
+	
+	if (next)
 	{
-		if (playRandom) 
+		if (currentTrackIndex < limitHigh) 
 		{
-			Serial.println(F("Einen zufälligen Titel wiedergeben"));
-			currentTrackIndex = random(firstTrack, endTrack + 1);
+			currentTrackIndex++;
+		} 
+		else 
+		{
+			Serial.println(F("Springe an Anfang"));
+			currentTrackIndex = limitLow;
+			if (useQueue)
+			{
+				Serial.println(F("Ende der Queue -> mische neu"));
+				shuffleQueue();
+			}
 		}
 	}
-	else
+	if (previous)
 	{
-		if (useQueue) 
+		if (currentTrackIndex > limitLow) 
 		{
-			if (next)
-			{
-				if (currentTrackIndex < allTracksCount()) 
-				{
-					currentTrackIndex++;
-				} 
-				else 
-				{
-					Serial.println(F("Ende der Queue -> beginne von vorne"));
-					currentTrackIndex = 1;
-					if (reShuffleOnEnd)
-					{
-						Serial.println(F("Ende der Queue -> mische neu"));
-						shuffleQueue();
-					}
-				}
-			}
-			if (previous)
-			{
-				if (currentTrackIndex > 1) 
-				{
-					currentTrackIndex--;
-				}
-				else
-				{
-					Serial.println(F("Anfang der Queue -> springe ans Ende"));
-					currentTrackIndex = allTracksCount();
-				}
-			}
-			if (first)
-			{
-				currentTrackIndex = 1;
-			}
-			if (last)
-			{
-				currentTrackIndex = allTracksCount();
-			}
+			currentTrackIndex--;
 		}
-		else // fixed numerical order
+		else
 		{
-			if (next)
-			{
-				if (currentTrackIndex < endTrack) 
-				{
-					currentTrackIndex++;
-				} 
-				else
-				{ 
-					currentTrackIndex = firstTrack;
-				}
-			}
-			if (previous)
-			{
-				if (currentTrackIndex > firstTrack) 
-				{
-					currentTrackIndex--;
-				}
-				else
-				{
-					currentTrackIndex = endTrack;
-				}
-			}
-			if (first)
-			{
-				currentTrackIndex = firstTrack;
-			}
-			if (last)
-			{
-				currentTrackIndex = endTrack;
-			}
+			Serial.println(F("Springe ans Ende"));
+			currentTrackIndex = limitHigh;
 		}
+	}
+	if (first)
+	{
+		currentTrackIndex = limitLow;
+	}
+	if (last)
+	{
+		currentTrackIndex = limitHigh;
 	}
 	
 	return true;
@@ -272,12 +261,12 @@ void TonuinoPlayer::loadFolder(uint16_t numTracksInFolder, MusicDataset * musicD
 	bool isRandomSectionPair = mode == Section_RandomUniDirectionalPair || mode == Section_RandomBiDirectionalPair;
 	bool isAnyRandomPair = isRandomSectionPair || mode == RandomUniDirectionalPair || mode == RandomBiDirectionalPair;
 	bool useSection = mode == Section_AudioDrama || mode == Section_Party || mode == Section_Album || mode == Section_Audiobook || isRandomSectionPair;
-	singleTrack = mode == AudioDrama || mode == Section_AudioDrama || mode == Single || 
-				  mode == UniDirectionalPair || mode == BiDirectionalPair || isAnyRandomPair;
-	playRandom = mode == AudioDrama || mode == Section_AudioDrama || 
-				 mode == Party || mode == Section_Party || mode == RandomFolder_Party || 
-				 isAnyRandomPair;
-	useQueue = mode == Party || mode == Section_Party || mode == RandomFolder_Party;
+	fixSingleTrack = mode == Single || mode == UniDirectionalPair || mode == BiDirectionalPair;
+	singleTrack = mode == AudioDrama || mode == Section_AudioDrama || fixSingleTrack || isAnyRandomPair;
+	useQueue = mode == AudioDrama || mode == Section_AudioDrama || 
+			   mode == Party || mode == Section_Party || mode == RandomFolder_Party || 
+			   isAnyRandomPair;
+	playRandom = useQueue;
 	
 	if (useSection)
 	{
@@ -288,33 +277,26 @@ void TonuinoPlayer::loadFolder(uint16_t numTracksInFolder, MusicDataset * musicD
 		firstTrack = musicDS->startTrack;
 		endTrack = musicDS->endTrack;
 	}
-
+	if (fixSingleTrack)
+	{
+		Serial.println(F("Bestimmten Titel wiedergeben"));
+		firstTrack = musicDS->startTrack;
+	}
+	
 	currentTrackIndex = firstTrack;
 
-	if (useQueue && playRandom)
+	if (useQueue)
 	{
-		Serial.println(F("Alle Titel in zufälliger Reihenfolge wiedergeben"));
+		Serial.println(F("Titel in zufälliger Reihenfolge"));
 		currentTrackIndex = 1;
 		shuffleQueue();
 	}
-	if (singleTrack) 
-	{
-		if (playRandom)
-		{
-			Serial.println(F("Einen zufälligen Titel wiedergeben"));
-			currentTrackIndex = random(firstTrack, endTrack + 1);
-		}
-		else
-		{
-			Serial.println(F("Einen bestimmten Titel wiedergeben"));
-			currentTrackIndex = musicDS->startTrack;
-		}
-	}
-	if (mode == AudioBook) 
+
+	if (mode == AudioBook || mode == Section_Audiobook) 
 	{
 		Serial.println(F("Kompletten Ordner spielen und Fortschritt merken"));
 		uint16_t recentTrack = musicDS->recentTrack;
-		if (recentTrack > 0 && recentTrack < numTracksInFolder) 
+		if (recentTrack >= firstTrack && recentTrack <= endTrack) 
 		{
 			currentTrackIndex = recentTrack;
 		}

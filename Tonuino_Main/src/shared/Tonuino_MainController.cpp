@@ -723,7 +723,7 @@ void handleModifier(EModifier modifier, uint16_t special, bool isCardRemoval)
 		}
 		case MODI_Player_Random:
 		{
-			tonuinoPlayer().playRandom = toggle ? !tonuinoPlayer().playRandom : bValue; break;
+			tonuinoPlayer().setRandomPlay(toggle ? !tonuinoPlayer().playRandom : bValue); break;
 		}
 		case MODI_Player_RepeatSingle:
 		{

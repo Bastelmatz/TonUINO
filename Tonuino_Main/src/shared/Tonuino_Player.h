@@ -59,8 +59,6 @@ class TonuinoPlayer
 	static bool isPlaying;
 	static bool singleRepetition;
 	static bool playRandom;
-	static bool useQueue;
-	static bool singleTrack;
 	static bool listenUntilTrackEnds;
 	
 	static uint8_t mode;
@@ -72,6 +70,7 @@ class TonuinoPlayer
 	void pauseNoStandBy();
 	void pauseAndStandBy();
 	void trackFinished();
+	void setRandomPlay(bool bValue);
 	
 	bool goToTrack(ETRACKDIRECTION trackDir);
 	
@@ -84,9 +83,11 @@ class TonuinoPlayer
 	static bool currentTrackFinished;
 	
 	static uint16_t queue[255];
-
+	static bool useQueue;
+	static bool singleTrack;
+	static bool fixSingleTrack;
 	uint16_t allTracksCount();
-	static bool reShuffleOnEnd;
+	uint16_t queueLimit();
 	
 	void showTimerInfo();
 	void shuffleQueue();
