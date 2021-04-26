@@ -533,7 +533,7 @@ void TonuinoDFPlayer::playAdvertisement(uint16_t advertisement, bool wait)
 	bool wasNotPlaying = !isPlaying();
 	if (wasNotPlaying) 
 	{
-		mp3.start();
+		start();
 	}
 	mp3.playAdvertisement(advertisement);
 	if (wait)
@@ -543,7 +543,7 @@ void TonuinoDFPlayer::playAdvertisement(uint16_t advertisement, bool wait)
 	if (wasNotPlaying) 
 	{
 		delay(100);
-		mp3.pause();
+		pause();
 	}
 }
 
@@ -589,6 +589,7 @@ void TonuinoDFPlayer::setEqualizer(DfMp3_Eq eq)
 
 void TonuinoDFPlayer::start()
 {
+	Serial.println(F("Start player"));
 	mp3.start();
 }
 
@@ -642,6 +643,7 @@ void TonuinoDFPlayer::loop()
 
 void TonuinoDFPlayer::pause()
 {
+	Serial.println(F("Pause player"));
 	mp3.pause();
 	tonuinoPlayer.pauseAndStandBy();
 }
