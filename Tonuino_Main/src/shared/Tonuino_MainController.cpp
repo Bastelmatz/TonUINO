@@ -263,8 +263,7 @@ void setupTonuino(TonuinoConfig config)
 	handlePotentiometer();
 	// play startup sound
 	dfPlayer.playAdvertisementAndWait(261);
-	dfPlayer.pause();
-	// give DFPlayer some time
+	// give DFPlayer some more time to init (to get correct folder track count)
 	delay(1000);
 	
 	// load defined or recent folder 
@@ -355,9 +354,8 @@ void handleUltraSonic()
 	{
 		if (sonicCounter > 1 && !countdownNextTrack) // avoid outliers and prevent new call while countdown
 		{
-			dfPlayer.pause();
-			delay(100);
 			dfPlayer.playAdvertisement(262);
+			dfPlayer.pause();
 			countdownNextTrack = true;
 		}
 		sonicCounter = 0;
