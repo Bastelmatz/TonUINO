@@ -37,6 +37,7 @@ class TonuinoHWConfig
 	bool RotaryEncoder = false;
 	bool UltraSonic = false;
 	bool NeopixelRing = false;
+	bool GB32000B = false;
 	
 	uint8_t NeopixelLeds = 12;
 };

@@ -18,9 +18,6 @@ enum ECOMPARERESULT
 	COMPARE_WRONG = 3,
 };
 
-static const uint8_t FOLDERCODE_MP3 = 0;
-static const uint8_t FOLDERCODE_ADVERTISEMENT = 100;
-
 class TonuinoDFPlayer
 {
 	public:
@@ -46,7 +43,7 @@ class TonuinoDFPlayer
 	static bool memoryMode_active;
 	static bool quizMode_active;
 			
-	void setup(uint8_t pinBusy);
+	void setup(uint8_t pinBusy, bool hasChip_GB32000B);
 	bool isPlaying();
 	void loadFolder(MusicDataset * dataset);
 	void loadAndPlayFolder(MusicDataset * dataset);
@@ -83,8 +80,11 @@ class TonuinoDFPlayer
 	
 	private:
 	static uint8_t pin_Busy;
+	static bool hasGB32000B;
 	static uint8_t activeFolder;
 	static uint16_t activeTrack;
+	static uint8_t lastStartedFolder;
+	static uint16_t lastStartedTrack;
 	static uint16_t numTracksInFolder;
 	static uint32_t timeLastFinished;
 	static bool newMusisDS;

@@ -4,8 +4,11 @@
 TonuinoPlayer TonuinoDFPlayer::tonuinoPlayer;
 
 uint8_t TonuinoDFPlayer::pin_Busy = 0;
+bool TonuinoDFPlayer::hasGB32000B = false;
 uint8_t TonuinoDFPlayer::activeFolder = 0;
 uint16_t TonuinoDFPlayer::activeTrack = 0;
+uint8_t TonuinoDFPlayer::lastStartedFolder = 0;
+uint16_t TonuinoDFPlayer::lastStartedTrack = 0;
 uint32_t TonuinoDFPlayer::timeLastFinished = 0;
 
 uint8_t TonuinoDFPlayer::volume = 0;
@@ -27,6 +30,11 @@ bool TonuinoDFPlayer::quizMode_active = false;
 bool TonuinoDFPlayer::playCompareTrack = false;
 
 #define PLAYTRACK_DELAY 1000
+
+static const uint8_t FOLDERCODE_MP3 = 0;
+static const uint8_t FOLDERCODE_ADVERTISEMENT = 100;
+
+static const uint8_t TRACKNUMBER_SILENCE = 0;
 
 // ********************************************************************
 // implement a notification class, its member methods will get called
@@ -65,9 +73,10 @@ void TonuinoDFPlayer::Mp3Notify::OnPlaySourceRemoved(DfMp3_PlaySources source)
 static SoftwareSerial playerSoftwareSerial = SoftwareSerial(2, 3); // TX, RX
 static DFMiniMp3<SoftwareSerial, TonuinoDFPlayer::Mp3Notify> mp3(playerSoftwareSerial);
 	
-void TonuinoDFPlayer::setup(uint8_t pinBusy)
+void TonuinoDFPlayer::setup(uint8_t pinBusy, bool hasChip_GB32000B)
 {
 	pin_Busy = pinBusy;
+	hasGB32000B = hasChip_GB32000B;
 	
 	pinMode(pinBusy, INPUT);
 	
@@ -102,11 +111,11 @@ void TonuinoDFPlayer::playTrack(uint8_t folder, uint16_t track)
 	Serial.print(track);
 	Serial.print(F(" from folder "));
 	Serial.println(folder);
-	activeFolder = folder;
-	activeTrack = track;
+	lastStartedFolder = folder;
+	lastStartedTrack = track;
 	if (folder == FOLDERCODE_ADVERTISEMENT)
 	{
-		playAdvertisement(track);
+		mp3.playAdvertisement(track);
 	}
 	else
 	{
@@ -116,6 +125,8 @@ void TonuinoDFPlayer::playTrack(uint8_t folder, uint16_t track)
 		}
 		else
 		{
+			activeFolder = folder;
+			activeTrack = track;
 			if (track > 255)
 			{
 				if (folder > 0 && folder < 16)
@@ -467,7 +478,18 @@ void TonuinoDFPlayer::lastTrack()
 
 void TonuinoDFPlayer::trackFinished()
 {
-	Serial.print(F("Finished track "));
+	if (hasGB32000B && (lastStartedFolder == FOLDERCODE_ADVERTISEMENT || lastStartedFolder == FOLDERCODE_MP3))
+	{
+		Serial.print(F("Last started track "));
+		Serial.print(lastStartedTrack);
+		Serial.print(F(" in folder "));
+		Serial.println(lastStartedFolder);
+		lastStartedFolder = activeFolder;
+		lastStartedTrack = activeTrack;
+		return;
+	}
+	
+	Serial.print(F("Active track "));
 	Serial.print(activeTrack);
 	Serial.print(F(" in folder "));
 	Serial.print(activeFolder);
@@ -530,9 +552,13 @@ void TonuinoDFPlayer::playAdvertisement(uint16_t advertisement, bool wait)
 	bool wasNotPlaying = !isPlaying();
 	if (wasNotPlaying) 
 	{
+		if (hasGB32000B)
+		{
+			return;
+		}
 		start();
 	}
-	mp3.playAdvertisement(advertisement);
+	playTrack(FOLDERCODE_ADVERTISEMENT, advertisement);
 	if (wait)
 	{
 		waitForTrackToFinish();
@@ -586,8 +612,12 @@ void TonuinoDFPlayer::setEqualizer(DfMp3_Eq eq)
 
 void TonuinoDFPlayer::start()
 {
-	Serial.println(F("Start player"));
-	mp3.start();
+	if (!isPlaying())
+	{
+		Serial.println(F("Start player"));
+		mp3.start();
+		delay(800);
+	}
 }
 
 void TonuinoDFPlayer::setNextStopAtMillis() 
@@ -652,6 +682,12 @@ void TonuinoDFPlayer::sleep()
 
 uint16_t TonuinoDFPlayer::getFolderTrackCount(uint16_t folder)
 {
+	if (hasGB32000B)
+	{
+		playTrack(folder, TRACKNUMBER_SILENCE);
+		delay(100);
+		mp3.pause();
+	}
 	return mp3.getFolderTrackCount(folder);
 }
 

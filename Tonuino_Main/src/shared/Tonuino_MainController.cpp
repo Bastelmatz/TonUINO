@@ -89,7 +89,7 @@ void turnOff()
 	{
 		return;
 	}
-	dfPlayer.playAdvertisementAndWait(302);
+	dfPlayer.playMP3AndWait(302);
 	
     // enter sleep state
     digitalWrite(pinConfig.Shutdown, HIGH);
@@ -206,7 +206,7 @@ void setupTonuino(TonuinoConfig config)
 	Serial.println(F("created by Bastelmatz."));
 
 	// DFPlayer Mini initialisieren
-	dfPlayer.setup(pinConfig.DFPlayer_Busy);
+	dfPlayer.setup(pinConfig.DFPlayer_Busy, hwConfig.GB32000B);
 
 	// set settings
 	dfPlayer.volumeMin = swConfig.VolumeMin;
@@ -261,9 +261,11 @@ void setupTonuino(TonuinoConfig config)
 
 	// set volume according to poti
 	handlePotentiometer();
+	
+	dfPlayer.start();
 	// play startup sound
-	dfPlayer.playAdvertisementAndWait(261);
-	// give DFPlayer some more time to init (to get correct folder track count)
+	dfPlayer.playMP3AndWait(261);
+	// give DFPlayer some more time to init
 	delay(1000);
 	
 	// load defined or recent folder 
@@ -354,14 +356,14 @@ void handleUltraSonic()
 	{
 		if (sonicCounter > 1 && !countdownNextTrack) // avoid outliers and prevent new call while countdown
 		{
-			dfPlayer.playAdvertisement(262);
-			dfPlayer.pause();
+			dfPlayer.playMp3Track(262);
 			countdownNextTrack = true;
 		}
 		sonicCounter = 0;
 	}
 	if (countdownNextTrack && neopixelRing.limitedAnimationFinished)
 	{
+		dfPlayer.waitForTrackToFinish(); // wait for countdown track to finish for proper finish event handling
 		dfPlayer.nextTrack();
 		countdownNextTrack = false;
 	}
