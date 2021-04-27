@@ -18,6 +18,7 @@ enum ECOMPARERESULT
 	COMPARE_WRONG = 3,
 };
 
+static const uint8_t FOLDERCODE_MP3 = 0;
 static const uint8_t FOLDERCODE_ADVERTISEMENT = 100;
 
 class TonuinoDFPlayer

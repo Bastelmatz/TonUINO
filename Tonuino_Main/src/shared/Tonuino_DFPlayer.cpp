@@ -86,11 +86,8 @@ bool TonuinoDFPlayer::isPlaying()
 
 void TonuinoDFPlayer::playMp3Track(uint16_t track)
 {
-	Serial.print(F("Play MP3 "));
-	Serial.println(track);
-	activeFolder = 0;
-	activeTrack = track;
-	mp3.playMp3FolderTrack(track);
+	playTrack(FOLDERCODE_MP3, track);
+	
 }
 
 void TonuinoDFPlayer::playMP3AndWait(uint16_t track)
@@ -113,22 +110,29 @@ void TonuinoDFPlayer::playTrack(uint8_t folder, uint16_t track)
 	}
 	else
 	{
-		if (track > 255)
+		if (folder == 0 || folder == FOLDERCODE_MP3)
 		{
-			if (folder > 0 && folder < 16)
-			{
-				mp3.playFolderTrack16(folder, track);
-			}
-			else
-			{
-				Serial.print(F("No large file support for that folder"));
-			}
+			mp3.playMp3FolderTrack(track);
 		}
 		else
 		{
-			mp3.playFolderTrack(folder, track);
+			if (track > 255)
+			{
+				if (folder > 0 && folder < 16)
+				{
+					mp3.playFolderTrack16(folder, track);
+				}
+				else
+				{
+					Serial.print(F("No large file support for that folder"));
+				}
+			}
+			else
+			{
+				mp3.playFolderTrack(folder, track);
+			}
+			delay(PLAYTRACK_DELAY);
 		}
-		delay(PLAYTRACK_DELAY);
 	}
 }
 
@@ -339,7 +343,7 @@ void TonuinoDFPlayer::loadFolder(MusicDataset * dataset, ETRACKDIRECTION trackDi
 	{
 		currentMusicFolder = newFolder;
 		currentMusicDS = *dataset;
-		numTracksInFolder = mp3.getFolderTrackCount(currentMusicFolder);
+		numTracksInFolder = getFolderTrackCount(currentMusicFolder);
 		
 		Serial.print(F("Load folder "));
 		Serial.print(currentMusicFolder);
@@ -385,7 +389,7 @@ void TonuinoDFPlayer::continueTitle()
 	}
 	if (tonuinoPlayer.currentTrackStarted)
 	{
-		mp3.start(); // Continue
+		start(); // Continue
 		tonuinoPlayer.playTitle();
 	}
 	else
@@ -466,14 +470,7 @@ void TonuinoDFPlayer::trackFinished()
 	Serial.print(F("Finished track "));
 	Serial.print(activeTrack);
 	Serial.print(F(" in folder "));
-	if (activeFolder > 0)
-	{
-		Serial.print(activeFolder);
-	}
-	else
-	{
-		Serial.print(F("MP3"));
-	}
+	Serial.print(activeFolder);
 	Serial.print(F(", Current track "));
 	Serial.println(tonuinoPlayer.currentTrack());
 	
