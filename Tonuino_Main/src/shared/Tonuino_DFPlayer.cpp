@@ -119,14 +119,15 @@ void TonuinoDFPlayer::playTrack(uint8_t folder, uint16_t track)
 	}
 	else
 	{
+		activeFolder = folder;
+		activeTrack = track;
 		if (folder == 0 || folder == FOLDERCODE_MP3)
 		{
+			tonuinoPlayer.pauseAndStandBy();
 			mp3.playMp3FolderTrack(track);
 		}
 		else
 		{
-			activeFolder = folder;
-			activeTrack = track;
 			if (track > 255)
 			{
 				if (folder > 0 && folder < 16)
@@ -478,7 +479,7 @@ void TonuinoDFPlayer::lastTrack()
 
 void TonuinoDFPlayer::trackFinished()
 {
-	if (hasGB32000B && (lastStartedFolder == FOLDERCODE_ADVERTISEMENT || lastStartedFolder == FOLDERCODE_MP3))
+	if (hasGB32000B && (lastStartedFolder == FOLDERCODE_ADVERTISEMENT))
 	{
 		Serial.print(F("Last started track "));
 		Serial.print(lastStartedTrack);
@@ -544,29 +545,12 @@ void TonuinoDFPlayer::waitForTrackToFinish()
 	} while (isPlaying());
 }
 
-
 void TonuinoDFPlayer::playAdvertisement(uint16_t advertisement, bool wait)
 {
-	Serial.print(F("Play advertisement "));
-	Serial.println(advertisement);
-	bool wasNotPlaying = !isPlaying();
-	if (wasNotPlaying) 
-	{
-		if (hasGB32000B)
-		{
-			return;
-		}
-		start();
-	}
-	playTrack(FOLDERCODE_ADVERTISEMENT, advertisement);
+	playTrack(isPlaying() ? FOLDERCODE_ADVERTISEMENT : FOLDERCODE_MP3, advertisement);
 	if (wait)
 	{
 		waitForTrackToFinish();
-	}
-	if (wasNotPlaying) 
-	{
-		delay(100);
-		pause();
 	}
 }
 
