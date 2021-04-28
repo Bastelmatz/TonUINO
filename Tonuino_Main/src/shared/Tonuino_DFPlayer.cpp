@@ -4,7 +4,7 @@
 TonuinoPlayer TonuinoDFPlayer::tonuinoPlayer;
 
 uint8_t TonuinoDFPlayer::pin_Busy = 0;
-bool TonuinoDFPlayer::hasGB32000B = false;
+bool TonuinoDFPlayer::hasGB3200B = false;
 uint8_t TonuinoDFPlayer::activeFolder = 0;
 uint16_t TonuinoDFPlayer::activeTrack = 0;
 uint8_t TonuinoDFPlayer::lastStartedFolder = 0;
@@ -73,10 +73,10 @@ void TonuinoDFPlayer::Mp3Notify::OnPlaySourceRemoved(DfMp3_PlaySources source)
 static SoftwareSerial playerSoftwareSerial = SoftwareSerial(2, 3); // TX, RX
 static DFMiniMp3<SoftwareSerial, TonuinoDFPlayer::Mp3Notify> mp3(playerSoftwareSerial);
 	
-void TonuinoDFPlayer::setup(uint8_t pinBusy, bool hasChip_GB32000B)
+void TonuinoDFPlayer::setup(uint8_t pinBusy, bool hasChip_GB3200B)
 {
 	pin_Busy = pinBusy;
-	hasGB32000B = hasChip_GB32000B;
+	hasGB3200B = hasChip_GB3200B;
 	
 	pinMode(pinBusy, INPUT);
 	
@@ -479,7 +479,7 @@ void TonuinoDFPlayer::lastTrack()
 
 void TonuinoDFPlayer::trackFinished()
 {
-	if (hasGB32000B && (lastStartedFolder == FOLDERCODE_ADVERTISEMENT))
+	if (hasGB3200B && (lastStartedFolder == FOLDERCODE_ADVERTISEMENT))
 	{
 		Serial.print(F("Last started track "));
 		Serial.print(lastStartedTrack);
@@ -666,7 +666,7 @@ void TonuinoDFPlayer::sleep()
 
 uint16_t TonuinoDFPlayer::getFolderTrackCount(uint16_t folder)
 {
-	if (hasGB32000B)
+	if (hasGB3200B)
 	{
 		playTrack(folder, TRACKNUMBER_SILENCE);
 		delay(100);

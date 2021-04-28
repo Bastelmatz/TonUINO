@@ -206,7 +206,7 @@ void setupTonuino(TonuinoConfig config)
 	Serial.println(F("created by Bastelmatz."));
 
 	// DFPlayer Mini initialisieren
-	dfPlayer.setup(pinConfig.DFPlayer_Busy, hwConfig.GB32000B);
+	dfPlayer.setup(pinConfig.DFPlayer_Busy, hwConfig.GB3200B);
 
 	// set settings
 	dfPlayer.volumeMin = swConfig.VolumeMin;

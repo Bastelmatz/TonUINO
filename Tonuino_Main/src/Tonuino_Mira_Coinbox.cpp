@@ -23,7 +23,7 @@ TonuinoConfig getConfigMira()
 	config.HW.UltraSonic = true;
 	config.HW.RotaryEncoder = true;
 	config.HW.NeopixelRing = true;
-	config.HW.GB32000B = true;
+	config.HW.GB3200B = true;
 	
 	config.SW.StartMusicDS.startFolder = 10;
 	config.SW.StartMusicDS.mode = 1;
