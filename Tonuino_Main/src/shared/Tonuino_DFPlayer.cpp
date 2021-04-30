@@ -177,6 +177,7 @@ ECOMPARERESULT TonuinoDFPlayer::playOrCompareTrack(MusicDataset * compareMusicDS
 	bool isFixPair = mode == UniDirectionalPair || mode == BiDirectionalPair;
 	bool isRandomPair = mode == RandomUniDirectionalPair || mode == RandomBiDirectionalPair || mode == Section_RandomUniDirectionalPair || mode == Section_RandomBiDirectionalPair;
 	bool isRandomSingle = mode == AudioDrama || mode == Section_AudioDrama;
+	bool isAnyRandom = isRandomPair || isRandomSingle;
 	bool isAnyPair = isFixPair || isRandomPair;
 	
 	if (isCardGone)
@@ -193,46 +194,39 @@ ECOMPARERESULT TonuinoDFPlayer::playOrCompareTrack(MusicDataset * compareMusicDS
 	}
 	if (isCardReturn)
 	{
-		if (!activeMemoryOrQuiz)
+		if (activeMemoryOrQuiz)
 		{
-			if (mode == RandomFolder_Album || mode == RandomFolder_Party)
+			if (isAnyRandom) 
 			{
-				loadAndPlayFolder(compareMusicDS);
-				return COMPARE_NO;
+				nextTrack();
 			}
-			if (!isFixPair)
-			{
-				if (stopOnCardRemoval || !isPlaying())
-				{
-					continueTitle();
-				}
-				else
-				{
-					nextTrack();
-				}
-				if (isAnyPair)
-				{
-					playCompareTrack = true;
-				}
-				return COMPARE_NO;
-			}
+			return COMPARE_NO;
 		}
-		if (quizMode_active)
+		if (mode == RandomFolder_Album || mode == RandomFolder_Party)
 		{
-			if (!playCompareTrack) 
+			loadAndPlayFolder(compareMusicDS);
+			return COMPARE_NO;
+		}
+		if (!isFixPair)
+		{
+			if (stopOnCardRemoval || !isPlaying())
 			{
-				if (isRandomPair || isRandomSingle) // First quiz track must be random one
-				{
-					loadAndPlayFolder(compareMusicDS);
-					playCompareTrack = true;
-				}
-				return COMPARE_NO;
+				continueTitle();
 			}
+			else
+			{
+				nextTrack();
+			}
+			if (isAnyPair)
+			{
+				playCompareTrack = true;
+			}
+			return COMPARE_NO;
 		}
 	}
 	if (isNewCard)
 	{
-		if (!activeMemoryOrQuiz)
+		if (!activeMemoryOrQuiz || isAnyRandom)
 		{
 			loadAndPlayFolder(compareMusicDS);
 			playCompareTrack = isAnyPair;
@@ -240,7 +234,7 @@ ECOMPARERESULT TonuinoDFPlayer::playOrCompareTrack(MusicDataset * compareMusicDS
 		}
 		if (!playCompareTrack)
 		{
-			if (!quizMode_active || (isRandomPair || isRandomSingle)) // First quiz track must be random one
+			if (!quizMode_active)
 			{
 				loadAndPlayFolder(compareMusicDS);
 				playCompareTrack = true;
