@@ -177,8 +177,8 @@ ECOMPARERESULT TonuinoDFPlayer::playOrCompareTrack(MusicDataset * compareMusicDS
 	bool isFixPair = mode == UniDirectionalPair || mode == BiDirectionalPair;
 	bool isRandomPair = mode == RandomUniDirectionalPair || mode == RandomBiDirectionalPair || mode == Section_RandomUniDirectionalPair || mode == Section_RandomBiDirectionalPair;
 	bool isRandomSingle = mode == AudioDrama || mode == Section_AudioDrama;
-	bool isAnyRandom = isRandomPair || isRandomSingle;
 	bool isAnyPair = isFixPair || isRandomPair;
+	bool isAnyFixSingle = isFixPair || mode == Single;
 	
 	if (isCardGone)
 	{
@@ -196,9 +196,10 @@ ECOMPARERESULT TonuinoDFPlayer::playOrCompareTrack(MusicDataset * compareMusicDS
 	{
 		if (activeMemoryOrQuiz)
 		{
-			if (isAnyRandom) 
+			if (!isAnyFixSingle) 
 			{
 				nextTrack();
+				playCompareTrack = true;
 			}
 			return COMPARE_NO;
 		}
@@ -226,10 +227,10 @@ ECOMPARERESULT TonuinoDFPlayer::playOrCompareTrack(MusicDataset * compareMusicDS
 	}
 	if (isNewCard)
 	{
-		if (!activeMemoryOrQuiz || isAnyRandom)
+		if (!activeMemoryOrQuiz || !isAnyFixSingle)
 		{
 			loadAndPlayFolder(compareMusicDS);
-			playCompareTrack = isAnyPair;
+			playCompareTrack = activeMemoryOrQuiz ? true : isAnyPair;
 			return COMPARE_NO;
 		}
 		if (!playCompareTrack)
