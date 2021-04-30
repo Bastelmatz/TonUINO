@@ -54,6 +54,8 @@ void TonuinoDFPlayer::Mp3Notify::PrintlnSourceAction(DfMp3_PlaySources source, c
 }
 void TonuinoDFPlayer::Mp3Notify::OnPlayFinished(DfMp3_PlaySources source, uint16_t track) 
 {
+	// track number is index within all tracks (01->99->advert folder)
+	// at least with GB3200B chip
 	TonuinoDFPlayer().trackFinished();
 }
 void TonuinoDFPlayer::Mp3Notify::OnPlaySourceOnline(DfMp3_PlaySources source) 
