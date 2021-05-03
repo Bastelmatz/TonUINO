@@ -238,9 +238,10 @@ namespace Tonuino_RFID_Tool
 
             // Text
             bool useStartEndTrack = false;
-            bool useSingleTrack = false;
+            bool useSingleTrio = false;
             bool useEndFolder = false;
-            bool useRecentTrackAndFolder = false;
+            bool useRecentFolder = false;
+            bool useRecentTrack = false;
             bool isMusicCard = false;
             bool isModifierCard = false;
             bool hasModiValue = false;
@@ -250,10 +251,11 @@ namespace Tonuino_RFID_Tool
                 MusicCardData musicData = (MusicCardData)data;
                 MusicMode mode = musicData.Mode;
                 useStartEndTrack = mode.UseStartEndTrack;
-                useSingleTrack = mode.UseDefinedSingleTrack;
+                useSingleTrio = mode.UseDefinedSingleTrio;
                 useEndFolder = mode.UseEndFolder;
                 bool useCompareFolder = mode.UseCompareFolder;
-                useRecentTrackAndFolder = mode.UseRecentTrackAndFolder;
+                useRecentFolder = mode.UseRecentFolder;
+                useRecentTrack = mode.UseRecentTrack;
 
                 setText(lblFolder, musicData.StartFolder);
                 setText(lblStartPos, musicData.StartPos);
@@ -262,7 +264,9 @@ namespace Tonuino_RFID_Tool
                 setText(lblRecentFolder, musicData.RecentFolder);
                 setText(lblRecentTrack, musicData.RecentTrack);
                 lblMode.Text = mode.Name;
-                lblStartPosCaption.Text = (useSingleTrack ? "" : "Start ") + "Track:";
+                lblStartPosCaption.Text = (useSingleTrio ? "1." : "Start ") + "Track:";
+                lblEndPosCaption.Text = (useSingleTrio ? "2." : "End ") + "Track:";
+                lblRecentTrackCaption.Text = (useSingleTrio ? "3." : "Recent ") + "Track:";
                 lblFolderCaption.Text = (useEndFolder ? "Start " : "") + "Folder:";
                 lblEndFolderCaption.Text = (useCompareFolder ? "Compare" : "End") + " Folder:";
 
@@ -313,11 +317,11 @@ namespace Tonuino_RFID_Tool
             lblModeCaption.Visible = lblMode.Visible = isDefinedCard;
             lblFolderCaption.Visible = lblFolder.Visible = isMusicCard;
             lblEndPosCaption.Visible = lblEndPos.Visible = isDefinedCard && useStartEndTrack;
-            lblStartPosCaption.Visible = lblStartPos.Visible = isDefinedCard && (useStartEndTrack || useSingleTrack);
+            lblStartPosCaption.Visible = lblStartPos.Visible = isDefinedCard && useStartEndTrack;
             lblEndFolderCaption.Visible = lblEndFolder.Visible = isDefinedCard && useEndFolder;
             lblReadModiValueCaption.Visible = lblReadModiValue.Visible = isModifierCard && hasModiValue;
-            lblRecentTrackCaption.Visible = lblRecentTrack.Visible = isMusicCard && useRecentTrackAndFolder;
-            lblRecentFolderCaption.Visible = lblRecentFolder.Visible = isMusicCard && useRecentTrackAndFolder;
+            lblRecentTrackCaption.Visible = lblRecentTrack.Visible = isMusicCard && useRecentTrack;
+            lblRecentFolderCaption.Visible = lblRecentFolder.Visible = isMusicCard && useRecentFolder;
         }
 
         private void updateCardActionVisibility()
@@ -335,13 +339,15 @@ namespace Tonuino_RFID_Tool
             {
                 MusicMode mode = (MusicMode)comboBox_MusicCardModes.SelectedItem;
                 bool useStartEndTrack = mode == null ? false : mode.UseStartEndTrack;
-                bool useSingleTrack = mode == null ? false : mode.UseDefinedSingleTrack;
+                bool useSingleTrio = mode == null ? false : mode.UseDefinedSingleTrio;
                 bool useEndFolder = mode == null ? false : mode.UseEndFolder;
                 bool useCompareFolder = mode == null ? false : mode.UseCompareFolder;
 
-                textBoxEndOnSD.Visible = lblEndOnSource.Visible = useStartEndTrack;
-                textBoxStartOnSD.Visible = lblStartOnSource.Visible = useStartEndTrack || useSingleTrack;
-                lblStartOnSource.Text = (useSingleTrack ? "" : "start ") + "track";
+                textBoxEndTrack.Visible = lblEndOnSource.Visible = useStartEndTrack;
+                textBoxStartTrack.Visible = lblStartOnSource.Visible = useStartEndTrack;
+                textBoxThirdTrack.Visible = lblThirdTrack.Visible = useSingleTrio;
+                lblStartOnSource.Text = (useSingleTrio ? "1. " : "start ") + "track";
+                lblEndOnSource.Text = (useSingleTrio ? "2. " : "end ") + "track";
                 textBoxEndFolder.Visible = lblWriteEndFolder.Visible = useEndFolder;
                 lblWriteStartFolder.Text = (useEndFolder ? "start " : "") + "folder";
                 lblWriteEndFolder.Text = (useCompareFolder ? "compare" : "end") + " folder";
@@ -461,9 +467,10 @@ namespace Tonuino_RFID_Tool
         {
             MusicMode mode = (MusicMode)comboBox_MusicCardModes.SelectedItem;
             byte startFolder = getByte(textBoxStartFolder);
-            ushort startTrack = getShort(textBoxStartOnSD);
-            ushort endTrack = getShort(textBoxEndOnSD);
+            ushort startTrack = getShort(textBoxStartTrack);
+            ushort endTrack = getShort(textBoxEndTrack);
             byte endFolder = getByte(textBoxEndFolder);
+            ushort thirdTrack = getByte(textBoxThirdTrack);
 
             MusicCardDataRaw musicData = new MusicCardDataRaw()
             {
@@ -471,7 +478,8 @@ namespace Tonuino_RFID_Tool
                 Raw_Mode = mode.Ident.Index,
                 Raw_Special = startTrack,
                 Raw_Special2 = endTrack,
-                Raw_EndFolder = endFolder
+                Raw_EndFolder = endFolder,
+                Raw_RecentTrack = thirdTrack,
             };
             return musicData;
         }
@@ -587,12 +595,12 @@ namespace Tonuino_RFID_Tool
 
         private void textBoxStartOnSD_TextChanged(object sender, EventArgs e)
         {
-            limitTrack(textBoxStartOnSD, textBoxStartFolder);
+            limitTrack(textBoxStartTrack, textBoxStartFolder);
         }
 
         private void textBoxEndOnSD_TextChanged(object sender, EventArgs e)
         {
-            limitTrack(textBoxEndOnSD, textBoxEndFolder);
+            limitTrack(textBoxEndTrack, textBoxEndFolder);
         }
 
         private void boxByte_TextChanged(object sender, EventArgs e)

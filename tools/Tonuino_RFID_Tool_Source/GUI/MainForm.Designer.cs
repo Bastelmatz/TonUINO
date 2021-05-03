@@ -46,8 +46,8 @@
             this.lblWriteStartFolder = new System.Windows.Forms.Label();
             this.lblStartOnSource = new System.Windows.Forms.Label();
             this.textBoxStartFolder = new System.Windows.Forms.TextBox();
-            this.textBoxStartOnSD = new System.Windows.Forms.TextBox();
-            this.textBoxEndOnSD = new System.Windows.Forms.TextBox();
+            this.textBoxStartTrack = new System.Windows.Forms.TextBox();
+            this.textBoxEndTrack = new System.Windows.Forms.TextBox();
             this.lblEndOnSource = new System.Windows.Forms.Label();
             this.btnWriteMusicCard = new System.Windows.Forms.Button();
             this.pnlModes = new System.Windows.Forms.Panel();
@@ -119,6 +119,8 @@
             this.lblByte01 = new System.Windows.Forms.Label();
             this.boxByte01 = new System.Windows.Forms.TextBox();
             this.btnWriteRawCard = new System.Windows.Forms.Button();
+            this.lblThirdTrack = new System.Windows.Forms.Label();
+            this.textBoxThirdTrack = new System.Windows.Forms.TextBox();
             this.pnlModes.SuspendLayout();
             this.pnlCardDetected.SuspendLayout();
             this.pnlModiCardAction.SuspendLayout();
@@ -289,23 +291,23 @@
             this.textBoxStartFolder.TabIndex = 19;
             this.textBoxStartFolder.TextChanged += new System.EventHandler(this.textBoxStartFolder_TextChanged);
             // 
-            // textBoxStartOnSD
+            // textBoxStartTrack
             // 
-            this.textBoxStartOnSD.Location = new System.Drawing.Point(9, 88);
-            this.textBoxStartOnSD.MaxLength = 4;
-            this.textBoxStartOnSD.Name = "textBoxStartOnSD";
-            this.textBoxStartOnSD.Size = new System.Drawing.Size(53, 20);
-            this.textBoxStartOnSD.TabIndex = 20;
-            this.textBoxStartOnSD.TextChanged += new System.EventHandler(this.textBoxStartOnSD_TextChanged);
+            this.textBoxStartTrack.Location = new System.Drawing.Point(9, 88);
+            this.textBoxStartTrack.MaxLength = 4;
+            this.textBoxStartTrack.Name = "textBoxStartTrack";
+            this.textBoxStartTrack.Size = new System.Drawing.Size(53, 20);
+            this.textBoxStartTrack.TabIndex = 20;
+            this.textBoxStartTrack.TextChanged += new System.EventHandler(this.textBoxStartOnSD_TextChanged);
             // 
-            // textBoxEndOnSD
+            // textBoxEndTrack
             // 
-            this.textBoxEndOnSD.Location = new System.Drawing.Point(9, 113);
-            this.textBoxEndOnSD.MaxLength = 4;
-            this.textBoxEndOnSD.Name = "textBoxEndOnSD";
-            this.textBoxEndOnSD.Size = new System.Drawing.Size(53, 20);
-            this.textBoxEndOnSD.TabIndex = 22;
-            this.textBoxEndOnSD.TextChanged += new System.EventHandler(this.textBoxEndOnSD_TextChanged);
+            this.textBoxEndTrack.Location = new System.Drawing.Point(9, 113);
+            this.textBoxEndTrack.MaxLength = 4;
+            this.textBoxEndTrack.Name = "textBoxEndTrack";
+            this.textBoxEndTrack.Size = new System.Drawing.Size(53, 20);
+            this.textBoxEndTrack.TabIndex = 22;
+            this.textBoxEndTrack.TextChanged += new System.EventHandler(this.textBoxEndOnSD_TextChanged);
             // 
             // lblEndOnSource
             // 
@@ -320,7 +322,7 @@
             // 
             this.btnWriteMusicCard.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
             this.btnWriteMusicCard.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnWriteMusicCard.Location = new System.Drawing.Point(9, 177);
+            this.btnWriteMusicCard.Location = new System.Drawing.Point(9, 200);
             this.btnWriteMusicCard.Name = "btnWriteMusicCard";
             this.btnWriteMusicCard.Size = new System.Drawing.Size(175, 23);
             this.btnWriteMusicCard.TabIndex = 24;
@@ -478,7 +480,7 @@
             this.pnlModiCardAction.Controls.Add(this.btnWriteModiCard);
             this.pnlModiCardAction.Location = new System.Drawing.Point(435, 139);
             this.pnlModiCardAction.Name = "pnlModiCardAction";
-            this.pnlModiCardAction.Size = new System.Drawing.Size(203, 210);
+            this.pnlModiCardAction.Size = new System.Drawing.Size(203, 230);
             this.pnlModiCardAction.TabIndex = 39;
             // 
             // pnlModeBehaviour
@@ -564,7 +566,7 @@
             // 
             this.btnWriteModiCard.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
             this.btnWriteModiCard.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnWriteModiCard.Location = new System.Drawing.Point(9, 177);
+            this.btnWriteModiCard.Location = new System.Drawing.Point(9, 200);
             this.btnWriteModiCard.Name = "btnWriteModiCard";
             this.btnWriteModiCard.Size = new System.Drawing.Size(175, 23);
             this.btnWriteModiCard.TabIndex = 24;
@@ -574,19 +576,21 @@
             // 
             // pnlMusicCardAction
             // 
+            this.pnlMusicCardAction.Controls.Add(this.lblThirdTrack);
+            this.pnlMusicCardAction.Controls.Add(this.textBoxThirdTrack);
             this.pnlMusicCardAction.Controls.Add(this.lblWriteEndFolder);
             this.pnlMusicCardAction.Controls.Add(this.textBoxEndFolder);
             this.pnlMusicCardAction.Controls.Add(this.lblWriteStartFolder);
             this.pnlMusicCardAction.Controls.Add(this.lblStartOnSource);
             this.pnlMusicCardAction.Controls.Add(this.textBoxStartFolder);
-            this.pnlMusicCardAction.Controls.Add(this.textBoxStartOnSD);
+            this.pnlMusicCardAction.Controls.Add(this.textBoxStartTrack);
             this.pnlMusicCardAction.Controls.Add(this.lblEndOnSource);
             this.pnlMusicCardAction.Controls.Add(this.pnlModes);
-            this.pnlMusicCardAction.Controls.Add(this.textBoxEndOnSD);
+            this.pnlMusicCardAction.Controls.Add(this.textBoxEndTrack);
             this.pnlMusicCardAction.Controls.Add(this.btnWriteMusicCard);
             this.pnlMusicCardAction.Location = new System.Drawing.Point(215, 139);
             this.pnlMusicCardAction.Name = "pnlMusicCardAction";
-            this.pnlMusicCardAction.Size = new System.Drawing.Size(210, 210);
+            this.pnlMusicCardAction.Size = new System.Drawing.Size(210, 230);
             this.pnlMusicCardAction.TabIndex = 40;
             // 
             // lblWriteEndFolder
@@ -656,7 +660,7 @@
             this.pnlSeparator.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.pnlSeparator.Location = new System.Drawing.Point(212, 61);
             this.pnlSeparator.Name = "pnlSeparator";
-            this.pnlSeparator.Size = new System.Drawing.Size(1, 320);
+            this.pnlSeparator.Size = new System.Drawing.Size(1, 340);
             this.pnlSeparator.TabIndex = 44;
             // 
             // pnlPorts
@@ -694,7 +698,7 @@
             // 
             this.btnResetCard.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
             this.btnResetCard.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnResetCard.Location = new System.Drawing.Point(224, 355);
+            this.btnResetCard.Location = new System.Drawing.Point(224, 375);
             this.btnResetCard.Name = "btnResetCard";
             this.btnResetCard.Size = new System.Drawing.Size(175, 23);
             this.btnResetCard.TabIndex = 47;
@@ -761,7 +765,7 @@
             this.pnlRawDataAction.Controls.Add(this.btnWriteRawCard);
             this.pnlRawDataAction.Location = new System.Drawing.Point(573, 18);
             this.pnlRawDataAction.Name = "pnlRawDataAction";
-            this.pnlRawDataAction.Size = new System.Drawing.Size(203, 210);
+            this.pnlRawDataAction.Size = new System.Drawing.Size(203, 230);
             this.pnlRawDataAction.TabIndex = 50;
             // 
             // lblByte15
@@ -1038,13 +1042,30 @@
             // 
             this.btnWriteRawCard.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
             this.btnWriteRawCard.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnWriteRawCard.Location = new System.Drawing.Point(9, 177);
+            this.btnWriteRawCard.Location = new System.Drawing.Point(9, 200);
             this.btnWriteRawCard.Name = "btnWriteRawCard";
             this.btnWriteRawCard.Size = new System.Drawing.Size(175, 23);
             this.btnWriteRawCard.TabIndex = 24;
             this.btnWriteRawCard.Text = "Write Raw Card";
             this.btnWriteRawCard.UseVisualStyleBackColor = false;
             this.btnWriteRawCard.Click += new System.EventHandler(this.btnWriteRawCard_Click);
+            // 
+            // lblThirdTrack
+            // 
+            this.lblThirdTrack.AutoSize = true;
+            this.lblThirdTrack.Location = new System.Drawing.Point(68, 167);
+            this.lblThirdTrack.Name = "lblThirdTrack";
+            this.lblThirdTrack.Size = new System.Drawing.Size(43, 13);
+            this.lblThirdTrack.TabIndex = 30;
+            this.lblThirdTrack.Text = "3. track";
+            // 
+            // textBoxThirdTrack
+            // 
+            this.textBoxThirdTrack.Location = new System.Drawing.Point(9, 164);
+            this.textBoxThirdTrack.MaxLength = 3;
+            this.textBoxThirdTrack.Name = "textBoxThirdTrack";
+            this.textBoxThirdTrack.Size = new System.Drawing.Size(53, 20);
+            this.textBoxThirdTrack.TabIndex = 31;
             // 
             // MainForm
             // 
@@ -1109,8 +1130,8 @@
         private System.Windows.Forms.Label lblWriteStartFolder;
         private System.Windows.Forms.Label lblStartOnSource;
         private System.Windows.Forms.TextBox textBoxStartFolder;
-        private System.Windows.Forms.TextBox textBoxStartOnSD;
-        private System.Windows.Forms.TextBox textBoxEndOnSD;
+        private System.Windows.Forms.TextBox textBoxStartTrack;
+        private System.Windows.Forms.TextBox textBoxEndTrack;
         private System.Windows.Forms.Label lblEndOnSource;
         private System.Windows.Forms.Button btnWriteMusicCard;
         private System.Windows.Forms.Panel pnlModes;
@@ -1181,6 +1202,8 @@
         private System.Windows.Forms.Label lblRecentTrack;
         private System.Windows.Forms.Label lblRecentFolderCaption;
         private System.Windows.Forms.Label lblRecentFolder;
+        private System.Windows.Forms.Label lblThirdTrack;
+        private System.Windows.Forms.TextBox textBoxThirdTrack;
     }
 }
 

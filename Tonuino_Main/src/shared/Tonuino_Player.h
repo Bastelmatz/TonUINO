@@ -79,6 +79,8 @@ class TonuinoPlayer
 	private:
 	static uint16_t currentTrackIndex;
 	static uint16_t firstTrack;
+	static uint16_t secondTrack;
+	static uint16_t thirdTrack;
 	static uint16_t endTrack;
 	static bool currentTrackFinished;
 	
@@ -86,7 +88,7 @@ class TonuinoPlayer
 	static uint16_t queue[queueSize];
 	static bool useQueue;
 	static bool singleTrack;
-	static bool fixSingleTrack;
+	static bool fixSingleTrio;
 	uint16_t allTracksCount();
 	uint16_t queueLimit();
 	

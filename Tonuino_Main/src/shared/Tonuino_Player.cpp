@@ -9,6 +9,8 @@ uint8_t TonuinoPlayer::mode = 0;
 
 uint16_t TonuinoPlayer::currentTrackIndex = 0;
 uint16_t TonuinoPlayer::firstTrack = 0;
+uint16_t TonuinoPlayer::secondTrack = 0;
+uint16_t TonuinoPlayer::thirdTrack = 0;
 uint16_t TonuinoPlayer::endTrack = 0;
 
 // Array size can be reduced (e.g. to 100) to free dynamic memory.
@@ -57,7 +59,7 @@ TonuinoTimer TonuinoPlayer::sleepTimer;
 bool TonuinoPlayer::useQueue = false;
 bool TonuinoPlayer::playRandom = false;
 bool TonuinoPlayer::singleTrack = false;
-bool TonuinoPlayer::fixSingleTrack = false;
+bool TonuinoPlayer::fixSingleTrio = false;
 bool TonuinoPlayer::singleRepetition = false;
 bool TonuinoPlayer::listenUntilTrackEnds = false;
 
@@ -201,8 +203,27 @@ bool TonuinoPlayer::goToTrack(ETRACKDIRECTION trackDirection)
 	bool last = trackDirection == TRACKDIR_Last;
 	
 	// repeat current track
-	if (singleRepetition || fixSingleTrack)
+	if (singleRepetition)
 	{
+		return true;
+	}
+	if (fixSingleTrio)
+	{
+		if (currentTrackIndex == firstTrack && secondTrack > 0)
+		{
+			currentTrackIndex = secondTrack;
+		}
+		else
+		{
+			if (currentTrackIndex == secondTrack && thirdTrack > 0)
+			{
+				currentTrackIndex = thirdTrack;
+			}
+			else
+			{
+				currentTrackIndex = firstTrack;
+			}
+		}
 		return true;
 	}
 	
@@ -259,8 +280,8 @@ void TonuinoPlayer::loadFolder(uint16_t numTracksInFolder, MusicDataset * musicD
 	bool isRandomSectionPair = mode == Section_RandomUniDirectionalPair || mode == Section_RandomBiDirectionalPair;
 	bool isAnyRandomPair = isRandomSectionPair || mode == RandomUniDirectionalPair || mode == RandomBiDirectionalPair;
 	bool useSection = mode == Section_AudioDrama || mode == Section_Party || mode == Section_Album || mode == Section_Audiobook || isRandomSectionPair;
-	fixSingleTrack = mode == Single || mode == UniDirectionalPair || mode == BiDirectionalPair;
-	singleTrack = mode == AudioDrama || mode == Section_AudioDrama || fixSingleTrack || isAnyRandomPair;
+	fixSingleTrio =  mode == Single || mode == UniDirectionalPair || mode == BiDirectionalPair;
+	singleTrack = mode == AudioDrama || mode == Section_AudioDrama || fixSingleTrio || isAnyRandomPair;
 	useQueue = mode == AudioDrama || mode == Section_AudioDrama || 
 			   mode == Party || mode == Section_Party || mode == RandomFolder_Party || 
 			   isAnyRandomPair;
@@ -275,10 +296,16 @@ void TonuinoPlayer::loadFolder(uint16_t numTracksInFolder, MusicDataset * musicD
 		firstTrack = musicDS->startTrack;
 		endTrack = musicDS->endTrack;
 	}
-	if (fixSingleTrack)
+	if (fixSingleTrio)
 	{
 		Serial.println(F("Bestimmten Titel wiedergeben"));
 		firstTrack = musicDS->startTrack;
+		secondTrack = musicDS->endTrack;
+		thirdTrack = musicDS->recentTrack;
+	}
+	else
+	{
+		secondTrack = thirdTrack = firstTrack;
 	}
 	
 	currentTrackIndex = firstTrack;

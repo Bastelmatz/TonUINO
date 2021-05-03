@@ -174,14 +174,21 @@ ECOMPARERESULT TonuinoDFPlayer::playOrCompareTrack(MusicDataset * compareMusicDS
 	uint8_t mode = compareMusicDS->mode;
 	uint16_t currentTrack = tonuinoPlayer.currentTrack();
 	bool activeMemoryOrQuiz = memoryMode_active || quizMode_active;
-	bool match = currentTrack == compareMusicDS->startTrack && (currentMusicFolder == compareMusicDS->startFolder || currentMusicFolder == compareMusicDS->endFolder);
+	
+	bool folderMatch = currentMusicFolder == compareMusicDS->startFolder || currentMusicFolder == compareMusicDS->endFolder;
+	bool match = currentTrack == compareMusicDS->startTrack && folderMatch;
+	bool isAnyFixSingleTrio = mode == Single || mode == UniDirectionalPair || mode == BiDirectionalPair;
+	if (isAnyFixSingleTrio)
+	{
+		match |= folderMatch && (currentTrack == compareMusicDS->endTrack || currentTrack == compareMusicDS->recentTrack);
+	}
+	
 	bool useCompareFolder = playCompareTrack && (!memoryMode_active || isNewCard); // repeat first track on card return with active memory mode 
 	bool isCardReturn = !isNewCard && !isCardGone;
 	bool isFixPair = mode == UniDirectionalPair || mode == BiDirectionalPair;
 	bool isRandomPair = mode == RandomUniDirectionalPair || mode == RandomBiDirectionalPair || mode == Section_RandomUniDirectionalPair || mode == Section_RandomBiDirectionalPair;
 	bool isRandomSingle = mode == AudioDrama || mode == Section_AudioDrama;
 	bool isAnyPair = isFixPair || isRandomPair;
-	bool isAnyFixSingle = isFixPair || mode == Single;
 	
 	if (isCardGone)
 	{
@@ -199,12 +206,12 @@ ECOMPARERESULT TonuinoDFPlayer::playOrCompareTrack(MusicDataset * compareMusicDS
 	{
 		if (activeMemoryOrQuiz)
 		{
-			if (!isAnyFixSingle) 
+			if (!isAnyFixSingleTrio) 
 			{
 				nextTrack();
 				playCompareTrack = true;
+				return COMPARE_NO;
 			}
-			return COMPARE_NO;
 		}
 		if (mode == RandomFolder_Album || mode == RandomFolder_Party)
 		{
@@ -230,7 +237,7 @@ ECOMPARERESULT TonuinoDFPlayer::playOrCompareTrack(MusicDataset * compareMusicDS
 	}
 	if (isNewCard)
 	{
-		if (!activeMemoryOrQuiz || !isAnyFixSingle)
+		if (!activeMemoryOrQuiz || !isAnyFixSingleTrio)
 		{
 			loadAndPlayFolder(compareMusicDS);
 			playCompareTrack = activeMemoryOrQuiz ? true : isAnyPair;

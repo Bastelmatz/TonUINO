@@ -70,11 +70,15 @@ namespace Tonuino_RFID_Tool
                     case EMusicMode.Section_RandomUniDirectionalPair:
                     case EMusicMode.Section_RandomBiDirectionalPair: return true;
                 }
+                if (UseDefinedSingleTrio)
+                {
+                    return true;
+                }
                 return false;
             }
         }
 
-        public bool UseDefinedSingleTrack
+        public bool UseDefinedSingleTrio
         {
             get
             {
@@ -126,7 +130,7 @@ namespace Tonuino_RFID_Tool
             }
         }
 
-        public bool UseRecentTrackAndFolder
+        public bool UseRecentFolder
         {
             get
             {
@@ -134,6 +138,18 @@ namespace Tonuino_RFID_Tool
                 {
                     case EMusicMode.Audiobook:
                     case EMusicMode.Section_Audiobook: return true;
+                }
+                return false;
+            }
+        }
+
+        public bool UseRecentTrack
+        {
+            get
+            {
+                if (UseRecentFolder || UseDefinedSingleTrio)
+                {
+                    return true;
                 }
                 return false;
             }
