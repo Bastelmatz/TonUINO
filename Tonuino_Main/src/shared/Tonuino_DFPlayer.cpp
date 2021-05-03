@@ -29,6 +29,9 @@ bool TonuinoDFPlayer::memoryMode_active = false;
 bool TonuinoDFPlayer::quizMode_active = false;
 bool TonuinoDFPlayer::playCompareTrack = false;
 
+uint16_t TonuinoDFPlayer::tracksFolderLarge[largeFolders];
+uint8_t TonuinoDFPlayer::tracksFolderSmall[smallFolders];
+
 #define PLAYTRACK_DELAY 1000
 
 static const uint8_t FOLDERCODE_MP3 = 0;
@@ -132,7 +135,7 @@ void TonuinoDFPlayer::playTrack(uint8_t folder, uint16_t track)
 		{
 			if (track > 255)
 			{
-				if (folder > 0 && folder < 16)
+				if (folder > 0 && folder <= largeFolders)
 				{
 					mp3.playFolderTrack16(folder, track);
 				}
@@ -358,6 +361,8 @@ void TonuinoDFPlayer::loadFolder(MusicDataset * dataset, ETRACKDIRECTION trackDi
 		Serial.print(currentMusicFolder);
 		Serial.print(F(" with mode "));
 		Serial.println(currentMusicDS.mode);
+		Serial.print(F("Files in folder: "));
+		Serial.println(numTracksInFolder);
 		tonuinoPlayer.loadFolder(numTracksInFolder, &currentMusicDS);
 		musicDSLoaded = true;
 		newMusisDS = true;
@@ -665,11 +670,40 @@ uint16_t TonuinoDFPlayer::getFolderTrackCount(uint16_t folder)
 {
 	if (hasGB3200B)
 	{
+		// return count from last request
+		if (folder > largeFolders)
+		{
+			uint8_t index = folder - largeFolders - 1;
+			if (tracksFolderSmall[index] > 0)
+			{
+				return tracksFolderSmall[index];
+			}
+		}
+		else
+		{
+			uint8_t index = folder - 1;
+			if (tracksFolderLarge[index] > 0)
+			{
+				return tracksFolderLarge[index];
+			}
+		}
 		playTrack(folder, TRACKNUMBER_SILENCE);
 		delay(100);
 		mp3.pause();
 	}
-	return mp3.getFolderTrackCount(folder);
+	uint16_t trackCount = mp3.getFolderTrackCount(folder);
+	// save track count for this folder
+	if (folder > largeFolders)
+	{
+		uint8_t index = folder - largeFolders - 1;
+		tracksFolderSmall[index] = trackCount;
+	}
+	else
+	{
+		uint8_t index = folder - 1;
+		tracksFolderLarge[index] = trackCount;
+	}
+	return trackCount;
 }
 
 

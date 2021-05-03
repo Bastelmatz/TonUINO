@@ -255,8 +255,6 @@ void TonuinoPlayer::loadFolder(uint16_t numTracksInFolder, MusicDataset * musicD
 	mode = musicDS->mode;
 	endTrack = numTracksInFolder;
 	firstTrack = 1;
-	Serial.print(numTracksInFolder);
-	Serial.println(F(" files in folder "));
 	
 	bool isRandomSectionPair = mode == Section_RandomUniDirectionalPair || mode == Section_RandomBiDirectionalPair;
 	bool isAnyRandomPair = isRandomSectionPair || mode == RandomUniDirectionalPair || mode == RandomBiDirectionalPair;

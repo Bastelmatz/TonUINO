@@ -82,7 +82,7 @@ class TonuinoPlayer
 	static uint16_t endTrack;
 	static bool currentTrackFinished;
 	
-	static const uint8_t queueSize = 255;
+	static const uint8_t queueSize = 100;
 	static uint16_t queue[queueSize];
 	static bool useQueue;
 	static bool singleTrack;

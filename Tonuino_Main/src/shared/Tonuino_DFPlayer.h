@@ -91,7 +91,11 @@ class TonuinoDFPlayer
 	static MusicDataset currentMusicDS;
 	static unsigned long freezeDance_nextStopAtMillis;
 	static bool playCompareTrack;
-	
+	static const uint8_t largeFolders = 15; // 1-15
+	static const uint8_t smallFolders = 84; // 16-99
+	static uint16_t tracksFolderLarge[largeFolders];
+	static uint8_t tracksFolderSmall[smallFolders];
+
 	void goToTrack(ETRACKDIRECTION trackDir);
 	void playCurrentTrack();
 	void playTrack(uint16_t track);
