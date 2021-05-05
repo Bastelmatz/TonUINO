@@ -30,7 +30,8 @@ class TonuinoButton
 	public:
 	uint8_t PIN;
 	uint8_t state;
-		
+	bool stateHandled = false;
+	
 	void setup(uint8_t pin, uint8_t codeClick, uint8_t codeIsPressed, uint8_t codeLongPress);
 	void setState(bool onlyOnce);
 	bool hasAnyState();
@@ -53,6 +54,7 @@ class TonuinoButtons
 	public:
 	void setup(uint8_t pinStartStop, uint8_t pinNext, uint8_t pinPrevious);
 	uint8_t read();
+	void stateHandled();
 	ModifierDataset getPlayerModification(bool isCurrentlyPlaying);
 	ModifierDataset getMenuModification(uint8_t currentValue, uint8_t defaultValue, uint8_t numberOptions);
 	

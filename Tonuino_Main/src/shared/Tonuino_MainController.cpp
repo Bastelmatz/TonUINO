@@ -776,7 +776,7 @@ void handleModifier(EModifier modifier, uint16_t special, bool isCardRemoval)
 		case MODI_TrackNumber:
 		{
 			uint16_t advertTrack = tonuinoPlayer().currentTrackInRange();
-			dfPlayer.playAdvertisementAndWait(advertTrack);
+			dfPlayer.playAdvertisement(advertTrack);
 			break;
 		}
 		case MODI_ShortCut:
@@ -785,9 +785,12 @@ void handleModifier(EModifier modifier, uint16_t special, bool isCardRemoval)
 		}
 		case MODI_Advertisement:
 		{
-			dfPlayer.playAdvertisementAndWait(special);
+			dfPlayer.playAdvertisement(special);
 		}
 	}
+	
+	// prevent multiple modifier handling
+	tonuinoButtons.stateHandled();
 }
 
 void evaluateModifierCardData(MusicDataset * musicDS, bool isCardRemoval)

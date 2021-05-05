@@ -632,14 +632,14 @@ void TonuinoDFPlayer::setFreezeDance(bool active)
 void TonuinoDFPlayer::setMemoryMode(bool active)
 {
 	memoryMode_active = active;
-	playAdvertisementAndWait(active ? 261 : 260);
+	playAdvertisement(active ? 261 : 260);
 	playCompareTrack = false;
 }
 
 void TonuinoDFPlayer::setQuizMode(bool active)
 {
 	quizMode_active = active;
-	playAdvertisementAndWait(active ? 261 : 260);
+	playAdvertisement(active ? 261 : 260);
 	playCompareTrack = false;
 }
 

@@ -12,6 +12,13 @@ void TonuinoButtons::setup(uint8_t pinStartStop, uint8_t pinNext, uint8_t pinPre
 	previousButton.setup(pinPrevious, BUTTONCLICK_Previous, BUTTONPRESSED_Previous, BUTTONPRESSED_LONG_Previous);
 }
 
+void TonuinoButtons::stateHandled()
+{
+	startStopButton.stateHandled = true;
+	nextButton.stateHandled = true;
+	previousButton.stateHandled = true;
+}
+
 uint8_t TonuinoButtons::read()
 {
 	return read(false);
@@ -203,7 +210,15 @@ void TonuinoButton::setState(bool onlyOnce)
 			lastReleasedTime = currentTime;
 		}
 	}
+	bool isWithinClickTime = currentTime - lastPressedTime < 1000;
 	
+	if (stateHandled)
+	{
+		stateHandled = isPressed || isWithinClickTime;
+		state = BUTTONACTION_None;
+		return;
+	}
+
 	uint8_t currentState = BUTTONACTION_None;
 	if (isPressed)
 	{
@@ -219,7 +234,7 @@ void TonuinoButton::setState(bool onlyOnce)
 	}
 	else
 	{
-		if (currentTime - lastPressedTime < 1000)
+		if (isWithinClickTime)
 		{
 			if (!onlyOnce || ignore == false)
 			{
@@ -231,6 +246,7 @@ void TonuinoButton::setState(bool onlyOnce)
 			}
 		}
 	}
+
 	state = currentState;
 }
 
