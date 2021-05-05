@@ -421,12 +421,6 @@ void TonuinoDFPlayer::continueTitle()
 	}
 }
 
-void TonuinoDFPlayer::pauseAndStandBy()
-{
-	mp3.pause();
-	tonuinoPlayer.pauseAndStandBy();
-}
-
 void TonuinoDFPlayer::togglePlay()
 {
 	if (isPlaying()) 
@@ -664,11 +658,16 @@ void TonuinoDFPlayer::loop()
 	mp3.loop();
 }
 
+void TonuinoDFPlayer::pauseAndStandBy()
+{
+	pause();
+	tonuinoPlayer.pauseAndStandBy();
+}
+
 void TonuinoDFPlayer::pause()
 {
 	Serial.println(F("Pause player"));
 	mp3.pause();
-	tonuinoPlayer.pauseAndStandBy();
 }
 
 void TonuinoDFPlayer::sleep()
@@ -699,7 +698,7 @@ uint16_t TonuinoDFPlayer::getFolderTrackCount(uint16_t folder)
 		}
 		playTrack(folder, TRACKNUMBER_SILENCE);
 		delay(100);
-		mp3.pause();
+		pause();
 	}
 	uint16_t trackCount = mp3.getFolderTrackCount(folder);
 	// save track count for this folder
