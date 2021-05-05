@@ -91,6 +91,8 @@ public:
     {
     }
 
+	bool ignoreCheckSum = false;
+		
     void begin(unsigned long baud = 9600)
     {
         _serial.begin(baud);
@@ -391,8 +393,7 @@ private:
         DfMp3_Packet_EndCode,
         DfMp3_Packet_SIZE
     };
-
-
+	
     T_SERIAL_METHOD& _serial;
     uint32_t _lastSend;
     uint16_t _lastSendSpace;
@@ -424,8 +425,17 @@ private:
             00,
             0xEF };
 
-        setChecksum(out);
-
+		if (ignoreCheckSum)
+		{
+			out[DfMp3_Packet_HiByteCheckSum] = 0xEF;
+			out[DfMp3_Packet_LowByteCheckSum] = 00;
+			out[DfMp3_Packet_EndCode] = 00;
+		}
+		else
+		{
+			setChecksum(out);
+		}
+		
         // wait for spacing since last send
         while (((millis() - _lastSend) < _lastSendSpace))
         {
@@ -460,7 +470,6 @@ private:
             {
                 // nothing read
                 *argument = DfMp3_Error_RxTimeout;
-
                 return false;
             }
         } while (in[DfMp3_Packet_StartCode] != 0x7e);
@@ -475,7 +484,7 @@ private:
 
         if (in[DfMp3_Packet_Version] != 0xFF ||
             in[DfMp3_Packet_Length] != 0x06 ||
-            in[DfMp3_Packet_EndCode] != 0xef)
+            in[DfMp3_Packet_EndCode] != 0xEF)
         {
             // invalid version or corrupted packet
             *argument = DfMp3_Error_PacketHeader;
@@ -522,6 +531,7 @@ private:
                         break;
 
                     case 0x3d: // micro sd
+					case 0x4c:
                         T_NOTIFICATION_METHOD::OnPlayFinished(DfMp3_PlaySources_Sd, replyArg);
                         break;
 

@@ -206,8 +206,8 @@ void setupTonuino(TonuinoConfig config)
 	Serial.println(F("created by Bastelmatz."));
 
 	// DFPlayer Mini initialisieren
-	dfPlayer.setup(pinConfig.DFPlayer_Busy, hwConfig.GB3200B);
-
+	dfPlayer.setup(pinConfig.DFPlayer_Busy, hwConfig.Chip_GB3200B, hwConfig.Chip_MH2024_16SS);
+	
 	// set settings
 	dfPlayer.volumeMin = swConfig.VolumeMin;
 	dfPlayer.volumeMax = swConfig.VolumeMax;
@@ -263,10 +263,10 @@ void setupTonuino(TonuinoConfig config)
 	handlePotentiometer();
 	
 	dfPlayer.start();
-	// play startup sound
-	dfPlayer.playMP3AndWait(261);
 	// give DFPlayer some more time to init
 	delay(1000);
+	// play startup sound
+	dfPlayer.playMP3AndWait(261);
 	
 	// load defined or recent folder 
 	MusicDataset startMusicDS = loadStartMusicDS();

@@ -78,7 +78,7 @@ void TonuinoDFPlayer::Mp3Notify::OnPlaySourceRemoved(DfMp3_PlaySources source)
 static SoftwareSerial playerSoftwareSerial = SoftwareSerial(2, 3); // TX, RX
 static DFMiniMp3<SoftwareSerial, TonuinoDFPlayer::Mp3Notify> mp3(playerSoftwareSerial);
 	
-void TonuinoDFPlayer::setup(uint8_t pinBusy, bool hasChip_GB3200B)
+void TonuinoDFPlayer::setup(uint8_t pinBusy, bool hasChip_GB3200B, bool hasChip_MH2024_16SS)
 {
 	pin_Busy = pinBusy;
 	hasGB3200B = hasChip_GB3200B;
@@ -87,6 +87,7 @@ void TonuinoDFPlayer::setup(uint8_t pinBusy, bool hasChip_GB3200B)
 	
 	// DFPlayer Mini initialisieren
 	mp3.begin();
+	mp3.ignoreCheckSum = hasChip_MH2024_16SS;
 	// Zwei Sekunden warten bis der DFPlayer Mini initialisiert ist
 	delay(2000);
 	
@@ -362,14 +363,15 @@ void TonuinoDFPlayer::loadFolder(MusicDataset * dataset, ETRACKDIRECTION trackDi
 	{
 		currentMusicFolder = newFolder;
 		currentMusicDS = *dataset;
-		numTracksInFolder = getFolderTrackCount(currentMusicFolder);
-		
 		Serial.print(F("Load folder "));
 		Serial.print(currentMusicFolder);
 		Serial.print(F(" with mode "));
 		Serial.println(currentMusicDS.mode);
+		
+		numTracksInFolder = getFolderTrackCount(currentMusicFolder);
 		Serial.print(F("Files in folder: "));
 		Serial.println(numTracksInFolder);
+		
 		tonuinoPlayer.loadFolder(numTracksInFolder, &currentMusicDS);
 		musicDSLoaded = true;
 		newMusisDS = true;
@@ -532,6 +534,7 @@ void TonuinoDFPlayer::waitForTrackToFinish()
 	// give the player some time to actually start the track
 	long currentTime = millis();
 	#define TIMEOUT 1000
+	Serial.println(F("Wait until playing..."));
 	do 
 	{
 		mp3.loop();
@@ -551,7 +554,7 @@ void TonuinoDFPlayer::waitForTrackToFinish()
 		//        e.g. only allow/call LED animations, but handle no inputs like buttons
 		//      - Set IsWaiting to false if DFPlayer IsPlaying is false
 		mp3.loop();
-	} while (isPlaying());
+	} while (isPlaying() && activeTrack > 0);
 }
 
 void TonuinoDFPlayer::playAdvertisement(uint16_t advertisement, bool wait)

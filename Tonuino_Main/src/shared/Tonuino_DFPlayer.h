@@ -43,7 +43,7 @@ class TonuinoDFPlayer
 	static bool memoryMode_active;
 	static bool quizMode_active;
 			
-	void setup(uint8_t pinBusy, bool hasChip_GB3200B);
+	void setup(uint8_t pinBusy, bool hasChip_GB3200B, bool hasChip_MH2024_16SS);
 	bool isPlaying();
 	void loadFolder(MusicDataset * dataset);
 	void loadAndPlayFolder(MusicDataset * dataset);

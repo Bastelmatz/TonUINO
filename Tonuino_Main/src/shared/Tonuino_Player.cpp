@@ -327,6 +327,7 @@ void TonuinoPlayer::loadFolder(uint16_t numTracksInFolder, MusicDataset * musicD
 		}
 	}
 
+	Serial.print(F("Current track: "));
 	Serial.println(currentTrackIndex);
 }
 
