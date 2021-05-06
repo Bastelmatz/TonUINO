@@ -263,7 +263,7 @@ void setupTonuino(TonuinoConfig config)
 	handlePotentiometer();
 	
 	dfPlayer.start();
-	// give DFPlayer some more time to init
+	// give DFPlayer some more time to init (otherwise finish event of MP3 track is not generated)
 	delay(1000);
 	// play startup sound
 	dfPlayer.playMP3AndWait(261);

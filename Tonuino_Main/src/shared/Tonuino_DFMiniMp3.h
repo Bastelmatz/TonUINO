@@ -308,7 +308,7 @@ public:
         return listenForReply(0x4e);
     }
 
-    uint16_t getTotalTrackCount(DfMp3_PlaySource source)
+    uint16_t getTotalTrackCount(DfMp3_PlaySource source = DfMp3_PlaySource_Sd)
     {
         drainResponses();
 
