@@ -47,10 +47,26 @@ void TonuinoTimer::disable()
 {
 	activeTime = 0;
 }
+
+// *********************************
+// Counter Class
+// *********************************
+
+void TonuinoCounter::activate()
+{
+	activeTarget = target;
+}
+
+void TonuinoCounter::disable()
+{
+	activeTarget = 0;
+}
+
 // *********************************
 
 TonuinoTimer TonuinoPlayer::standbyTimer;
 TonuinoTimer TonuinoPlayer::sleepTimer;
+TonuinoCounter TonuinoPlayer::sleepCounter;
 
 // *********************************
 // Settings
@@ -134,15 +150,24 @@ void TonuinoPlayer::showTimerInfo()
 	if (sleepTimer.timeInMin > 0)
 	{
 		Serial.print(F("Sleep timer: "));
-		Serial.print(sleepTimer.activeTime);
-		Serial.println(sleepTimer.activeTime > 0 ? "" : " = disabled");
+		showTimerInfo(sleepTimer.timeInMin);
 	}
 	if (standbyTimer.timeInMin > 0)
 	{
 		Serial.print(F("Standby timer: "));
-		Serial.print(standbyTimer.activeTime);
-		Serial.println(standbyTimer.activeTime > 0 ? "" : " = disabled");
+		showTimerInfo(standbyTimer.timeInMin);
 	}
+	if (sleepCounter.target > 0)
+	{
+		Serial.print(F("Sleep counter: "));
+		showTimerInfo(sleepCounter.target);
+	}
+}
+
+void TonuinoPlayer::showTimerInfo(uint8_t value)
+{
+	Serial.print(value);
+	Serial.println(value > 0 ? "" : " = disabled");
 }
 
 void TonuinoPlayer::playTitle()
@@ -152,14 +177,7 @@ void TonuinoPlayer::playTitle()
 	currentTrackFinished = false;
 	standbyTimer.disable();
 	sleepTimer.activate();
-	showTimerInfo();
-}
-
-void TonuinoPlayer::pauseNoStandBy()
-{
-	isPlaying = false;
-	standbyTimer.disable();
-	sleepTimer.disable();
+	sleepCounter.activate();
 	showTimerInfo();
 }
 
@@ -168,6 +186,7 @@ void TonuinoPlayer::pauseAndStandBy()
 	isPlaying = false;
 	standbyTimer.activate();
 	sleepTimer.disable();
+	sleepCounter.disable();
 	showTimerInfo();
 }
 

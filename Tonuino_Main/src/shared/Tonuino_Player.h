@@ -50,11 +50,22 @@ class TonuinoTimer
 	void disable();
 };
 
+class TonuinoCounter
+{
+	public:
+	uint8_t activeTarget = 0;
+	uint8_t target = 0;
+	
+	void activate();
+	void disable();
+};
+
 class TonuinoPlayer
 {
 	public:	
 	static TonuinoTimer sleepTimer;
 	static TonuinoTimer standbyTimer;
+	static TonuinoCounter sleepCounter;
 	
 	static bool isPlaying;
 	static bool singleRepetition;
@@ -67,7 +78,6 @@ class TonuinoPlayer
 	static bool currentTrackStarted;
 		
 	void playTitle();
-	void pauseNoStandBy();
 	void pauseAndStandBy();
 	void trackFinished();
 	void setRandomPlay(bool bValue);
@@ -93,6 +103,7 @@ class TonuinoPlayer
 	uint16_t queueLimit();
 	
 	void showTimerInfo();
+	void showTimerInfo(uint8_t value);
 	void shuffleQueue();
 	bool goToTrack(bool next);
 };

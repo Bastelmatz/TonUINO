@@ -16,11 +16,13 @@ namespace Tonuino_RFID_Tool
         ShortCut,
         Advertisement,
 
-        Player_StandbyTime,
-        Player_SleepTime,
         Player_Volume,
         Player_VolumeUp,
         Player_VolumeDown,
+
+        Player_StandbyTime,
+        Player_SleepTime,
+        Player_SleepCounter,
 
         Player_Random,
         Player_RepeatSingle,
@@ -67,11 +69,13 @@ namespace Tonuino_RFID_Tool
                 new Ident<EModiType>(10, EModiType.ShortCut, "Play Shortcut"),
                 new Ident<EModiType>(11, EModiType.Advertisement, "Play Advertisement"),
 
-                new Ident<EModiType>(20, EModiType.Player_StandbyTime, "Standby Time"),
-                new Ident<EModiType>(21, EModiType.Player_SleepTime, "Sleep Time"),
-                new Ident<EModiType>(22, EModiType.Player_Volume, "Volume"),
-                new Ident<EModiType>(23, EModiType.Player_VolumeUp, "Volume Up"),
-                new Ident<EModiType>(24, EModiType.Player_VolumeDown, "Volume Down"),
+                new Ident<EModiType>(20, EModiType.Player_Volume, "Volume"),
+                new Ident<EModiType>(21, EModiType.Player_VolumeUp, "Volume Up"),
+                new Ident<EModiType>(22, EModiType.Player_VolumeDown, "Volume Down"),
+
+                new Ident<EModiType>(25, EModiType.Player_StandbyTime, "Standby Time"),
+                new Ident<EModiType>(26, EModiType.Player_SleepTime, "Sleep Time"),
+                new Ident<EModiType>(27, EModiType.Player_SleepCounter, "Sleep Counter"),
 
                 new Ident<EModiType>(30, EModiType.Player_Random, "Play Random"),
                 new Ident<EModiType>(31, EModiType.Player_RepeatSingle, "Repeat Single Track"),
@@ -134,9 +138,10 @@ namespace Tonuino_RFID_Tool
                 {
                     case EModiType.ShortCut:
                     case EModiType.Advertisement:
+                    case EModiType.Player_Volume:
                     case EModiType.Player_StandbyTime:
                     case EModiType.Player_SleepTime:
-                    case EModiType.Player_Volume: return true;
+                    case EModiType.Player_SleepCounter: return true;
                 }
                 return false;
             }

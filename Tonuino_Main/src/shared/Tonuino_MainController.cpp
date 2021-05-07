@@ -60,6 +60,11 @@ void setSleepTimerValue(uint8_t timeInMin)
 	tonuinoPlayer().sleepTimer.timeInMin = timeInMin;
 }
 
+void setSleepCounterValue(uint8_t targetCount)
+{
+	tonuinoPlayer().sleepCounter.target = targetCount;
+}
+
 MusicDataset loadStartMusicDS()
 {
 	if (swConfig.StartMusicDS.startFolder == 0)
@@ -216,7 +221,8 @@ void setupTonuino(TonuinoConfig config)
 	dfPlayer.setEqualizer(swConfig.Equalizer);
 	setStandbyTimerValue(swConfig.StandbyTimeInMin);
 	setSleepTimerValue(swConfig.SleepTimeInMin);
-
+	setSleepCounterValue(swConfig.SleepTargetCount);
+	
 	// NFC Leser initialisieren
 	if (hwConfig.CardReader)
 	{
@@ -705,10 +711,6 @@ void handleModifier(EModifier modifier, uint16_t special, bool isCardRemoval)
 			dfPlayer.playMp3Track(999); 
 			break;
 		}
-		case MODI_Player_SleepTime:
-		{
-			setSleepTimerValue(special); break;
-		}
 		case MODI_Player_Volume:
 		{
 			dfPlayer.setVolume(special); break;
@@ -720,6 +722,14 @@ void handleModifier(EModifier modifier, uint16_t special, bool isCardRemoval)
 		case MODI_Player_VolumeDown:
 		{
 			dfPlayer.volumeDown(); break;
+		}
+		case MODI_Player_SleepTime:
+		{
+			setSleepTimerValue(special); break;
+		}
+		case MODI_Player_SleepCounter:
+		{
+			setSleepCounterValue(special); break;
 		}
 		case MODI_Player_Random:
 		{

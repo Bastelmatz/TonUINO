@@ -16,11 +16,13 @@ enum EModifier
 	MODI_ShortCut = 10,
 	MODI_Advertisement = 11,
 	
-	MODI_Player_StandbyTime = 20,
-	MODI_Player_SleepTime = 21,
-	MODI_Player_Volume = 22,
-	MODI_Player_VolumeUp = 23,
-	MODI_Player_VolumeDown = 24,
+	MODI_Player_Volume = 20,
+	MODI_Player_VolumeUp = 21,
+	MODI_Player_VolumeDown = 22,
+	
+	MODI_Player_StandbyTime = 25,
+	MODI_Player_SleepTime = 26,
+	MODI_Player_SleepCounter = 27,
 	
 	MODI_Player_Random = 30,
 	MODI_Player_RepeatSingle = 31,
