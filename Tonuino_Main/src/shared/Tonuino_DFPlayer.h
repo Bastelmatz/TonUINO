@@ -18,6 +18,14 @@ enum ECOMPARERESULT
 	COMPARE_WRONG = 3,
 };
 
+enum EDFPLAYER_MODE
+{
+	DFPLAYER_MODE_NORMAL = 0,
+	DFPLAYER_MODE_MEMORY = 1,
+	DFPLAYER_MODE_QUIZ = 2, 	
+	DFPLAYER_MODE_FREEZEDANCE = 3,
+};
+
 class TonuinoDFPlayer
 {
 	public:
@@ -39,9 +47,7 @@ class TonuinoDFPlayer
 	static uint8_t volumeMax;
 	static uint8_t volumeIncrement;
 	static bool musicDSLoaded;
-	static bool freezeDance_active;
-	static bool memoryMode_active;
-	static bool quizMode_active;
+	static EDFPLAYER_MODE actionMode;
 			
 	void setup(uint8_t pinBusy, bool hasChip_GB3200B, bool hasChip_MH2024_16SS);
 	bool isPlaying();

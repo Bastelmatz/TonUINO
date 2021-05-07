@@ -431,7 +431,7 @@ void onNewMusicCard()
 			mode == RandomFolder_Album || 
 			mode == RandomFolder_Party)
 		{
-			if (!dfPlayer.quizMode_active && !dfPlayer.memoryMode_active)
+			if (dfPlayer.actionMode == DFPLAYER_MODE_NORMAL)
 			{
 				tonuinoEEPROM.writeToFlash_RecentMusicDS(recentCardMusicDS);
 				recentMusicDSinEEPROM = recentCardMusicDS;
@@ -745,15 +745,15 @@ void handleModifier(EModifier modifier, uint16_t special, bool isCardRemoval)
 		}
 		case MODI_Player_FreezeDance:
 		{
-			dfPlayer.setFreezeDance(toggle ? !dfPlayer.freezeDance_active : bValue); break;
+			dfPlayer.setFreezeDance(toggle ? dfPlayer.actionMode != DFPLAYER_MODE_FREEZEDANCE : bValue); break;
 		}
 		case MODI_Player_Memory:
 		{
-			dfPlayer.setMemoryMode(toggle ? !dfPlayer.memoryMode_active : bValue); break;
+			dfPlayer.setMemoryMode(toggle ? dfPlayer.actionMode != DFPLAYER_MODE_MEMORY : bValue); break;
 		}
 		case MODI_Player_Quiz:
 		{
-			dfPlayer.setQuizMode(toggle ? !dfPlayer.quizMode_active : bValue); break;
+			dfPlayer.setQuizMode(toggle ? dfPlayer.actionMode != DFPLAYER_MODE_QUIZ : bValue); break;
 		}
 		case MODI_TrackContinue:
 		{

@@ -22,11 +22,10 @@ uint16_t TonuinoDFPlayer::numTracksInFolder = 0;
 bool TonuinoDFPlayer::musicDSLoaded = false;
 bool TonuinoDFPlayer::newMusisDS = false;
 
-bool TonuinoDFPlayer::freezeDance_active = false;
+EDFPLAYER_MODE TonuinoDFPlayer::actionMode = DFPLAYER_MODE_NORMAL;
+
 unsigned long TonuinoDFPlayer::freezeDance_nextStopAtMillis = 0;
 
-bool TonuinoDFPlayer::memoryMode_active = false;
-bool TonuinoDFPlayer::quizMode_active = false;
 bool TonuinoDFPlayer::playCompareTrack = false;
 
 uint16_t TonuinoDFPlayer::tracksFolderLarge[largeFolders];
@@ -174,7 +173,7 @@ ECOMPARERESULT TonuinoDFPlayer::playOrCompareTrack(MusicDataset * compareMusicDS
 {
 	uint8_t mode = compareMusicDS->mode;
 	uint16_t currentTrack = tonuinoPlayer.currentTrack();
-	bool activeMemoryOrQuiz = memoryMode_active || quizMode_active;
+	bool activeMemoryOrQuiz = actionMode == DFPLAYER_MODE_MEMORY || actionMode == DFPLAYER_MODE_QUIZ;
 	
 	bool folderMatch = currentMusicFolder == compareMusicDS->startFolder || currentMusicFolder == compareMusicDS->endFolder;
 	bool match = currentTrack == compareMusicDS->startTrack && folderMatch;
@@ -184,13 +183,15 @@ ECOMPARERESULT TonuinoDFPlayer::playOrCompareTrack(MusicDataset * compareMusicDS
 		match |= folderMatch && (currentTrack == compareMusicDS->endTrack || currentTrack == compareMusicDS->recentTrack);
 	}
 	
-	bool useCompareFolder = playCompareTrack && (!memoryMode_active || isNewCard); // repeat first track on card return with active memory mode 
+	bool useCompareFolder = playCompareTrack && (actionMode != DFPLAYER_MODE_MEMORY || isNewCard); // repeat first track on card return with active memory mode 
 	bool isCardReturn = !isNewCard && !isCardGone;
 	bool isFixPair = mode == UniDirectionalPair || mode == BiDirectionalPair;
 	bool isRandomPair = mode == RandomUniDirectionalPair || mode == RandomBiDirectionalPair || mode == Section_RandomUniDirectionalPair || mode == Section_RandomBiDirectionalPair;
 	bool isRandomSingle = mode == AudioDrama || mode == Section_AudioDrama;
 	bool isAnyPair = isFixPair || isRandomPair;
 	
+	Serial.print(F("action mode: "));
+	Serial.println(actionMode);
 	if (isCardGone)
 	{
 		// resolve pair (play second track on card removal)
@@ -246,7 +247,7 @@ ECOMPARERESULT TonuinoDFPlayer::playOrCompareTrack(MusicDataset * compareMusicDS
 		}
 		if (!playCompareTrack)
 		{
-			if (!quizMode_active)
+			if (actionMode != DFPLAYER_MODE_QUIZ)
 			{
 				loadAndPlayFolder(compareMusicDS);
 				playCompareTrack = true;
@@ -268,7 +269,7 @@ ECOMPARERESULT TonuinoDFPlayer::playOrCompareTrack(MusicDataset * compareMusicDS
 
 void TonuinoDFPlayer::tryPlayCompareTrack(MusicDataset * compareMusicDS, bool useCompareFolder, bool useMatchingTrack)
 {
-	bool activeMemoryOrQuiz = memoryMode_active || quizMode_active;
+	bool activeMemoryOrQuiz = actionMode == DFPLAYER_MODE_MEMORY || actionMode == DFPLAYER_MODE_QUIZ;
 	
 	uint16_t track = tonuinoPlayer.currentTrack();
 	if (!useMatchingTrack && activeMemoryOrQuiz)
@@ -294,7 +295,7 @@ void TonuinoDFPlayer::tryPlayCompareTrack(MusicDataset * compareMusicDS, bool us
 	
 	if (useCompareFolder || !activeMemoryOrQuiz)
 	{
-		if (!quizMode_active || useMatchingTrack) // for quiz: stay in compare mode until rigth answer was shown (match)
+		if (actionMode != DFPLAYER_MODE_QUIZ || useMatchingTrack) // for quiz: stay in compare mode until rigth answer was shown (match)
 		{
 			playCompareTrack = !playCompareTrack;
 		}
@@ -437,7 +438,7 @@ void TonuinoDFPlayer::goToTrack(ETRACKDIRECTION trackDir)
 {
 	if (playCompareTrack)
 	{
-		if (quizMode_active)
+		if (actionMode == DFPLAYER_MODE_QUIZ)
 		{
 			tryPlayCompareTrack(&currentMusicDS, true, true);
 			return;
@@ -448,7 +449,7 @@ void TonuinoDFPlayer::goToTrack(ETRACKDIRECTION trackDir)
 	{
 		reloadFolder(trackDir);
 		playCurrentTrack();
-		if (quizMode_active)
+		if (actionMode == DFPLAYER_MODE_QUIZ)
 		{
 			playCompareTrack = true;
 		}
@@ -620,7 +621,7 @@ void TonuinoDFPlayer::setNextStopAtMillis()
 	
 void TonuinoDFPlayer::setFreezeDance(bool active)
 {
-	freezeDance_active = active;
+	actionMode = active ? DFPLAYER_MODE_FREEZEDANCE : DFPLAYER_MODE_NORMAL;
 	if (active)
 	{
 		playAdvertisementAndWait(300);
@@ -631,21 +632,21 @@ void TonuinoDFPlayer::setFreezeDance(bool active)
 
 void TonuinoDFPlayer::setMemoryMode(bool active)
 {
-	memoryMode_active = active;
+	actionMode = active ? DFPLAYER_MODE_MEMORY : DFPLAYER_MODE_NORMAL;
 	playAdvertisement(active ? 261 : 260);
 	playCompareTrack = false;
 }
 
 void TonuinoDFPlayer::setQuizMode(bool active)
 {
-	quizMode_active = active;
+	actionMode = active ? DFPLAYER_MODE_QUIZ : DFPLAYER_MODE_NORMAL;
 	playAdvertisement(active ? 261 : 260);
 	playCompareTrack = false;
 }
 
 void TonuinoDFPlayer::loop()
 {
-	if (freezeDance_active)
+	if (actionMode == DFPLAYER_MODE_FREEZEDANCE)
 	{
 		if (millis() > freezeDance_nextStopAtMillis) 
 		{
