@@ -13,6 +13,8 @@ uint16_t TonuinoPlayer::secondTrack = 0;
 uint16_t TonuinoPlayer::thirdTrack = 0;
 uint16_t TonuinoPlayer::endTrack = 0;
 
+uint8_t TonuinoPlayer::tracksPlayedInARow = 0;
+
 // Array size can be reduced (e.g. to 100) to free dynamic memory.
 // As queue is only used for random play and reshuffled at the end, 
 //  ... it shouldn't be noticable for the user that not all tracks are played once before repetition
@@ -172,9 +174,15 @@ void TonuinoPlayer::showTimerInfo(uint8_t value)
 
 void TonuinoPlayer::playTitle()
 {
-	isPlaying = true;
 	currentTrackStarted = true;
 	currentTrackFinished = false;
+	tracksPlayedInARow++;
+	continueTitle();
+}
+
+void TonuinoPlayer::continueTitle()
+{
+	isPlaying = true;
 	standbyTimer.disable();
 	sleepTimer.activate();
 	sleepCounter.activate();
@@ -188,6 +196,7 @@ void TonuinoPlayer::pauseAndStandBy()
 	sleepTimer.disable();
 	sleepCounter.disable();
 	showTimerInfo();
+	tracksPlayedInARow = 0;
 }
 
 void TonuinoPlayer::trackFinished()
@@ -204,6 +213,17 @@ void TonuinoPlayer::trackFinished()
 	{
 		Serial.println(F("Nur einen Titel spielen -> keinen neuen Titel spielen"));
 		pauseAndStandBy();
+	}
+	
+	if (sleepCounter.activeTarget > 0 && tracksPlayedInARow >= sleepCounter.activeTarget)
+	{
+		Serial.println(F("Sleep by counter"));
+		pauseAndStandBy();
+		// set standby timer to current time to immediately trigger shutdown
+		if (standbyTimer.timeInMin > 0)
+		{
+			standbyTimer.activeTime = millis();
+		}
 	}
 }
 

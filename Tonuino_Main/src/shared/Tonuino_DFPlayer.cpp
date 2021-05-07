@@ -413,7 +413,7 @@ void TonuinoDFPlayer::continueTitle()
 	if (tonuinoPlayer.currentTrackStarted)
 	{
 		start(); // Continue
-		tonuinoPlayer.playTitle();
+		tonuinoPlayer.continueTitle();
 	}
 	else
 	{

@@ -78,6 +78,7 @@ class TonuinoPlayer
 	static bool currentTrackStarted;
 		
 	void playTitle();
+	void continueTitle();
 	void pauseAndStandBy();
 	void trackFinished();
 	void setRandomPlay(bool bValue);
@@ -93,6 +94,7 @@ class TonuinoPlayer
 	static uint16_t thirdTrack;
 	static uint16_t endTrack;
 	static bool currentTrackFinished;
+	static uint8_t tracksPlayedInARow;
 	
 	static const uint8_t queueSize = 100;
 	static uint16_t queue[queueSize];
