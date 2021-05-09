@@ -76,7 +76,8 @@ class TonuinoPlayer
 	uint16_t currentTrack();
 	uint16_t currentTrackInRange();
 	static bool currentTrackStarted;
-		
+	static bool currentTrackFinished;
+			
 	void playTitle();
 	void continueTitle();
 	void pauseAndStandBy();
@@ -93,7 +94,6 @@ class TonuinoPlayer
 	static uint16_t secondTrack;
 	static uint16_t thirdTrack;
 	static uint16_t endTrack;
-	static bool currentTrackFinished;
 	static uint8_t tracksPlayedInARow;
 	
 	static const uint8_t queueSize = 100;

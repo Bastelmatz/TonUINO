@@ -222,7 +222,7 @@ ECOMPARERESULT TonuinoDFPlayer::playOrCompareTrack(MusicDataset * compareMusicDS
 		}
 		if (!isFixPair)
 		{
-			if (stopOnCardRemoval || !isPlaying())
+			if (stopOnCardRemoval || (!isPlaying() && !tonuinoPlayer.currentTrackFinished))
 			{
 				continueTitle();
 			}
