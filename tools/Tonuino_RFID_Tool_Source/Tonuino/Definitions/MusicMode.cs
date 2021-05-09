@@ -109,7 +109,7 @@ namespace Tonuino_RFID_Tool
             }
         }
 
-        public bool UseEndFolder
+        public bool UseEndFolderBehindStartFolder
         {
             get
             {
@@ -122,7 +122,15 @@ namespace Tonuino_RFID_Tool
                     case EMusicMode.RandomFolder_Album:
                     case EMusicMode.RandomFolder_Party: return true;
                 }
-                if (UseCompareFolder)
+                return false;
+            }
+        }
+
+        public bool UseEndFolder
+        {
+            get
+            {
+                if (UseEndFolderBehindStartFolder || UseCompareFolder)
                 {
                     return true;
                 }

@@ -581,7 +581,11 @@ namespace Tonuino_RFID_Tool
         private void textBoxEndFolder_TextChanged(object sender, EventArgs e)
         {
             int min = 0;
-            int.TryParse(textBoxStartFolder.Text, out min);
+            MusicMode mode = (MusicMode)comboBox_MusicCardModes.SelectedItem;
+            if (mode != null && mode.UseEndFolderBehindStartFolder)
+            {
+                int.TryParse(textBoxStartFolder.Text, out min);
+            }
             limitText(textBoxEndFolder, Math.Max(min, 1), CardData.MAX_FOLDER);
             updateWriteDataControls();
         }
