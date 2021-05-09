@@ -175,7 +175,9 @@ ECOMPARERESULT TonuinoDFPlayer::playOrCompareTrack(MusicDataset * compareMusicDS
 	uint16_t currentTrack = tonuinoPlayer.currentTrack();
 	bool activeMemoryOrQuiz = actionMode == DFPLAYER_MODE_MEMORY || actionMode == DFPLAYER_MODE_QUIZ;
 	
-	bool folderMatch = currentMusicFolder == compareMusicDS->startFolder || currentMusicFolder == compareMusicDS->endFolder;
+	bool folderMatch = currentMusicFolder == compareMusicDS->startFolder || 
+					   currentMusicFolder == compareMusicDS->endFolder ||
+					   currentMusicDS.endFolder == compareMusicDS->startFolder;
 	bool match = currentTrack == compareMusicDS->startTrack && folderMatch;
 	bool isAnyFixSingleTrio = mode == Single || mode == UniDirectionalPair || mode == BiDirectionalPair;
 	if (isAnyFixSingleTrio)
@@ -190,7 +192,7 @@ ECOMPARERESULT TonuinoDFPlayer::playOrCompareTrack(MusicDataset * compareMusicDS
 	bool isRandomSingle = mode == AudioDrama || mode == Section_AudioDrama;
 	bool isAnyPair = isFixPair || isRandomPair;
 	
-	Serial.print(F("action mode: "));
+	Serial.print(F("Action mode: "));
 	Serial.println(actionMode);
 	if (isCardGone)
 	{
