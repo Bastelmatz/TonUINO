@@ -1,7 +1,57 @@
 # TonUINO Mira
-RFID-Musikbox mit Arduino Nano und DFPlayer
+RFID-Musicbox with Arduino Nano and DFPlayer
 
-# Content
+# Content - Overview
+			
+- Player modes:
+	- Memory
+	- Quiz
+	- Freeze Dance
+- New  music modes:
+	- Uni/Bi-Directional Pair
+	- Random Uni/Bi-Directional Pair
+	- Random Folder
+- Up to 3 tracks for Single and Uni/Bi-Directional-Pair music modes
+- Player extensions:
+	- Advertisement folder 
+	- End-Folder 
+	- Large Folder
+- Card Handling:
+	- Play next track on card return
+	- Modes and modifiers that activates on card removal
+	- "Stop on card removal", disabled by default
+	- Option to really reset card (write 0s)
+- Auto pause and shutdown:
+	- Standby timer
+	- Sleep timer
+	- Sleep counter
+- Hardware Support
+	- DFPlayer chip GB3200B and MH2024K-16SS
+	- Stop-LED (lights when player is paused)
+	- LED animation (12 neopixel)
+	- Ultrasonic sensor (used for track start in coinbox)
+	- Buttons:
+		- 3 Buttons for start/pause, previous and next track
+		- On long press:
+			- Previous/next button while playing: Play first/last track 
+			- Previous/next/start button while not playing: Play shortcut 2-4
+	- Volume Control:
+		- Potentiometer
+		- Rotary encoder
+- Miscellaneous:
+	- Tonuino RFID Tool (to read and write RFID tags)
+	- Save recent track and folder for cards with any audiobook mode on RFID card instead of EEPROM
+	- Save recent music dataset to EEPROM (to start on next power-up without card)
+	- Start-up music dataset
+- Code refactoring:
+	- Replace JCButton library with own implementation
+	- Nearly all original Tonuino code refactored
+	- Use multiple .cpp/.h files
+	- Remove admin menu and settings
+	- Central modifier handling, with dozens of modifiers
+
+	
+# Content - In Detail
 
 ## Support for large folder
 - Folder 1-15 can have upto 3000 tracks
@@ -12,6 +62,7 @@ RFID-Musikbox mit Arduino Nano und DFPlayer
 
 ## Support for Advertisement folder for music cards 
 -> Set Folder to 100
+- Works not with DFPlayer chip MH2024K-16SS and GB3200B
 - Therefore, advertisement music cards with single mode can be used for memory
 	-> Listen to your favourite Tonuino songs while playing memory
 
@@ -77,6 +128,20 @@ RFID-Musikbox mit Arduino Nano und DFPlayer
 		-> jumps to last track in last folder for last track action
 	- Party, AudioDrama -> jumps to random folder on next track action
 
+## Up to 3 tracks for Single and Uni/Bi-Directional-Pair music modes
+- Second fix track (uses bytes of end track)
+- Third fix track (uses bytes of recent track)
+- On play next/previous: 1. track -> 2. track -> 3. track -> 1. track -> ...
+- In memory and quiz mode: match if track 1 or 2 or 3 matches
+
+## Auto Pause and Shutdown
+- Standby Timer
+	- Shutdown the Tonuino after a defined time (if supported by hardware)
+- Sleep Timer
+	- Pause Tonuino after a defined time (and shutdown if possible)
+- Sleep Counter
+	- Pause Tonuino after defined number of tracks were played (and shutdown if possible)
+
 ## Music Modes - Definitions
 
 	AudioDrama = 1
@@ -135,11 +200,13 @@ RFID-Musikbox mit Arduino Nano und DFPlayer
 	MODI_ShortCut = 10
 	MODI_Advertisement = 11
 	
-	MODI_Player_StandbyTime = 20
-	MODI_Player_SleepTime = 21
-	MODI_Player_Volume = 22
-	MODI_Player_VolumeUp = 23
-	MODI_Player_VolumeDown = 24
+	MODI_Player_Volume = 20
+	MODI_Player_VolumeUp = 21
+	MODI_Player_VolumeDown = 22
+	
+	MODI_Player_StandbyTime = 25
+	MODI_Player_SleepTime = 26
+	MODI_Player_SleepCounter = 27
 	
 	MODI_Player_Random = 30
 	MODI_Player_RepeatSingle = 31
@@ -202,6 +269,20 @@ RFID-Musikbox mit Arduino Nano und DFPlayer
 ############################################################
 	
 # Change Log
+
+## Version Mira 1.2 (10.05.2021)
+- Support for DFPlayer chip GB3200B and MH2024K-16SS
+- Sleep Counter
+- Multiple fixes for player 
+- Fix compare track handling
+- Integrate DFPlayer 1.0.7 by Makuna
+- Pause player after ultrasonic coin sound (instead of before)
+- Allow all modes for quiz mode first track
+- Save track count to array during getFolderTrackCount
+- Reduce queue size to 100
+- Prevent multiple modifier handling caused by pressed button
+- Play next track on card return, when previous track has finished
+
 
 ## Version Mira 1.1 (19.04.2021)
 - Add support for large folders (1-15) with upto 3000 songs (requires 4 digit track number pattern: 0256.mp3 to 3000.mp3)
